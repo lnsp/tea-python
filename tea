@@ -1,0 +1,58 @@
+#!/usr/bin/python3
+# -*- mode: python -*-
+# vi: set ft=python :
+import collections
+
+TEA_VERSION = "1.0.0"
+TEA_TITLE = "Tea @" + TEA_VERSION
+CLI_SYMBOL = "#> "
+CLI_SPACE = " " * 3
+CLI_NULL = 0
+CLI_CONTINUE = -1
+CLI_EXIT = -2
+
+def main():
+    # print application title
+    print(TEA_TITLE)
+
+    # run REPL
+    result = (CLI_NULL,)
+    while result[0] != CLI_EXIT:
+        result = run(input(CLI_SYMBOL), result)
+        while result[0] == CLI_CONTINUE:
+            result = run(input(CLI_SPACE), result)
+
+# eval the abstract syntax tree
+def eval(ast):
+    return
+
+# parse the tokens to an abstract syntax tree
+def parse(tokens):
+    return
+
+# tokenize, classify characters, whitespaces, literals
+def tokenize(command):
+    return
+
+# run a command with a call context
+def run(command, call):
+    call = call if len(call) > 1 else (call, default_context(),)
+
+    if command == "continue":
+        return (CLI_CONTINUE,)
+    elif command == "exit":
+        return (CLI_EXIT,)
+    else:
+        return (CLI_NULL,)
+
+def default_context():
+    context = tree()
+    # init context here
+    return context
+
+# infinite dict tree
+def tree():
+    return collections.defaultdict(tree)
+
+if __name__ == "__main__":
+    main()
