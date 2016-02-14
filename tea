@@ -11,94 +11,203 @@ CLI_NULL = 0
 CLI_CONTINUE = -1
 CLI_EXIT = -2
 
-REGEX_OPERATOR = "^[+\-]+$"
+REGEX_OPERATOR = "^[+\-;]+$"
 REGEX_WHITESPACE = "^\s+$"
 REGEX_NUMBER = "^\-?[0-9]+(\.[0-9]+)?$"
 REGEX_IDENTIFIER = "^[a-zA-Z_]+([0-9a-zA-Z_]+)?$"
 REGEX_STRING = "^\"[^\\n\\r\"]*\"?$"
 
-def is_operator(item, context):
+TOKEN_WHITESPACE = "whitespace"
+TOKEN_STR_LITERAL = "str_literal"
+TOKEN_IDENTIFIER = "identifier"
+TOKEN_NUM_LITERAL = "num_literal"
+TOKEN_OPERATOR = "operator"
+
+def is_operator(item):
     return re.match(REGEX_OPERATOR, item)
 
-def is_identifier(item, context):
+def is_identifier(item):
     return re.match(REGEX_IDENTIFIER, item)
 
-def is_whitespace(item, context):
+def is_whitespace(item):
     return re.match(REGEX_WHITESPACE, item)
 
-def is_number_literal(item, context):
+def is_number_literal(item):
     return re.match(REGEX_NUMBER, item)
 
-def is_string_literal(item, context):
+def is_string_literal(item):
     return re.match(REGEX_STRING, item)
 
 TOKEN_TYPES = {
-    "whitespace": {
-        "name": "whitespace",
+    TOKEN_WHITESPACE: {
+        "name": TOKEN_WHITESPACE,
         "match": is_whitespace,
     },
-    "operator": {
-        "name": "operator",
+    TOKEN_OPERATOR: {
+        "name": TOKEN_OPERATOR,
         "match": is_operator,
     },
-    "identifier": {
-        "name": "identifier",
+    TOKEN_IDENTIFIER: {
+        "name": TOKEN_IDENTIFIER,
         "match": is_identifier,
     },
-    "num_literal": {
-        "name": "num_literal",
+    TOKEN_NUM_LITERAL: {
+        "name": TOKEN_NUM_LITERAL,
         "match": is_number_literal,
     },
-    "str_literal": {
-        "name": "str_literal",
+    TOKEN_STR_LITERAL: {
+        "name": TOKEN_STR_LITERAL,
         "match": is_string_literal,
     }
 }
 
+DATA_INTEGER = "Integer" # Any integer number
+DATA_FLOAT = "Float" # Any floating point number
+DATA_BOOLEAN = "Boolean" # true / false
+DATA_STRING = "String" # Any string value
+DATA_REFERENCE = "Reference"  # Name reference
+DATA_NONE = "None" # None / null value
 
-# eval the infix notation
-def eval(prefix):
-    return
+def store_value(data_type, data):
+    return { "type": data_type, "data": data }
+
+def store_none():
+    return store_value(DATA_NONE, None)
+
+NODE_SEQUENCE = "sequence"
+NODE_BRANCH = "branch"
+NODE_RETURN = "return"
+# TODO: Add loops and functions
+NODE_OPERATOR = "operator"
+NODE_IDENTIFIER = "identifier"
+NODE_LITERAL = "literal"
+
+BEHAVIOUR_DEFAULT = "default" # do nothing special
+BEHAVIOUR_RETURN = "return" # return, but reset to nothing
+BEHAVIOUR_BREAK = "break" # return, dont reset (handled by loop)
+BEHAVIOUR_CONTINUE = "continue" # return, dont reset (handled by loop)
+BEHAVIOUR_EXIT = "exit"
+
+class ASTNode:
+    def __init__(self, node_type, node_data):
+        self.children = []
+        self.type = node_type
+        self.data = node_data
+
+    def eval(self, context):
+        return self.type["execution"](self, context)
+
+    def add_child(node):
+        self.children.append(node)
+
+# evaluates a sequence of expressions, loops or branches
+def eval_sequence(node, context):
+    context["behaviour"] = BEHAVIOUR_DEFAULT
+    last_value = store_none()
+
+    for item in node.children:
+        last_value = item.eval(context)
+        if (context["behaviour"] != BEHAVIOUR_DEFAULT):
+            break
+
+    return last_value
+
+# evaluates a n-component branch (if, else-if, else)
+def eval_branch(node, context):
+    for branch in node.children[:-1]: # all if / else if branches
+        if branch.children[0].eval(context): # condition ->
+            return branch.children[1].eval(context) # execution
+    return branch.children[-1] # else branch
+
+# evaluates an operator and returns the resulting value
+def eval_operator(node, context):
+    pass
+
+# evaluates an identifier and returns the resulting value
+def eval_identifier(node, context):
+    pass
+
+# evaluates an literal and returns the resulting value
+def eval_literal(node, context):
+    pass
+
+# evaluates a return statement
+def eval_return(node, context):
+    pass
+
+NODE_TYPES = {
+    NODE_SEQUENCE: {
+        "name": NODE_SEQUENCE,
+        "execution": eval_sequence,
+    },
+    NODE_BRANCH: {
+        "name": NODE_BRANCH,
+        "execution": eval_branch,
+    },
+    NODE_OPERATOR: {
+        "name": NODE_OPERATOR,
+        "execution": eval_operator,
+    },
+    NODE_IDENTIFIER: {
+        "name": NODE_IDENTIFIER,
+        "execution": eval_identifier,
+    },
+    NODE_LITERAL: {
+        "name": NODE_LITERAL,
+        "execution": eval_literal,
+    },
+    NODE_RETURN: {
+        "name": NODE_RETURN,
+        "execution": None,
+    }
+}
+
+def syntax_tree():
+    root = ASTNode(NODE_TYPES[NODE_SEQUENCE], None)
+    return root
+
+# eval the ast notation
+def execute(syntax_tree, context):
+    syntax_tree.eval(context)
+    if context["behaviour"] == BEHAVIOUR_EXIT:
+        context["status"] = CLI_EXIT
 
 # parse the tokens to an infix notation
-def parse(prefix):
-    return
+def parse(tokens):
+    # TODO: Implement parser
+    return syntax_tree()
 
 # tokenize, classify characters, whitespaces, literals
-def tokenize(command, context):
+def tokenize(expression):
     token = { "value": "", "type": None }
     token_list = []
 
     # scan each character
-    for char in command:
+    for char in expression:
         exp = token["value"] + char
-        if token["type"] != None and token["type"]["match"](exp, context):
+        if token["type"] != None and token["type"]["match"](exp):
             token["value"] = exp
         else:
             if token["type"] != None:
                 token_list.append(token)
-            token = { "value" : char, "type": match_type(char, context) }
+            token = { "value" : char, "type": match_type(char) }
 
     token_list.append(token)
     return token_list
 
 # searches for a matching type, returns None when no match is found
-def match_type(char, context):
+def match_type(char):
     for _, candidate in TOKEN_TYPES.items():
-        if candidate["match"](char, context):
+        if candidate["match"](char):
             return candidate
     return None
 
 # run a command with a call context
-def run(command, call):
-    call = call if len(call) > 1 else (call, default_context(),)
-
-    if command == "exit":
-        return (CLI_EXIT,)
+def interpret(expression, context):
+    if expression == "exit":
+        context["status"] = CLI_EXIT
     else:
-        # print tokens
-        print(tokenize(command, call[1]))
-        return (CLI_NULL,)
+        execute(parse(tokenize(expression)), context)
 
 def default_context():
     context = tree()
@@ -115,13 +224,14 @@ def main():
     print(TEA_TITLE)
 
     # run REPL
-    result = (CLI_NULL,)
-    while result[0] != CLI_EXIT:
-        result = run(input(CLI_SYMBOL), result)
-        while result[0] == CLI_CONTINUE:
-            result = run(input(CLI_SPACE), result)
-        if len(result) > 2:
-            print(result[2])
+    context = tree()
+    while context["status"] != CLI_EXIT:
+        context["status"] = CLI_NULL
+        context["output"] = None
+        interpret(input(CLI_SYMBOL), context)
+        while context["status"] == CLI_CONTINUE:
+            interpret(input(CLI_SPACE), context)
+        print(context["output"])
 
 if __name__ == "__main__":
     main()

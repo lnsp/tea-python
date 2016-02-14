@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 ## [Unreleased]
 ### Added
 - String literals
+- Expression executer
+
+### Changed
+- Enhanced tokenizer speed
 
 ## [0.0.2]
 ### Added
