@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- mode: python -*-
 # vi: set ft=python :
-import collections
+import collections, re
 
 TEA_VERSION = "1.0.0"
 TEA_TITLE = "Tea @" + TEA_VERSION
@@ -10,6 +10,105 @@ CLI_SPACE = " " * 3
 CLI_NULL = 0
 CLI_CONTINUE = -1
 CLI_EXIT = -2
+
+REGEX_OPERATOR = "^[+\-]+$"
+REGEX_WHITESPACE = "^\s+$"
+REGEX_NUMBER = "^\-?[0-9]+(\.[0-9]+)?$"
+REGEX_IDENTIFIER = "^[a-zA-Z_]+([0-9a-zA-Z_]+)?$"
+REGEX_STRING = "" # TODO: Add regex for string
+
+def is_operator(item, context):
+    return re.match(REGEX_OPERATOR, item)
+
+def is_identifier(item, context):
+    return re.match(REGEX_IDENTIFIER, item)
+
+def is_whitespace(item, context):
+    return re.match(REGEX_WHITESPACE, item)
+
+def is_number_literal(item, context):
+    return re.match(REGEX_NUMBER, item)
+
+def is_string_literal(item, context):
+    return False # TODO: Add string regex here
+
+TOKEN_TYPES = {
+    "whitespace": {
+        "name": "whitespace",
+        "match": is_whitespace,
+    },
+    "operator": {
+        "name": "operator",
+        "match": is_operator,
+    },
+    "identifier": {
+        "name": "identifier",
+        "match": is_identifier,
+    },
+    "num_literal": {
+        "name": "num_literal",
+        "match": is_number_literal,
+    },
+    "str_literal": {
+        "name": "str_literal",
+        "match": is_string_literal,
+    }
+}
+
+
+# eval the infix notation
+def eval(prefix):
+    return
+
+# parse the tokens to an infix notation
+def parse(prefix):
+    return
+
+# tokenize, classify characters, whitespaces, literals
+def tokenize(command, context):
+    token = { "value": "", "type": None }
+    token_list = []
+
+    # scan each character
+    for char in command:
+        exp = token["value"] + char
+        if token["type"] != None and token["type"]["match"](exp, context):
+            token["value"] = exp
+        else:
+            if token["type"] != None:
+                token_list.append(token)
+            token = { "value" : char, "type": match_type(char, context) }
+
+    token_list.append(token)
+    return token_list
+
+# searches for a matching type, returns None when no match is found
+def match_type(char, context):
+    for _, candidate in TOKEN_TYPES.items():
+        if candidate["match"](char, context):
+            return candidate
+    return None
+
+# run a command with a call context
+def run(command, call):
+    call = call if len(call) > 1 else (call, default_context(),)
+
+    if command == "exit":
+        return (CLI_EXIT,)
+    else:
+        # print tokens
+        print(tokenize(command, call[1]))
+        return (CLI_NULL,)
+
+def default_context():
+    context = tree()
+
+    # TODO: Init default context here
+    return context
+
+# infinite dict tree
+def tree():
+    return collections.defaultdict(tree)
 
 def main():
     # print application title
@@ -21,38 +120,8 @@ def main():
         result = run(input(CLI_SYMBOL), result)
         while result[0] == CLI_CONTINUE:
             result = run(input(CLI_SPACE), result)
-
-# eval the abstract syntax tree
-def eval(ast):
-    return
-
-# parse the tokens to an abstract syntax tree
-def parse(tokens):
-    return
-
-# tokenize, classify characters, whitespaces, literals
-def tokenize(command):
-    return
-
-# run a command with a call context
-def run(command, call):
-    call = call if len(call) > 1 else (call, default_context(),)
-
-    if command == "continue":
-        return (CLI_CONTINUE,)
-    elif command == "exit":
-        return (CLI_EXIT,)
-    else:
-        return (CLI_NULL,)
-
-def default_context():
-    context = tree()
-    # init context here
-    return context
-
-# infinite dict tree
-def tree():
-    return collections.defaultdict(tree)
+        if len(result) > 2:
+            print(result[2])
 
 if __name__ == "__main__":
     main()
