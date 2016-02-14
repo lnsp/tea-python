@@ -3,7 +3,7 @@
 # vi: set ft=python :
 import collections, re
 
-TEA_VERSION = "0.0.2-dev"
+TEA_VERSION = "0.0.3-dev"
 TEA_TITLE = "Tea @" + TEA_VERSION
 CLI_SYMBOL = "#> "
 CLI_SPACE = " " * 3
@@ -15,7 +15,7 @@ REGEX_OPERATOR = "^[+\-]+$"
 REGEX_WHITESPACE = "^\s+$"
 REGEX_NUMBER = "^\-?[0-9]+(\.[0-9]+)?$"
 REGEX_IDENTIFIER = "^[a-zA-Z_]+([0-9a-zA-Z_]+)?$"
-REGEX_STRING = "" # TODO: Add regex for string
+REGEX_STRING = "^\"[^\\n\\r\"]*\"?$"
 
 def is_operator(item, context):
     return re.match(REGEX_OPERATOR, item)
@@ -30,7 +30,7 @@ def is_number_literal(item, context):
     return re.match(REGEX_NUMBER, item)
 
 def is_string_literal(item, context):
-    return False # TODO: Add string regex here
+    return re.match(REGEX_STRING, item)
 
 TOKEN_TYPES = {
     "whitespace": {
