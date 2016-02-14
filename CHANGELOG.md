@@ -6,5 +6,6 @@ This project adheres to [Semantic Versioning](https://semver.org).
 ### Added
 - Basic command line inteface for REPL-mode
 - Simple tokenizer supporting operators, whitespace, identifiers and numbers
+
 ### Fixed
 - Wrong CLI version number
