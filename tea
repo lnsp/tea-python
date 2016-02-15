@@ -74,6 +74,15 @@ def store_value(data_type, data):
 def store_none():
     return store_value(DATA_NONE, None)
 
+OPERATOR_ADD = {
+    "name": "add",
+    "precedence": 4,
+    "binding": "left",
+    "symbol": "+",
+    "execution": None,
+}
+OPERATOR_SUBTRACT = "-"
+
 NODE_SEQUENCE = "sequence"
 NODE_BRANCH = "branch"
 NODE_RETURN = "return"
@@ -84,9 +93,7 @@ NODE_LITERAL = "literal"
 
 BEHAVIOUR_DEFAULT = "default" # do nothing special
 BEHAVIOUR_RETURN = "return" # return, but reset to nothing
-BEHAVIOUR_BREAK = "break" # return, dont reset (handled by loop)
-BEHAVIOUR_CONTINUE = "continue" # return, dont reset (handled by loop)
-BEHAVIOUR_EXIT = "exit"
+BEHAVIOUR_EXIT = "exit" # exit from program
 
 class ASTNode:
     def __init__(self, node_type, node_data):
@@ -99,6 +106,45 @@ class ASTNode:
 
     def add_child(node):
         self.children.append(node)
+
+class Namespace:
+    def __init__(self, parent):
+        # parent namespace
+        self.parent = parent
+        # item map
+        self.items = {}
+        # operator map
+        self.operators = {}
+
+    def find_identifier(self, identifier):
+        # search in local namespace
+        for key in self.items:
+            if key == identifier:
+                return self.items[key]
+        # find in parent namespaces
+        if self.parent != None:
+            return self.parent.find_identifier(identifier)
+        # return if nothing available
+        return None
+
+    def find_operator(self, operator):
+        # search in local namespace
+        for key in self.operators:
+            if key == operator:
+                return self.operators[key]
+        # find in parent namespaces
+        if self.parent != None:
+            return self.parent.find_operator(operator)
+        # return if nothing available
+        return None
+
+    def put_item(self, item):
+        # add item to namespace
+        self.items[item["name"]] = item
+    
+    def put_operator(self, operator):
+        # add operator to namespace
+        self.operator[item["name"]] = operator
 
 # evaluates a sequence of expressions, loops or branches
 def eval_sequence(node, context):
@@ -209,10 +255,16 @@ def interpret(expression, context):
     else:
         execute(parse(tokenize(expression)), context)
 
-def default_context():
-    context = tree()
+# create default namespace
+def default_namespace():
+    namespace = Namespace(None)
+    # add items and operators
+    return namespace
 
-    # TODO: Init default context here
+def default_context():
+    # create default context with namespace
+    context = tree()
+    context["namespace"] = default_namespace()
     return context
 
 # infinite dict tree
