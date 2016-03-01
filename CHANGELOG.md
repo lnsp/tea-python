@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 ### Added
 - String literals
 - Expression executer
+- Split up file structure
+- Add tea scripts
 
 ### Changed
 - Enhanced tokenizer speed
