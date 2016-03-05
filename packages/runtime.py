@@ -1,5 +1,10 @@
 #!/usr/bin/python3
-import teasplit, teaparse, teaeval, helper
+"""Command line runtime for Tea."""
+
+import teasplit
+import teaparse
+import teaeval
+import helper
 
 TEA_VERSION = "0.0.3-dev"
 TEA_TITLE = "Tea @" + TEA_VERSION
@@ -9,17 +14,19 @@ CLI_NULL = 0
 CLI_CONTINUE = -1
 CLI_EXIT = -2
 
-# run a command with a call context
+
 def interpret(expression, context):
+    """Interpret an expression by tokenizing, parsing and evaluating."""
     if expression == "exit":
         context["status"] = CLI_EXIT
     else:
         expr_tokens = teasplit.apply(expression)
         expr_tree = teaparse.apply(expr_tokens)
-        expr_result = teaeval.apply(expr_tree, context)
+        teaeval.apply(expr_tree, context)
 
-# main runtime
+
 def main():
+    """Run the CLI."""
     # print application title
     print(TEA_TITLE)
 
