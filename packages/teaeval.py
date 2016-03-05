@@ -10,18 +10,17 @@ DATA_INTEGER = "Integer"  # Any integer number
 DATA_FLOAT = "Float"  # Any floating point number
 DATA_BOOLEAN = "Boolean"  # true / false
 DATA_STRING = "String"  # Any string value
-DATA_REFERENCE = "Reference"  # Name reference
 DATA_FUNCTION = "Function"
 DATA_NONE = "None"  # None / null value
 # TODO: Add lists, maps and sets
 
-SEQUENCE = "sequence"
-BRANCH = "branch"
-RETURN = "return"
-FUNCTION = "function"
-OPERATOR = "operator"
-IDENTIFIER = "identifier"
-LITERAL = "literal"
+_SEQUENCE = "sequence"
+_BRANCH = "branch"
+_RETURN = "return"
+_FUNCTION = "function"
+_OPERATOR = "operator"
+_IDENTIFIER = "identifier"
+_LITERAL = "literal"
 
 
 def store_value(t, v):
@@ -85,38 +84,38 @@ class Namespace:
         # parent namespace
         self.parent = parent
         # item map
-        self.items = {}
+        self.identifiers = {}
         # operator map
         self.operators = {}
 
-    def find_identifier(self, identifier):
+    def find_identifier(self, ident):
         """Search for an identifier in this and higher order namespaces."""
         # search in local namespace
-        for key in self.items:
-            if key == identifier:
+        for key in self.identifiers:
+            if key == ident:
                 return self.items[key]
         # find in parent namespaces
         if self.parent is not None:
-            return self.parent.find_identifier(identifier)
+            return self.parent.find_identifier(ident)
         # return if nothing available
         return None
 
-    def find_operator(self, operator):
+    def find_operator(self, op):
         """Search for an operator in this and higher order namespaces."""
         # search in local namespace
         for key in self.operators:
-            if key == operator:
+            if key == op:
                 return self.operators[key]
         # find in parent namespaces
         if self.parent is not None:
-            return self.parent.find_operator(operator)
+            return self.parent.find_operator(op)
         # return if nothing available
         return None
 
     def put_item(self, item):
         """Store identifier in namespace."""
         # add item to namespace
-        self.items[item["name"]] = item
+        self.identifiers[item["name"]] = item
 
     def put_operator(self, operator):
         """Store operator in namespace."""
@@ -176,6 +175,7 @@ def eval_identifier(node, context):
     """
     identifier = context.find_identifier(node.data["name"])
     if identifier is not None:
+        identifier["name"] = node.data["name"]
         return identifier
     return "Identifier not found"
 
@@ -196,36 +196,39 @@ def eval_return(node, context):
     value = store_none()
     if len(node.children) == 1:
         value = node.children[0].eval(context)
-    context["behaviour"] = BEHAVIOUR_RETURN
+
+    if context["behaviour"] != BEHAVIOUR_EXIT:
+        context["behaviour"] = BEHAVIOUR_RETURN
     return value
 
+
 TYPES = {
-    SEQUENCE: {
-        "name": SEQUENCE,
+    _SEQUENCE: {
+        "name": _SEQUENCE,
         "execution": eval_sequence,
     },
-    BRANCH: {
-        "name": BRANCH,
+    _BRANCH: {
+        "name": _BRANCH,
         "execution": eval_branch,
     },
-    OPERATOR: {
-        "name": OPERATOR,
+    _OPERATOR: {
+        "name": _OPERATOR,
         "execution": eval_operator,
     },
-    IDENTIFIER: {
-        "name": IDENTIFIER,
+    _IDENTIFIER: {
+        "name": _IDENTIFIER,
         "execution": eval_identifier,
     },
-    LITERAL: {
-        "name": LITERAL,
+    _LITERAL: {
+        "name": _LITERAL,
         "execution": eval_literal,
     },
-    RETURN: {
-        "name": RETURN,
+    _RETURN: {
+        "name": _RETURN,
         "execution": None,
     },
-    FUNCTION: {
-        "name": FUNCTION,
+    _FUNCTION: {
+        "name": _FUNCTION,
         "execution": eval_function,
     },
 }
@@ -234,13 +237,11 @@ TYPES = {
 def default_namespace():
     """Initialize a default namespace."""
     namespace = Namespace(None)
-    # add items and operators
     return namespace
 
 
 def default_context():
     """Initialize a default context."""
-    # create default context with namespace
     context = helper.tree()
     context["namespace"] = default_namespace()
     return context
@@ -248,12 +249,13 @@ def default_context():
 
 def syntax_tree():
     """Initialize a default syntax tree."""
-    root = Node(TYPES[SEQUENCE], None)
+    root = Node(TYPES[_SEQUENCE], None)
     return root
 
 
 def apply(syntax_tree, context):
     """Evaluate the syntax tree."""
-    syntax_tree.eval(context)
+    result = syntax_tree.eval(context)
     if context["behaviour"] == BEHAVIOUR_EXIT:
         context["status"] = runtime.CLI_EXIT
+    return result

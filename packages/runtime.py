@@ -10,6 +10,7 @@ TEA_VERSION = "0.0.3-dev"
 TEA_TITLE = "Tea @" + TEA_VERSION
 CLI_SYMBOL = "#> "
 CLI_SPACE = " " * 3
+CLI_RESULT = "<- "
 CLI_NULL = 0
 CLI_CONTINUE = -1
 CLI_EXIT = -2
@@ -22,7 +23,8 @@ def interpret(expression, context):
     else:
         expr_tokens = teasplit.apply(expression)
         expr_tree = teaparse.apply(expr_tokens)
-        teaeval.apply(expr_tree, context)
+        expr_result = teaeval.apply(teaparse.demo_syntax_tree(), context)
+        context["output"] = CLI_RESULT + str(expr_result["value"])
 
 
 def main():
