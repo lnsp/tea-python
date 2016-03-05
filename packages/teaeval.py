@@ -1,5 +1,6 @@
 """Eval an abstract syntax tree."""
 import runtime
+import helper
 
 BEHAVIOUR_DEFAULT = "default"  # do nothing special
 BEHAVIOUR_RETURN = "return"  # return, but reset to nothing
@@ -235,6 +236,14 @@ def default_namespace():
     namespace = Namespace(None)
     # add items and operators
     return namespace
+
+
+def default_context():
+    """Initialize a default context."""
+    # create default context with namespace
+    context = helper.tree()
+    context["namespace"] = default_namespace()
+    return context
 
 
 def syntax_tree():

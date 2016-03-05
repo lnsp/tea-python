@@ -1,3 +1,4 @@
+"""Split the expression into tokens."""
 import re
 
 REGEX_OPERATOR = "^[+\-;]+$"
@@ -12,20 +13,31 @@ IDENTIFIER = "identifier"
 NUM_LITERAL = "num_literal"
 OPERATOR = "operator"
 
+
 def is_operator(item):
+    """Check if the item is an operator."""
     return re.match(REGEX_OPERATOR, item)
 
+
 def is_identifier(item):
+    """Check if the item is an identifier."""
     return re.match(REGEX_IDENTIFIER, item)
 
+
 def is_whitespace(item):
+    """Check if the item is a whitespace."""
     return re.match(REGEX_WHITESPACE, item)
 
+
 def is_number_literal(item):
+    """Check if the item is a number."""
     return re.match(REGEX_NUMBER, item)
 
+
 def is_string_literal(item):
+    """Check if the item is a string."""
     return re.match(REGEX_STRING, item)
+
 
 TOKEN_TYPES = {
     WHITESPACE: {
@@ -50,26 +62,28 @@ TOKEN_TYPES = {
     }
 }
 
-# tokenize, classify characters, whitespaces, literals
+
 def apply(expression):
-    token = { "value": "", "type": None }
+    """Tokenize and classify the expression components."""
+    token = {"value": "", "type": None}
     token_list = []
 
     # scan each character
     for char in expression:
         exp = token["value"] + char
-        if token["type"] != None and token["type"]["match"](exp):
+        if token["type"] is not None and token["type"]["match"](exp):
             token["value"] = exp
         else:
-            if token["type"] != None:
+            if token["type"] is not None:
                 token_list.append(token)
-            token = { "value" : char, "type": match_type(char) }
+            token = {"value": char, "type": match_type(char)}
 
     token_list.append(token)
     return token_list
 
-# searches for a matching type, returns None when no match is found
+
 def match_type(char):
+    """Search for a matching type, return None when no match is found."""
     for _, candidate in TOKEN_TYPES.items():
         if candidate["match"](char):
             return candidate
