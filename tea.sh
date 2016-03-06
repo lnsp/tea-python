@@ -1,2 +1,2 @@
 #!/bin/bash
-@python3 packages/runtime.py
+@python3 repl.py

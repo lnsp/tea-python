@@ -1,2 +1,2 @@
 @ECHO OFF
-python packages/runtime.py
+python repl.py

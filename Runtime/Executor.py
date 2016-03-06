@@ -1,6 +1,5 @@
 """Eval an abstract syntax tree."""
-import runtime
-import helper
+import Utils
 
 BEHAVIOUR_DEFAULT = "default"  # do nothing special
 BEHAVIOUR_RETURN = "return"  # return, but reset to nothing
@@ -242,7 +241,7 @@ def default_namespace():
 
 def default_context():
     """Initialize a default context."""
-    context = helper.tree()
+    context = Utils.tree()
     context["namespace"] = default_namespace()
     return context
 
@@ -257,5 +256,5 @@ def apply(syntax_tree, context):
     """Evaluate the syntax tree."""
     result = syntax_tree.eval(context)
     if context["behaviour"] == BEHAVIOUR_EXIT:
-        context["status"] = runtime.CLI_EXIT
+        context["status"] = Utils.CMD_EXIT
     return result

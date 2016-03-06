@@ -1,19 +1,19 @@
 """Parse an tokenized expression into an AST."""
-import teaeval
+import Executor
 
 
 def apply(tokens):
     """Parse the tokens to AST notation."""
     # TODO: Implement parser
-    return teaeval.syntax_tree()
+    return Executor.syntax_tree()
 
 
 def demo_syntax_tree():
     """Initialize a demo syntax tree."""
-    tree = teaeval.syntax_tree()
+    tree = Executor.syntax_tree()
 
-    literal = teaeval.store_value(teaeval.DATA_STRING, "Hallo Welt!")
-    literal_node = teaeval.Node(teaeval.TYPES[teaeval._LITERAL], literal)
+    literal = Executor.store_value(Executor.DATA_STRING, "Hallo Welt!")
+    literal_node = Executor.Node(Executor.TYPES[Executor._LITERAL], literal)
 
     tree.add(literal_node)
     return tree

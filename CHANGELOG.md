@@ -8,9 +8,11 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Expression executer
 - Split up file structure
 - Add tea scripts
+- Test cases for Executor
 
 ### Changed
 - Enhanced tokenizer speed
+- Splitted up Runtime and REPL-console
 
 ## [0.0.2]
 ### Added

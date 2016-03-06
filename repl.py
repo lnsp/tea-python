@@ -1,29 +1,26 @@
 #!/usr/bin/python3
 """Command line runtime for Tea."""
 
-import teasplit
-import teaparse
-import teaeval
-import helper
+from Runtime import Tokenizer
+from Runtime import Parser
+from Runtime import Executor
+from Runtime import Utils
 
 TEA_VERSION = "0.0.3-dev"
 TEA_TITLE = "Tea @" + TEA_VERSION
 CLI_SYMBOL = "#> "
 CLI_SPACE = " " * 3
 CLI_RESULT = "<- "
-CLI_NULL = 0
-CLI_CONTINUE = -1
-CLI_EXIT = -2
 
 
 def interpret(expression, context):
     """Interpret an expression by tokenizing, parsing and evaluating."""
     if expression == "exit":
-        context["status"] = CLI_EXIT
+        context["status"] = Utils.CMD_EXIT
     else:
-        expr_tokens = teasplit.apply(expression)
-        expr_tree = teaparse.apply(expr_tokens)
-        expr_result = teaeval.apply(teaparse.demo_syntax_tree(), context)
+        expr_tokens = Tokenizer.apply(expression)
+        expr_tree = Parser.apply(expr_tokens)
+        expr_result = Executor.apply(Parser.demo_syntax_tree(), context)
         context["output"] = CLI_RESULT + str(expr_result["value"])
 
 
@@ -33,13 +30,13 @@ def main():
     print(TEA_TITLE)
 
     # run REPL
-    context = helper.tree()
-    while context["status"] != CLI_EXIT:
-        context["status"] = CLI_NULL
+    context = Utils.tree()
+    while context["status"] != Utils.CMD_EXIT:
+        context["status"] = Utils.CMD_NULL
         context["output"] = None
 
         interpret(input(CLI_SYMBOL), context)
-        while context["status"] == CLI_CONTINUE:
+        while context["status"] == Utils.CMD_CONTINUE:
             interpret(input(CLI_SPACE), context)
         print(context["output"])
 
