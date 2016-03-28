@@ -1,6 +1,6 @@
 """Test package for Executor.py."""
 import unittest
-import Executor
+from Runtime import Executor
 
 
 class TestExecutor(unittest.TestCase):

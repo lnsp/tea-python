@@ -1,6 +1,6 @@
 """Test package for Utils.py."""
 import unittest
-import Utils
+from Runtime import Utils
 
 
 class TestUtils(unittest.TestCase):
