@@ -5,7 +5,6 @@ BEHAVIOUR_DEFAULT = "default"  # do nothing special
 BEHAVIOUR_BREAK = "break"
 BEHAVIOUR_CONTINUE = "continue"
 BEHAVIOUR_RETURN = "return"  # return, but reset to nothing
-BEHAVIOUR_EXIT = "exit"  # exit from program
 
 DATA_INTEGER = "Integer"  # Any integer number
 DATA_FLOAT = "Float"  # Any floating point number
@@ -324,7 +323,4 @@ def syntax_tree():
 
 def apply(syntax_tree, context):
     """Evaluate the syntax tree."""
-    result = syntax_tree.eval(context)
-    if context["behaviour"] == BEHAVIOUR_EXIT:
-        context["status"] = Utils.CMD_EXIT
-    return result
+    return syntax_tree.eval(context)
