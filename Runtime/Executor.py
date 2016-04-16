@@ -13,7 +13,7 @@ DATA_STRING = "String"  # Any string value
 DATA_FUNCTION = "Function"
 DATA_NONE = "None"  # None / null value
 DATA_LIST = "List"
-DATA_MAPS = "Map"
+DATA_MAP = "Map"
 DATA_SET = "Set"
 
 _SEQUENCE = "sequence"
