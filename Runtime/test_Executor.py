@@ -55,12 +55,12 @@ class TestExecutor(unittest.TestCase):
         """Test the run_in_substitution method."""
         access_node_type = {
             "name": "Test",
-            "execution": lambda n, c: c["local"].put_identifier("x", 0),
+            "execution": lambda n, c: c.ns.put_identifier("x", 0),
         }
         context = Executor.default_context()
         access_node = Executor.Node(access_node_type, None)
         Executor.run_in_substitution(access_node, context)
-        self.assertEqual(context["local"].find_identifier("x"), None)
+        self.assertEqual(context.ns.find_identifier("x"), None)
 
         value_node_type = {
             "name": "Test",
@@ -74,7 +74,7 @@ class TestExecutor(unittest.TestCase):
     def test_default_context(self):
         """Test the default_context method."""
         context = Executor.default_context()
-        self.assertEqual(context["global"], context["local"])
+        self.assertEqual(context.globalns, context.ns)
 
     def test_store_none(self):
         """Test the store_none method."""
@@ -165,13 +165,13 @@ class TestExecutor(unittest.TestCase):
         break_loop = new_node(Executor._LOOP)
         break_loop.children = [true_literal, break_node]
         self.assertEqual(break_loop.eval(context), none_literal.data)
-        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_DEFAULT)
+        self.assertEqual(context.behaviour, Executor.BEHAVIOUR_DEFAULT)
         
         # check for return
         return_loop = new_node(Executor._LOOP)
         return_loop.children = [true_literal, return_node]
         self.assertEqual(return_loop.eval(context), true_literal.data)
-        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_RETURN)
+        self.assertEqual(context.behaviour, Executor.BEHAVIOUR_RETURN)
 
     def test_return_node(self):
         """Test the return node."""
@@ -179,28 +179,28 @@ class TestExecutor(unittest.TestCase):
         context = Executor.default_context()
         empty_return = new_node(Executor._RETURN)
         self.assertEqual(empty_return.eval(context), none_literal.data)
-        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_RETURN)
+        self.assertEqual(context.behaviour, Executor.BEHAVIOUR_RETURN)
         
         # test return with value
         context = Executor.default_context()
         value_return = new_node(Executor._RETURN)
         value_return.add(true_literal)
         self.assertEqual(value_return.eval(context), true_literal.data)
-        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_RETURN)
+        self.assertEqual(context.behaviour, Executor.BEHAVIOUR_RETURN)
 
     def test_break_node(self):
         """Test the break node."""
         context = Executor.default_context()
         break_node = new_node(Executor._BREAK)
         self.assertEqual(break_node.eval(context), none_literal.data)
-        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_BREAK)
+        self.assertEqual(context.behaviour, Executor.BEHAVIOUR_BREAK)
 
     def test_continue_node(self):
         """Test the continue node."""
         context = Executor.default_context()
         continue_node = new_node(Executor._CONTINUE)
         self.assertEqual(continue_node.eval(context), none_literal.data)
-        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_CONTINUE)
+        self.assertEqual(context.behaviour, Executor.BEHAVIOUR_CONTINUE)
 
     def test_function_node(self):
         """Test the function node."""

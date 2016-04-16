@@ -80,7 +80,7 @@ class Node:
     def add(self, node):
         """Add a child to the node."""
         self.children.append(node)
-
+        
 
 class Namespace:
     """A variable and operator namespace."""
@@ -128,24 +128,32 @@ class Namespace:
         # add operator to namespace
         self.operators[symbol] = operator
 
+class Context:
+    """A context for temporary storage."""
+    
+    def __init__(self, namespace):
+        self.ns = namespace
+        self.globalns = namespace
+        self.behaviour = BEHAVIOUR_DEFAULT
+        self.flags = []
 
 def run_in_substitution(node, context):
     """Run the node in a subtituted namespace."""
-    sub = Namespace(context["local"])
-    context["local"] = sub
+    sub = Namespace(context.ns)
+    context.ns = sub
     result = node.eval(context)
-    context["local"] = sub.parent
+    context.ns = sub.parent
     return result
 
 
 def eval_sequence(node, context):
     """Evaluate a sequence of statements."""
-    context["behaviour"] = BEHAVIOUR_DEFAULT
+    context.behaviour = BEHAVIOUR_DEFAULT
     last_value = store_none()
 
     for item in node.children:
         last_value = item.eval(context)
-        if (context["behaviour"] != BEHAVIOUR_DEFAULT):
+        if (context.behaviour != BEHAVIOUR_DEFAULT):
             break
 
     return last_value
@@ -174,10 +182,10 @@ def eval_loop(node, context):
     """Evaluate a 2-component loop. for [0] { ... }"""
     cond = eval_conditional(node, context)
     while cond != False:
-        bhv = context["behaviour"]
+        bhv = context.behaviour
         if bhv == BEHAVIOUR_RETURN: return cond
         else:
-            context["behaviour"] = BEHAVIOUR_DEFAULT
+            context.behaviour = BEHAVIOUR_DEFAULT
             if bhv == BEHAVIOUR_BREAK: return store_none()
         cond = eval_conditional(node, context)
     return store_none()
@@ -191,7 +199,7 @@ def eval_operator(node, context):
     if operator is not None:
         values = [child.eval(context) for child in node.children]
         return operator["execution"](context, values)
-    raise "Operator not found"
+    raise Exception("Operator not found")
 
 
 def eval_function(node, context):
@@ -203,14 +211,14 @@ def eval_function(node, context):
     if function is not None:
         values = [child.eval(context) for child in node.children]
         # substitute namespace
-        parent_ns = context["local"]
-        child_ns = Namespace(context["global"])
-        context["local"] = child_ns
+        parent_ns = context.ns
+        child_ns = Namespace(context.globalns)
+        context.ns = child_ns
         # execute function
         result = function["execution"](context, values)
-        context["local"] = parent_ns
+        context.ns = parent_ns
         return result
-    raise "Function not found"
+    raise Exception("Function not found")
 
 
 def eval_identifier(node, context):
@@ -239,19 +247,19 @@ def eval_return(node, context):
     Changes the behaviour context to 'RETURN'.
     """
     value = eval_sequence(node, context)
-    context["behaviour"] = BEHAVIOUR_RETURN
+    context.behaviour = BEHAVIOUR_RETURN
     return value
 
 
 def eval_break(node, context):
     """Evaluate a break statement."""
-    context["behaviour"] = BEHAVIOUR_BREAK
+    context.behaviour = BEHAVIOUR_BREAK
     return store_none()
 
 
 def eval_continue(node, context):
     """Evaluate a continue statement."""
-    context["behaviour"] = BEHAVIOUR_CONTINUE
+    context.behaviour = BEHAVIOUR_CONTINUE
     return store_none()
 
 TYPES = {
@@ -310,9 +318,7 @@ def default_namespace():
 
 def default_context():
     """Initialize a default context."""
-    context = Utils.tree()
-    context["local"] = context["global"] = default_namespace()
-    return context
+    return Context(default_namespace())
 
 
 def syntax_tree():
