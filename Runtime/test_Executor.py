@@ -212,7 +212,19 @@ class TestExecutor(unittest.TestCase):
 
     def test_identifier_node(self):
         """Test the identifier node."""
-        pass
+        context = Executor.default_context()
+        # Search in local ns
+        context.ns.put_identifier("i", string_literal.data)
+        ident_node = new_node(Executor._IDENTIFIER, { "name": "i" })
+        self.assertEqual(ident_node.eval(context)["value"], string_literal.data["value"])
+        
+        # Search in parent ns
+        context.ns = Executor.Namespace(context.ns)
+        self.assertEqual(ident_node.eval(context)["value"], string_literal.data["value"])
+        
+        # Identifier does not exist
+        bad_node = new_node(Executor._IDENTIFIER, { "name": "nope" })
+        self.assertRaises(Exception, bad_node.eval, context)
 
     def test_literal_node(self):
         """Test the literal node."""
