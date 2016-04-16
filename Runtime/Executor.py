@@ -262,9 +262,7 @@ def eval_return(node, context):
 
     Changes the behaviour context to 'RETURN'.
     """
-    value = store_none()
-    if len(node.children) == 1:
-        value = node.children[0].eval(context)
+    value = eval_sequence(node, context)
 
     if context["behaviour"] != BEHAVIOUR_EXIT:
         context["behaviour"] = BEHAVIOUR_RETURN
