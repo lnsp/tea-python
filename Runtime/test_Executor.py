@@ -215,7 +215,7 @@ class TestExecutor(unittest.TestCase):
         context = Executor.default_context()
         # Search in local ns
         context.ns.put_identifier("i", string_literal.data)
-        ident_node = new_node(Executor._IDENTIFIER, { "name": "i" })
+        ident_node = new_node(Executor._IDENTIFIER, "i")
         self.assertEqual(ident_node.eval(context)["value"], string_literal.data["value"])
         
         # Search in parent ns
@@ -223,7 +223,7 @@ class TestExecutor(unittest.TestCase):
         self.assertEqual(ident_node.eval(context)["value"], string_literal.data["value"])
         
         # Identifier does not exist
-        bad_node = new_node(Executor._IDENTIFIER, { "name": "nope" })
+        bad_node = new_node(Executor._IDENTIFIER, "nope")
         self.assertRaises(Exception, bad_node.eval, context)
 
     def test_literal_node(self):
