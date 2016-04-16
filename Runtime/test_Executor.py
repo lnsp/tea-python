@@ -159,7 +159,30 @@ class TestExecutor(unittest.TestCase):
 
     def test_loop_node(self):
         """Test the loop node."""
-        pass
+        true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
+        false_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, False))
+        none_literal = new_literal(Executor.store_none())
+        break_node = new_node(Executor._BREAK)
+        return_node = new_node(Executor._RETURN)
+        return_node.children = [true_literal]
+        context = Executor.default_context()
+        
+        # check for exception
+        bad_loop = new_node(Executor._LOOP)
+        bad_loop.children = [none_literal, true_literal]
+        self.assertRaises(Exception, bad_loop.eval, context)
+        
+        # check for break 
+        break_loop = new_node(Executor._LOOP)
+        break_loop.children = [true_literal, break_node]
+        self.assertEqual(break_loop.eval(context), none_literal.data)
+        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_DEFAULT)
+        
+        # check for return
+        return_loop = new_node(Executor._LOOP)
+        return_loop.children = [true_literal, return_node]
+        self.assertEqual(return_loop.eval(context), true_literal.data)
+        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_RETURN)
 
     def test_return_node(self):
         """Test the return node."""
