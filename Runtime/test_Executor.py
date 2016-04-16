@@ -197,7 +197,10 @@ class TestExecutor(unittest.TestCase):
 
     def test_continue_node(self):
         """Test the continue node."""
-        pass
+        context = Executor.default_context()
+        continue_node = new_node(Executor._CONTINUE)
+        self.assertEqual(continue_node.eval(context), none_literal.data)
+        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_CONTINUE)
 
     def test_function_node(self):
         """Test the function node."""
