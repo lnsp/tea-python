@@ -86,6 +86,26 @@ class TestExecutor(unittest.TestCase):
         predicted_result = Executor.store_none()
         self.assertEqual(sequence.eval(context), predicted_result)
 
+    def test_conditional_node(self):
+        """Test the conditional node."""
+        none_value = Executor.store_none()
+        none_literal = Executor.Node(Executor.TYPES[Executor._LITERAL], none_value)
+        true_value = Executor.store_value(Executor.DATA_BOOLEAN, True)
+        true_literal = Executor.Node(Executor.TYPES[Executor._LITERAL], true_value)
+        context = Executor.default_context()
+        
+        # Test bad conditional error
+        bad_conditional = Executor.Node(Executor.TYPES[Executor._CONDITIONAL], None)
+        bad_conditional.add(none_literal) # if None:
+        bad_conditional.add(none_literal) # then None
+        self.assertRaises(Exception, bad_conditional.eval, context)
+        
+        # Test correct result
+        good_conditional = Executor.Node(Executor.TYPES[Executor._CONDITIONAL], None)
+        good_conditional.add(true_literal)
+        good_conditional.add(none_literal)
+        self.assertEqual(good_conditional.eval(context), none_value)
+
     def test_branch_node(self):
         """Test the branch node."""
         pass
