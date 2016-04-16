@@ -18,6 +18,7 @@ DATA_MAPS = "Map"
 DATA_SET = "Set"
 
 _SEQUENCE = "sequence"
+_CONDITIONAL = "conditional"
 _BRANCH = "branch"
 _LOOP = "loop"
 _RETURN = "return"
@@ -153,12 +154,23 @@ def eval_sequence(node, context):
 
 def eval_branch(node, context):
     """Evaluate a n-component branch (if, else-if ..., else)."""
-    for branch in node.children[:-1]:  # all if / else if branches
-        if branch.children[0].eval(context)["value"]:  # condition ->
-            return run_in_substitution(branch.children[1])
-    return run_in_substitution(branch.children[-1])
+    for conditional in node.children[:-1]:  # all if / else if branches
+        correct, result = conditional.eval(context)
+        if correct:
+            return result
+    return run_in_substitution(node.children[-1])
 
-
+def eval_conditional(node, context):
+    """Evaluate a conditional (if [0] then [1])."""
+    correct = node.children[0].eval(context)
+    if correct["type"] != DATA_BOOLEAN:
+        raise "Bad conditional"
+    else:
+        if correct["value"]:
+            return True, run_in_substitution(node.children[1])
+        else:
+            return False, None
+    
 def eval_loop(node, context):
     """Evaluate either a 2-component or 4-component loop."""
     n = len(node.children)
@@ -278,6 +290,10 @@ TYPES = {
     _BRANCH: {
         "name": _BRANCH,
         "execution": eval_branch,
+    },
+    _CONDITIONAL: {
+        "name": _CONDITIONAL,
+        "execution": eval_conditional,
     },
     _LOOP: {
         "name": _LOOP,
