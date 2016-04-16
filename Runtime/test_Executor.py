@@ -7,6 +7,12 @@ def new_node(typename, data=None):
     
 def new_literal(value):
     return new_node(Executor._LITERAL, value)
+    
+none_literal = new_literal(Executor.store_none())
+true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
+false_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, False))
+string_literal = new_literal(Executor.store_value(Executor.DATA_STRING, "works"))
+        
 
 class TestExecutor(unittest.TestCase):
     """Test cases for the Executor."""
@@ -87,8 +93,6 @@ class TestExecutor(unittest.TestCase):
     def test_sequence_node(self):
         """Test the sequence node."""
         context = Executor.default_context()
-        none_literal = new_literal(Executor.store_none())
-        true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
         return_node = new_node(Executor._RETURN, None)
         return_node.children = [true_literal]
         # empty sequence
@@ -110,8 +114,6 @@ class TestExecutor(unittest.TestCase):
 
     def test_conditional_node(self):
         """Test the conditional node."""
-        none_literal = new_literal(Executor.store_none())
-        true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
         context = Executor.default_context()
         
         # Test bad conditional error
@@ -128,40 +130,27 @@ class TestExecutor(unittest.TestCase):
 
     def test_branch_node(self):
         """Test the branch node."""
-        correct_literal = new_literal(Executor.store_value(Executor.DATA_STRING, "works"))
-        true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
-        false_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, False))
-        none_literal = new_literal(Executor.store_none())
         context = Executor.default_context()
         # always evaluates
         true_cond = new_node(Executor._CONDITIONAL)
-        true_cond.add(true_literal)
-        true_cond.add(correct_literal)
+        true_cond.children = [true_literal, string_literal]
         false_cond = new_node(Executor._CONDITIONAL)
-        false_cond.add(false_literal)
-        false_cond.add(none_literal)
+        false_cond.children = [false_literal, none_literal]
         # Test if branch
         if_branch = new_node(Executor._BRANCH)
-        if_branch.add(true_cond)
-        if_branch.add(none_literal)
-        self.assertEqual(if_branch.eval(context), correct_literal.data)
+        if_branch.children = [true_cond, none_literal]
+        self.assertEqual(if_branch.eval(context), string_literal.data)
         # Test if-else branch
         ifelse_branch = new_node(Executor._BRANCH)
-        ifelse_branch.add(false_cond)
-        ifelse_branch.add(correct_literal)
-        self.assertEqual(ifelse_branch.eval(context), correct_literal.data)
+        ifelse_branch.children = [false_cond, string_literal]
+        self.assertEqual(ifelse_branch.eval(context), string_literal.data)
         # Test if-elif-else branch
         ifelifelse_branch = new_node(Executor._BRANCH)
-        ifelifelse_branch.add(false_cond)
-        ifelifelse_branch.add(true_cond)
-        ifelifelse_branch.add(none_literal)
-        self.assertEqual(ifelifelse_branch.eval(context), correct_literal.data)
+        ifelifelse_branch.children = [false_cond, true_cond, none_literal]
+        self.assertEqual(ifelifelse_branch.eval(context), string_literal.data)
 
     def test_loop_node(self):
         """Test the loop node."""
-        true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
-        false_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, False))
-        none_literal = new_literal(Executor.store_none())
         break_node = new_node(Executor._BREAK)
         return_node = new_node(Executor._RETURN)
         return_node.children = [true_literal]
@@ -186,9 +175,6 @@ class TestExecutor(unittest.TestCase):
 
     def test_return_node(self):
         """Test the return node."""
-        none_literal = new_literal(Executor.store_none())
-        true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
-        
         # test empty return node
         context = Executor.default_context()
         empty_return = new_node(Executor._RETURN)
