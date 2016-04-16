@@ -155,21 +155,21 @@ def eval_sequence(node, context):
 def eval_branch(node, context):
     """Evaluate a n-component branch (if, else-if ..., else)."""
     for conditional in node.children[:-1]:  # all if / else if branches
-        correct, result = conditional.eval(context)
-        if correct:
+        result = conditional.eval(context)
+        if result != False:
             return result
-    return run_in_substitution(node.children[-1])
+    return run_in_substitution(node.children[-1], context)
 
 def eval_conditional(node, context):
     """Evaluate a conditional (if [0] then [1])."""
     correct = node.children[0].eval(context)
-    if correct["type"] != DATA_BOOLEAN:
-        raise "Bad conditional"
+    if correct["type"] is not DATA_BOOLEAN:
+        raise Exception("Bad conditional")
     else:
         if correct["value"]:
-            return True, run_in_substitution(node.children[1])
+            return run_in_substitution(node.children[1], context)
         else:
-            return False, None
+            return False
     
 def eval_loop(node, context):
     """Evaluate either a 2-component or 4-component loop."""
