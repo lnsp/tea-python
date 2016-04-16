@@ -62,7 +62,8 @@ class TestExecutor(unittest.TestCase):
 
     def test_default_context(self):
         """Test the default_context method."""
-        pass
+        context = Executor.default_context()
+        self.assertEqual(context["global"], context["local"])
 
     def test_store_none(self):
         """Test the store_none method."""
@@ -74,7 +75,10 @@ class TestExecutor(unittest.TestCase):
 
     def test_store_value(self):
         """Test the store_value method."""
-
+        i = Executor.store_value(Executor.DATA_NONE, None)
+        self.assertEqual(i["type"], Executor.DATA_NONE)
+        self.assertEqual(i["value"], None)
+        
     def test_sequence_node(self):
         """Test the sequence node."""
         sequence = Executor.Node(Executor.TYPES[Executor._SEQUENCE], None)
