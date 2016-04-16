@@ -173,14 +173,15 @@ def eval_conditional(node, context):
     
 def eval_loop(node, context):
     """Evaluate a 2-component loop. for [0] { ... }"""
-    cond = False
-    while (cond = eval_conditional(node, context)) != False:
-        if context["behaviour"] == BEHAVIOUR_CONTINUE:
+    cond = eval_conditional(node, context)
+    while cond != False:
+        bhv = context["behaviour"]
+        if bhv == BEHAVIOUR_RETURN: return cond
+        else:
             context["behaviour"] = BEHAVIOUR_DEFAULT
-        if context["behaviour"] == BEHAVIOUR_BREAK:
-            break
-        if context["behaviour"] == BEHAVIOUR_RETURN:
-            return cond
+            if bhv == BEHAVIOUR_BREAK: return store_none()
+        cond = eval_conditional(node, context)
+    return store_none()
 
 def eval_operator(node, context):
     """Evaluate an operator and return the result.
@@ -239,9 +240,7 @@ def eval_return(node, context):
     Changes the behaviour context to 'RETURN'.
     """
     value = eval_sequence(node, context)
-
-    if context["behaviour"] != BEHAVIOUR_EXIT:
-        context["behaviour"] = BEHAVIOUR_RETURN
+    context["behaviour"] = BEHAVIOUR_RETURN
     return value
 
 
