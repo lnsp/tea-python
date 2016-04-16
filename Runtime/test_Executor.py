@@ -2,6 +2,11 @@
 import unittest
 from Runtime import Executor
 
+def new_node(typename, data=None):
+    return Executor.Node(Executor.TYPES[typename], data)
+    
+def new_literal(value):
+    return new_node(Executor._LITERAL, value)
 
 class TestExecutor(unittest.TestCase):
     """Test cases for the Executor."""
@@ -81,34 +86,59 @@ class TestExecutor(unittest.TestCase):
         
     def test_sequence_node(self):
         """Test the sequence node."""
-        sequence = Executor.Node(Executor.TYPES[Executor._SEQUENCE], None)
+        sequence = new_node(Executor._SEQUENCE)
         context = Executor.default_context()
         predicted_result = Executor.store_none()
         self.assertEqual(sequence.eval(context), predicted_result)
 
     def test_conditional_node(self):
         """Test the conditional node."""
-        none_value = Executor.store_none()
-        none_literal = Executor.Node(Executor.TYPES[Executor._LITERAL], none_value)
-        true_value = Executor.store_value(Executor.DATA_BOOLEAN, True)
-        true_literal = Executor.Node(Executor.TYPES[Executor._LITERAL], true_value)
+        none_literal = new_literal(Executor.store_none())
+        true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
         context = Executor.default_context()
         
         # Test bad conditional error
-        bad_conditional = Executor.Node(Executor.TYPES[Executor._CONDITIONAL], None)
+        bad_conditional = new_node(Executor._CONDITIONAL)
         bad_conditional.add(none_literal) # if None:
         bad_conditional.add(none_literal) # then None
         self.assertRaises(Exception, bad_conditional.eval, context)
         
         # Test correct result
-        good_conditional = Executor.Node(Executor.TYPES[Executor._CONDITIONAL], None)
+        good_conditional = new_node(Executor._CONDITIONAL)
         good_conditional.add(true_literal)
         good_conditional.add(none_literal)
-        self.assertEqual(good_conditional.eval(context), none_value)
+        self.assertEqual(good_conditional.eval(context), none_literal.data)
 
     def test_branch_node(self):
         """Test the branch node."""
-        pass
+        correct_literal = new_literal(Executor.store_value(Executor.DATA_STRING, "works"))
+        true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
+        false_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, False))
+        none_literal = new_literal(Executor.store_none())
+        context = Executor.default_context()
+        # always evaluates
+        true_cond = new_node(Executor._CONDITIONAL)
+        true_cond.add(true_literal)
+        true_cond.add(correct_literal)
+        false_cond = new_node(Executor._CONDITIONAL)
+        false_cond.add(false_literal)
+        false_cond.add(none_literal)
+        # Test if branch
+        if_branch = new_node(Executor._BRANCH)
+        if_branch.add(true_cond)
+        if_branch.add(none_literal)
+        self.assertEqual(if_branch.eval(context), correct_literal.data)
+        # Test if-else branch
+        ifelse_branch = new_node(Executor._BRANCH)
+        ifelse_branch.add(false_cond)
+        ifelse_branch.add(correct_literal)
+        self.assertEqual(ifelse_branch.eval(context), correct_literal.data)
+        # Test if-elif-else branch
+        ifelifelse_branch = new_node(Executor._BRANCH)
+        ifelifelse_branch.add(false_cond)
+        ifelifelse_branch.add(true_cond)
+        ifelifelse_branch.add(none_literal)
+        self.assertEqual(ifelifelse_branch.eval(context), correct_literal.data)
 
     def test_loop_node(self):
         """Test the loop node."""
