@@ -186,7 +186,21 @@ class TestExecutor(unittest.TestCase):
 
     def test_return_node(self):
         """Test the return node."""
-        pass
+        none_literal = new_literal(Executor.store_none())
+        true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
+        
+        # test empty return node
+        context = Executor.default_context()
+        empty_return = new_node(Executor._RETURN)
+        self.assertEqual(empty_return.eval(context), none_literal.data)
+        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_RETURN)
+        
+        # test return with value
+        context = Executor.default_context()
+        value_return = new_node(Executor._RETURN)
+        value_return.add(true_literal)
+        self.assertEqual(value_return.eval(context), true_literal.data)
+        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_RETURN)
 
     def test_break_node(self):
         """Test the break node."""
