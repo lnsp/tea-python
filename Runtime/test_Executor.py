@@ -190,7 +190,10 @@ class TestExecutor(unittest.TestCase):
 
     def test_break_node(self):
         """Test the break node."""
-        pass
+        context = Executor.default_context()
+        break_node = new_node(Executor._BREAK)
+        self.assertEqual(break_node.eval(context), none_literal.data)
+        self.assertEqual(context["behaviour"], Executor.BEHAVIOUR_BREAK)
 
     def test_continue_node(self):
         """Test the continue node."""
