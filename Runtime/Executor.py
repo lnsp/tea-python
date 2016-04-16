@@ -39,30 +39,6 @@ def store_none():
     return store_value(DATA_NONE, None)
 
 
-def operator_add_exec(context, params):
-    """Add operator function."""
-    return store_value(DATA_INTEGER, 0)
-
-
-def operator_subtract_exec(context, params):
-    """Subtract operator function."""
-    return store_value(DATA_INTEGER, 0)
-
-OPERATOR_ADD = {
-    "name": "add",
-    "precedence": 4,
-    "binding": "left",
-    "symbol": "+",
-    "execution": operator_add_exec,
-}
-OPERATOR_SUBTRACT = {
-    "name": "subtract",
-    "precedence": 4,
-    "binding": "left",
-    "symbol": "-",
-    "execution": operator_subtract_exec,
-}
-
 
 class Node:
     """A node in the abstract syntax tree."""
