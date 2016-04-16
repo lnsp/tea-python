@@ -252,7 +252,7 @@ def eval_break(node, context):
 
 def eval_continue(node, context):
     """Evaluate a continue statement."""
-    context["continue"] = BEHAVIOUR_CONTINUE
+    context["behaviour"] = BEHAVIOUR_CONTINUE
     return store_none()
 
 TYPES = {
