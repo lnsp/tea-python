@@ -172,39 +172,15 @@ def eval_conditional(node, context):
             return False
     
 def eval_loop(node, context):
-    """Evaluate either a 2-component or 4-component loop."""
-    n = len(node.children)
-    # substitute for loop context
-    loop_ns = Namespace(context["local"])
-    context["local"] = loop_ns
-    if n == 2:  # while-loop
-        behaviour = context["behaviour"]
-        while node.children[0].eval(context)["value"]:
+    """Evaluate a 2-component loop. for [0] { ... }"""
+    cond = False
+    while (cond = eval_conditional(node, context)) != False:
+        if context["behaviour"] == BEHAVIOUR_CONTINUE:
             context["behaviour"] = BEHAVIOUR_DEFAULT
-            result = node.children[1].eval(context)
-            behaviour = context["behaviour"]
-            if behaviour == BEHAVIOUR_RETURN:
-                return result
-            if behaviour == BEHAVIOUR_BREAK:
-                break
-        return store_none()
-    elif n == 4:
-        # execute start statement
-        node.children[0].eval(context)
-        # execute loop
-        while node.children[1].eval(context)["value"]:
-            context["behaviour"] = BEHAVIOUR_DEFAULT
-            # execute statements
-            result = node.children[2].eval(context)
-            behaviour = context["behaviour"]
-            if behaviour == BEHAVIOUR_RETURN:
-                return result
-            if behaviour == BEHAVIOUR_BREAK:
-                break
-            # execute iterator
-            node.children[3].eval(context)
-        return store_none()
-
+        if context["behaviour"] == BEHAVIOUR_BREAK:
+            break
+        if context["behaviour"] == BEHAVIOUR_RETURN:
+            return cond
 
 def eval_operator(node, context):
     """Evaluate an operator and return the result.
