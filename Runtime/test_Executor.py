@@ -216,7 +216,11 @@ class TestExecutor(unittest.TestCase):
 
     def test_literal_node(self):
         """Test the literal node."""
-        pass
+        context = Executor.default_context()
+        self.assertEqual(none_literal.eval(context), none_literal.data)
+        self.assertEqual(string_literal.eval(context), string_literal.data)
+        self.assertEqual(true_literal.eval(context), true_literal.data)
+        self.assertEqual(false_literal.eval(context), false_literal.data)
 
 if __name__ == "__main__":
     unittest.main()
