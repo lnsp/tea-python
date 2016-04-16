@@ -177,10 +177,10 @@ def eval_operator(node, context):
 
     node.data['symbol'] is required for execution.
     """
-    operator = context.find_operator(node.data["symbol"])
+    operator = context.find_operator(node.data)
     if operator is not None:
-        values = [child.eval(context) for child in node.children]
-        return operator["execution"](context, values)
+        args = [child.eval(context) for child in node.children]
+        return operator["execution"](context, args)
     raise Exception("Operator not found")
 
 
@@ -189,16 +189,10 @@ def eval_function(node, context):
 
     node.data['name'] is required for execution.
     """
-    function = context.find_identifier(node.data["name"])
+    function = context.find_identifier(node.data)
     if function is not None:
-        values = [child.eval(context) for child in node.children]
-        # substitute namespace
-        parent_ns = context.ns
-        child_ns = Namespace(context.globalns)
-        context.ns = child_ns
-        # execute function
-        result = function["execution"](context, values)
-        context.ns = parent_ns
+        args = [child.eval(context) for child in node.children]
+        result = function["execution"](context, args)
         return result
     raise Exception("Function not found")
 
@@ -208,9 +202,9 @@ def eval_identifier(node, context):
 
     node.data['name'] is required for execution.
     """
-    identifier = context.find_identifier(node.data["name"])
+    identifier = context.find_identifier(node.data)
     if identifier is not None:
-        identifier["name"] = node.data["name"]
+        identifier["name"] = node.data
         return identifier
     raise Exception("Identifier not found")
 
