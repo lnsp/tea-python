@@ -136,6 +136,12 @@ class Context:
         self.globalns = namespace
         self.behaviour = BEHAVIOUR_DEFAULT
         self.flags = []
+    
+    def find_identifier(self, name):
+        return self.ns.find_identifier(name)
+        
+    def find_operator(self, symbol):
+        return self.ns.find_operator(symbol)
 
 def run_in_substitution(node, context):
     """Run the node in a subtituted namespace."""
@@ -230,7 +236,7 @@ def eval_identifier(node, context):
     if identifier is not None:
         identifier["name"] = node.data["name"]
         return identifier
-    return "Identifier not found"
+    raise Exception("Identifier not found")
 
 
 def eval_literal(node, context):
