@@ -86,10 +86,27 @@ class TestExecutor(unittest.TestCase):
         
     def test_sequence_node(self):
         """Test the sequence node."""
-        sequence = new_node(Executor._SEQUENCE)
         context = Executor.default_context()
-        predicted_result = Executor.store_none()
-        self.assertEqual(sequence.eval(context), predicted_result)
+        none_literal = new_literal(Executor.store_none())
+        true_literal = new_literal(Executor.store_value(Executor.DATA_BOOLEAN, True))
+        return_node = new_node(Executor._RETURN, None)
+        return_node.children = [true_literal]
+        # empty sequence
+        empty_seq = new_node(Executor._SEQUENCE)
+        self.assertEqual(empty_seq.eval(context), none_literal.data)
+        
+        # non-empty sequence
+        non_seq = new_node(Executor._SEQUENCE)
+        non_seq.children = [none_literal, true_literal]
+        self.assertEqual(non_seq.eval(context), true_literal.data)
+        non_seq.children = [true_literal, none_literal]
+        self.assertEqual(non_seq.eval(context), none_literal.data)
+        
+        # sequence with return
+        ret_seq = new_node(Executor._SEQUENCE)
+        ret_seq.children = [return_node, none_literal]
+        self.assertEqual(ret_seq.eval(context), true_literal.data)
+        
 
     def test_conditional_node(self):
         """Test the conditional node."""
