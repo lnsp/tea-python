@@ -36,14 +36,12 @@ class Signature(object):
             if expected_var.datatype != Null:
                 if called_n > n:
                     var = expected_var.datatype.cast(called[n])
-                    var.name = expected_var.name
-                    args.append(var)
                 elif expected_var.data != None:
                     var = expected_var.datatype.cast(expected_var)
-                    var.name = expected_var.name
-                    args.append(var)
                 else:
                     raise Exception("Too less arguments")
+                var.name = expected_var.name
+                args.append(var)
         return args, self.function
     def __str__(self):
         return "<Signature (%s)>" % ",".join(self.expected.name)
