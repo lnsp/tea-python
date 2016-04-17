@@ -5,6 +5,7 @@ int_value = std.Value(std.Integer, 1)
 float_value = std.Value(std.Float, 1.0)
 string_value = std.Value(std.String, "Hello", "identifier")
 list_value = std.Value(std.List, ["H", "e", "l", "l", "o"])
+set_value = std.Value(std.List, set([list_value]))
 bool_value = std.Value(std.Boolean, True, "b")
 true_str_value = std.Value(std.String, "true")
 missing_value = std.Value(std.Integer, 0, "missing")
@@ -87,3 +88,9 @@ class TestStd(unittest.TestCase):
         self.assertEqual(std.List.cast(list_value), list_value)
         self.assertEqual(std.List.cast(string_value), list_value)
         self.assertRaises(std.CastError, std.List.cast, bool_value)
+        
+    def test_set(self):
+        """Test the Set type."""
+        self.assertEqual(std.Set.cast(set_value), set_value)
+        self.assertEqual(std.Set.cast(list_value), set_value)
+        self.assertRaises(std.CastError, std.Set.cast, bool_value)
