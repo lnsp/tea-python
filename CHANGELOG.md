@@ -5,14 +5,16 @@ This project adheres to [Semantic Versioning](https://semver.org).
 ## [Unreleased]
 ### Added
 - String literals
-- Expression executer
-- Split up file structure
-- Add tea scripts
-- Test cases for Executor
+- Abstract syntax tree evaluation
+- Startup scripts
+- Test cases for runtime.ast and runtime.std
+- Basic type system
+- Support for functions and operators
 
 ### Changed
 - Enhanced tokenizer speed
-- Splitted up Runtime and REPL-console
+- Splitted up runtime and REPL interface
+- Seperated the executor into the abstract syntax tree and the standard runtime environment
 
 ## [0.0.2]
 ### Added
