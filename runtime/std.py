@@ -102,6 +102,8 @@ def cast_integer(value):
             return Value(Integer, int(value.data))
         if value.datatype is Boolean:
             return Value(Integer, 1 if value.data else 0)
+        if value.datatype is Null:
+            return Value(Integer, 0)
     raise CastError(value, Integer)
     
 Integer = Type("int", cast_integer)
@@ -110,6 +112,8 @@ def cast_float(value):
     if type(value) is Value:
         if value.datatype in (Float, Integer):
             return Value(Float, float(value.data))
+        if value.datatype is Null:
+            return Value(Float, 0.0)
     raise CastError(value, Float)
     
 Float = Type("float", cast_float)
@@ -132,6 +136,8 @@ def cast_boolean(value):
             return Value(Boolean, True if value.data > 0 else False)
         if value.datatype is Boolean:
             return Value(Boolean, bool(value.data))
+        if value.datatype is Null:
+            return Value(Null, False)
     raise CastError(value, Boolean)
     
 Boolean = Type("bool", cast_boolean)
@@ -160,17 +166,25 @@ def cast_list(value):
 List = Type("list", cast_list)
 
 def cast_map(value):
-    pass
+    if type(value) is Value:
+        if value.datatype in Map:
+            return Value(Map, map(value.data))
+    raise CastError(value, Map)
     
 Map = Type("map", cast_map)
 
 def cast_set(value):
-    pass
+    if type(value) is Value:
+        if value.datatype in (Set, List):
+            return Value(Set, set(value.data))
+    raise CastError(value, Set)
     
 Set = Type("set", cast_set)
 
 def cast_object(value):
-    pass
+    if type(Value) is Value:
+        return Value(Object, value.data)
+    raise CastError(value, Object)
 
 Object = Type("object", cast_object)
 
