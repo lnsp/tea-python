@@ -1,5 +1,5 @@
 """Parse an tokenized expression into an AST."""
-from Runtime import Executor
+import runtime.execution
 
 
 def apply(tokens):

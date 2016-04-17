@@ -1,6 +1,6 @@
 """Test package for Utils.py."""
 import unittest
-from Runtime import Utils
+from runtime import utils
 
 
 class TestUtils(unittest.TestCase):
@@ -8,7 +8,7 @@ class TestUtils(unittest.TestCase):
 
     def test_tree(self):
         """Test the tree method."""
-        t = Utils.tree()
+        t = utils.tree()
         t["hello"] = 3
         t["foo"]["bar"] = 42
         self.assertEqual(t["hello"], 3)

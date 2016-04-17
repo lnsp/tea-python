@@ -1,5 +1,5 @@
 """Eval an abstract syntax tree."""
-from Runtime import Utils
+from runtime import utils
 
 BEHAVIOUR_DEFAULT = "default"  # do nothing special
 BEHAVIOUR_BREAK = "break"
