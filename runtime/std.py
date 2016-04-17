@@ -13,6 +13,8 @@ class Value(object):
             and self.data == other.data)
     def __ne__(self, other):
         return not self.__eq__(other) 
+    def __str__(self):
+        return "<Value ? %s *(%s)>" % (self.datatype, self.name)
 
 class Signature(object):
     """A signature matching a function call."""
@@ -32,6 +34,9 @@ class Signature(object):
             raise Exception("Too many arguments")
         args = [self.expected[n].cast(called[n]) for n in range(expected_n)]
         return args, self.function
+    def __str__(self):
+        return "<Signature (%s)>" % ",".join(self.expected.name)
+     
 
 class Function(object):
     """A function with a collection of signatures."""
@@ -46,6 +51,9 @@ class Function(object):
                 return fnc(context, values)
             except: pass
         raise Exception("No matching signature found")
+        
+    def __str__(self):
+        return "<Function *(%s)>" % self.name
 
 class Operator(object):
     """A operator with a collection of signatures and functions."""
@@ -57,45 +65,83 @@ class Operator(object):
     def eval(self, args, context):
         return self.function.eval(args, context)
         
+    def __str__(self):
+        return "<Operator (%s)>" % self.symbol
+        
 class Type(object):
     """A type representing a basic type."""
     
     def __init__(self, name, cast=None):
         self.name = name
         self.cast = cast
+        
+    def __str__(self):
+        return "<T %s>" % self.name
+
+class CastError(Exception):
+    def __init__(self, value, datatype):
+        super().__init__("%s not parseable to %s" % (value, datatype))
 
 def cast_integer(value):
-    pass
+    if type(value) is Value:
+        if value.datatype in (Float, Integer):
+            return Value(Integer, int(value.data))
+        if value.datatype is Boolean:
+            return Value(Integer, 1 if value.data else 0)
+    raise CastError(value, Integer)
     
 Integer = Type("int", cast_integer)
 
 def cast_float(value):
-    pass
+    if type(value) is Value:
+        if value.datatype in (Float, Integer):
+            return Value(Float, float(value.data))
+    raise CastError(value, Float)
     
 Float = Type("float", cast_float)
 
 def cast_string(value):
-    pass
+    if type(value) is Value:
+        if value.datatype in (Integer, Float, String):
+            return Value(String, str(value.data))
+        if value.datatype is Boolean:
+            return Value(String, "true" if value.data else "false")
+        if value.datatype is Null:
+            return Value(String, "null")
+    raise CastError(value, String)
     
 String = Type("string", cast_string)
 
 def cast_boolean(value):
-    pass
+    if type(value) is Value:
+        if value.datatype is Integer:
+            return Value(Boolean, True if value.data > 0 else False)
+        if value.datatype is Boolean:
+            return Value(Boolean, bool(value.data))
+    raise CastError(value, Boolean)
     
 Boolean = Type("bool", cast_boolean)
 
 def cast_null(value):
-    pass
+    if type(value) is Value:
+        return Value(Null)
+    raise CastError(value, Null)
     
 Null = Type("null", cast_null)
 
-def cast_function(value):
-    pass
+def cast_func(value):
+    if type(value) is Value:
+        if value.datatype is Func:
+            return Value(Func, value.data)
+    raise CastError(value, Func)
     
-Function = Type("function", cast_function)
+Func = Type("func", cast_func)
 
 def cast_list(value):
-    pass
+    if type(value) is Value:
+        if value.datatype in (List, String):
+            return Value(List, list(value.data))
+    raise CastError(value, List)
     
 List = Type("list", cast_list)
 
