@@ -16,6 +16,11 @@ class Value(object):
     def __str__(self):
         return "<Value ? %s *(%s)>" % (self.datatype, self.name)
 
+class ArgumentError(Exception):
+    def __init__(self, expected, got):
+        message = "Too " + ("many" if expected < got else "less") + "arguments"
+        super().__init__("%s: expected %d, got %d" % (message, expected, got))
+
 class Signature(object):
     """A signature matching a function call."""
     def __init__(self, expected, function):
@@ -29,7 +34,7 @@ class Signature(object):
         """
         expected_n, called_n = len(self.expected), len(called)
         if expected_n < called_n:
-            raise Exception("Too many arguments")
+            raise ArgumentError(expected_n, called_n)
         args = [Value(Null) for x in range(expected_n)]
         for n in range(expected_n):
             expected_var = self.expected[n]
@@ -39,9 +44,9 @@ class Signature(object):
                 elif expected_var.data != None:
                     var = expected_var.datatype.cast(expected_var)
                 else:
-                    raise Exception("Too less arguments")
+                    raise ArgumentError(expected_n, called_n)
                 var.name = expected_var.name
-                args.append(var)
+                args[n] = var
         return args, self.function
     def __str__(self):
         return "<Signature (%s)>" % ",".join(self.expected.name)
