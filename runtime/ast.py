@@ -24,6 +24,12 @@ class Node:
         
     def __str__(self):
         return "<Node (%s)>" % (type(self).name)
+        
+    def tree_to_string(self, root=0):
+        path_ws = " " * root
+        my_path = path_ws + "|\n" + path_ws + "+-" + ("+" if len(self.children) > 0 else "-") + "-"
+        my_node = my_path + str(self) + "\n"
+        return my_node + ''.join([n.tree_to_string(root+2) for n in self.children])
 
 class Sequence(Node):
     """A sequence node."""

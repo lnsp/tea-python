@@ -18,7 +18,7 @@ def interpret(expression, context):
     
     tokens = tokenizer.apply(expression)
     tree = parser.generate(tokens)
-    return CLI_RESULT + str(tree.eval(context).data)
+    return tree.tree_to_string()
 
 
 def main():
@@ -28,10 +28,11 @@ def main():
 
     # run REPL
     context = std.default_context()
-    while "exit" not in context.flags:
+    while "done" not in context.flags:
         output = interpret(input(CLI_SYMBOL), context)
         while "continue" in context.flags:
             output = interpret(input(CLI_SPACE), context)
+        if "exit" in context.flags: return
         print(output)
 
 if __name__ == "__main__":
