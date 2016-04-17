@@ -13,6 +13,7 @@ null_value = std.Value(std.Null)
 example_operator = std.Operator(None, "+")
 missing_operator = std.Operator(None, "?")
 empty_function = std.Value(std.Func, None)
+object_value = std.Value(std.Object, None)
 
 class TestStd(unittest.TestCase):
     def test_namespace(self):
@@ -94,3 +95,8 @@ class TestStd(unittest.TestCase):
         self.assertEqual(std.Set.cast(set_value), set_value)
         self.assertEqual(std.Set.cast(list_value), set_value)
         self.assertRaises(std.CastError, std.Set.cast, bool_value)
+    
+    def test_object(self):
+        """Test the Object type."""
+        self.assertEqual(std.Object.cast(object_value), object_value)
+        self.assertRaises(std.CastError, std.Object.cast, missing_operator)
