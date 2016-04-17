@@ -50,26 +50,30 @@ class Signature(object):
         return args, self.function
     def __str__(self):
         return "<Signature (%s)>" % ",".join(self.expected.name)
-     
+
+class FunctionError(Exception):
+    def __init__(self, function, message="No signature found"):
+        super().__init__("%s in %s" % (message, function))
 
 class Function(object):
     """A function with a collection of signatures."""
     def __init__(self, signatures, name=None, source_ns=None):
         self.signatures = signatures
         self.name = name
+        self.source_ns = source_ns
         
     def eval(self, args, context):
         for sgn in self.signatures:
             try:
                 values, fnc = sgn.match(args)
-                orig, context.ns = context.ns, Namespace(source_ns)
+                orig, context.ns = context.ns, Namespace(self.source_ns)
                 # place args in namespace
                 context.ns.store_all(values)
                 result = fnc.eval(context)
                 context.ns = orig
                 return result
-            except: pass
-        raise Exception("No matching signature found")
+            except (ArgumentError, CastError): pass
+        raise FunctionError(self)
         
     def __str__(self):
         return "<Function *(%s)>" % self.name
