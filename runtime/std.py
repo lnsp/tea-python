@@ -28,11 +28,22 @@ class Signature(object):
         If no, it raises an error.
         """
         expected_n, called_n = len(self.expected), len(called)
-        if expected_n > called_n:
-            raise Exception("Too less arguments")
-        elif expected_n < called_n:
+        if expected_n < called_n:
             raise Exception("Too many arguments")
-        args = [self.expected[n].cast(called[n]) for n in range(expected_n)]
+        args = [Value(Null) for x in range(expected_n)]
+        for n in range(expected_n):
+            expected_var = self.expected[n]
+            if expected_var.datatype != Null:
+                if called_n > n:
+                    var = expected_var.datatype.cast(called[n])
+                    var.name = expected_var.name
+                    args.append(var)
+                elif expected_var.data != None:
+                    var = expected_var.datatype.cast(expected_var)
+                    var.name = expected_var.name
+                    args.append(var)
+                else:
+                    raise Exception("Too less arguments")
         return args, self.function
     def __str__(self):
         return "<Signature (%s)>" % ",".join(self.expected.name)
@@ -40,15 +51,20 @@ class Signature(object):
 
 class Function(object):
     """A function with a collection of signatures."""
-    def __init__(self, signatures, name=None):
+    def __init__(self, signatures, name=None, source_ns=None):
         self.signatures = signatures
         self.name = name
         
     def eval(self, args, context):
         for sgn in self.signatures:
             try:
-                values, fnc = match(args)
-                return fnc(context, values)
+                values, fnc = sgn.match(args)
+                orig, context.ns = context.ns, Namespace(source_ns)
+                # place args in namespace
+                context.ns.store_all(values)
+                result = fnc.eval(context)
+                context.ns = orig
+                return result
             except: pass
         raise Exception("No matching signature found")
         
@@ -160,6 +176,10 @@ def cast_object(value):
 
 Object = Type("object", cast_object)
 
+default_types = [
+    Integer, Float, Boolean, String, List, Set, Map, Object, Null, Func
+]
+
 class Namespace:
     """A variable and operator namespace."""
 
@@ -197,8 +217,16 @@ class Namespace:
         else:
             raise Exception("Item cannot be stored in namespace")
             
+    def store_all(self, items):
+        """Stores a list or tuple of items."""
+        for e in items:
+            self.store(e)
+            
     def child(self):
         return Namespace(self)
+        
+    def __str__(self):
+        return "<Namespace>"
 
 class Context:
     """A context for temporary storage."""
@@ -222,10 +250,15 @@ class Context:
         org = self.ns
         self.ns = self.ns.child()
         return org
+        
+    def __str__(self):
+        return "<Context>"
 
 def default_namespace():
     """Initialize a default namespace."""
-    return Namespace(None)
+    ns = Namespace(None)
+    ns.store_all(default_types)
+    return ns
 
 
 def default_context():

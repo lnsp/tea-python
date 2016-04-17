@@ -21,6 +21,9 @@ class Node:
         
     def add(self, node):
         self.children.append(node)
+        
+    def __str__(self):
+        return "<Node (%s)>" % (type(self).name)
 
 class Sequence(Node):
     """A sequence node."""
@@ -154,7 +157,7 @@ class Cast(Node):
         
     def eval(self, context):
         """Evaluate a type cast and return the result."""
-        target_type = context.find("ty", self.type)
+        target_type = context.find("ty", self.target)
         if target_type is not None:
             value = self.children[0].eval(context)
             return target_type.cast(value)
@@ -200,8 +203,3 @@ class Continue(Node):
 def syntax_tree():
     """Initialize a default syntax tree."""
     return Sequence()
-
-
-def apply(syntax_tree, context):
-    """Evaluate the syntax tree."""
-    return syntax_tree.eval(context)

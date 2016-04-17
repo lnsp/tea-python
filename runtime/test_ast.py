@@ -28,6 +28,7 @@ class TestAST(unittest.TestCase):
         ret_seq = ast.Sequence()
         ret_seq.children = [return_node, null_literal]
         self.assertEqual(ret_seq.eval(context), true_literal.value)
+        self.assertEqual(ret_seq.__str__(), "<Node (sequence)>")
         
 
     def test_conditional_node(self):
@@ -45,6 +46,7 @@ class TestAST(unittest.TestCase):
         good_conditional.add(true_literal)
         good_conditional.add(null_literal)
         self.assertEqual(good_conditional.eval(context), null_literal.value)
+        self.assertEqual(good_conditional.__str__(), "<Node (conditional)>")
 
     def test_branch_node(self):
         """Test the branch node."""
@@ -66,6 +68,7 @@ class TestAST(unittest.TestCase):
         ifelifelse_branch = ast.Branch()
         ifelifelse_branch.children = [false_cond, true_cond, null_literal]
         self.assertEqual(ifelifelse_branch.eval(context), string_literal.value)
+        self.assertEqual(if_branch.__str__(), "<Node (branch)>")
 
     def test_loop_node(self):
         """Test the loop node."""
@@ -90,6 +93,7 @@ class TestAST(unittest.TestCase):
         return_loop.children = [true_literal, return_node]
         self.assertEqual(return_loop.eval(context), true_literal.value)
         self.assertEqual(context.behaviour, ast.Behaviour.Return)
+        self.assertEqual(return_loop.__str__(), "<Node (loop)>")
 
     def test_return_node(self):
         """Test the return node."""
@@ -105,6 +109,7 @@ class TestAST(unittest.TestCase):
         value_return.add(true_literal)
         self.assertEqual(value_return.eval(context), true_literal.value)
         self.assertEqual(context.behaviour, ast.Behaviour.Return)
+        self.assertEqual(value_return.__str__(), "<Node (return)>")
 
     def test_break_node(self):
         """Test the break node."""
@@ -112,6 +117,7 @@ class TestAST(unittest.TestCase):
         break_node = ast.Break()
         self.assertEqual(break_node.eval(context), null_literal.value)
         self.assertEqual(context.behaviour, ast.Behaviour.Break)
+        self.assertEqual(break_node.__str__(), "<Node (break)>")
 
     def test_continue_node(self):
         """Test the continue node."""
@@ -119,13 +125,18 @@ class TestAST(unittest.TestCase):
         continue_node = ast.Continue()
         self.assertEqual(continue_node.eval(context), null_literal.value)
         self.assertEqual(context.behaviour, ast.Behaviour.Continue)
+        self.assertEqual(continue_node.__str__(), "<Node (continue)>")
 
-    def test_function_node(self):
+    def test_call_node(self):
         """Test the function node."""
         pass
 
     def test_operator_node(self):
         """Test the operator node."""
+        pass
+        
+    def test_cast_node(self):
+        """Test the cast node."""
         pass
 
     def test_identifier_node(self):

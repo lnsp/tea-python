@@ -1,10 +1,7 @@
 #!/usr/bin/python3
 """Command line runtime for Tea."""
 
-from Runtime import Tokenizer
-from Runtime import Parser
-from Runtime import Executor
-from Runtime import Utils
+from runtime import tokenizer, parser, ast, std
 
 TEA_VERSION = "0.0.3-dev"
 TEA_TITLE = "Tea @" + TEA_VERSION
@@ -16,12 +13,12 @@ CLI_RESULT = "<- "
 def interpret(expression, context):
     """Interpret an expression by tokenizing, parsing and evaluating."""
     if expression == "exit":
-        context["status"] = Utils.CMD_EXIT
-    else:
-        expr_tokens = Tokenizer.apply(expression)
-        expr_tree = Parser.apply(expr_tokens)
-        expr_result = Executor.apply(Parser.demo_syntax_tree(), context)
-        context["output"] = CLI_RESULT + str(expr_result["value"])
+        context.flags.append("exit")
+        return
+    
+    tokens = tokenizer.apply(expression)
+    tree = parser.generate(tokens)
+    return CLI_RESULT + str(tree.eval(context).data)
 
 
 def main():
@@ -30,15 +27,12 @@ def main():
     print(TEA_TITLE)
 
     # run REPL
-    context = Utils.tree()
-    while context["status"] != Utils.CMD_EXIT:
-        context["status"] = Utils.CMD_NULL
-        context["output"] = None
-
-        interpret(input(CLI_SYMBOL), context)
-        while context["status"] == Utils.CMD_CONTINUE:
-            interpret(input(CLI_SPACE), context)
-        print(context["output"])
+    context = std.default_context()
+    while "exit" not in context.flags:
+        output = interpret(input(CLI_SYMBOL), context)
+        while "continue" in context.flags:
+            output = interpret(input(CLI_SPACE), context)
+        print(output)
 
 if __name__ == "__main__":
     main()
