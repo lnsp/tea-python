@@ -182,7 +182,7 @@ def cast_set(value):
 Set = Type("set", cast_set)
 
 def cast_object(value):
-    if type(Value) is Value:
+    if type(value) is Value:
         return Value(Object, value.data)
     raise CastError(value, Object)
 
