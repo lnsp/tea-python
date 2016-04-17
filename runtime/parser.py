@@ -1,19 +1,17 @@
 """Parse an tokenized expression into an AST."""
-import runtime.execution
-
+from runtime import ast, std
 
 def apply(tokens):
     """Parse the tokens to AST notation."""
     # TODO: Implement parser
-    return Executor.syntax_tree()
+    return ast.syntax_tree()
 
 
 def demo_syntax_tree():
     """Initialize a demo syntax tree."""
-    tree = Executor.syntax_tree()
+    tree = ast.syntax_tree()
 
-    literal = Executor.store_value(Executor.DATA_STRING, "Hallo Welt!")
-    literal_node = Executor.Node(Executor.TYPES[Executor._LITERAL], literal)
-
+    literal_node = ast.Literal(std.Value(std.String, "Hallo Welt!"))
     tree.add(literal_node)
+    
     return tree
