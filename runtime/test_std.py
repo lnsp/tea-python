@@ -1,5 +1,5 @@
 import unittest
-from runtime import std
+from runtime import std, ast
 
 int_value = std.Value(std.Integer, 1)
 float_value = std.Value(std.Float, 1.0)
@@ -148,3 +148,34 @@ class TestStd(unittest.TestCase):
             std.Value(std.Float, -1.0, "phi"),
         ]
         self.assertEqual(sign.match(fourth_case), (fourth_case_result, "works!"))
+        
+    def test_function(self):
+        """Test the function class."""
+        context = std.default_context()
+        
+        # Function without signatures
+        func = std.Function([])
+        self.assertRaises(std.FunctionError, func.eval, [], context)
+        
+        # Function with one signature, perfect match
+        identifier_literal = ast.Identifier("str")
+        func = std.Function([
+            std.Signature([std.Value(std.String, None, "str")], identifier_literal),
+        ])
+        args = [
+            string_value,
+        ]
+        self.assertEqual(func.eval(args, context), string_value)
+        
+        # Function with one signature, optional argument
+        func = std.Function([
+            std.Signature([std.Value(std.String, string_value.data, "str")], identifier_literal),
+        ])
+        self.assertEqual(func.eval(args, context), string_value)
+        
+        # Function with two signatures, second perfect match
+        func = std.Function([
+            std.Signature([std.Value(std.Integer, None, "i")], None),
+            std.Signature([std.Value(std.String, None, "str")], identifier_literal),
+        ])
+        self.assertEqual(func.eval(args, context), string_value)
