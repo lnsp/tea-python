@@ -56,7 +56,7 @@ class Type:
         self.name = name
         self.cast = cast
 
-datatypes = {
+TYPES = {
     "int": Type("int"),
     "float": Type("float"),
     "bool": Type("bool"),
@@ -69,7 +69,7 @@ datatypes = {
 }
 
 def store_null():
-    return Value(datatypes["null"], None)
+    return Value(TYPES["null"], None)
 
 class Function:
     """A function with a collection of signatures."""
@@ -235,7 +235,7 @@ def eval_branch(node, context):
 def eval_conditional(node, context):
     """Evaluate a conditional (if [0] then [1])."""
     correct = node.children[0].eval(context)
-    if correct.datatype is not datatypes["bool"]:
+    if correct.datatype is not TYPES["bool"]:
         raise Exception("Bad conditional")
     else:
         if correct.data:
@@ -293,7 +293,7 @@ def eval_identifier(node, context):
 def eval_literal(node, context):
     """Evaluate a literal and return the result.
 
-    node.data['type'] and node.data['value'] is required for execution.
+    node.data (Value) is required for execution.
     """
     return node.data
 
@@ -319,7 +319,7 @@ def eval_continue(node, context):
     context.behaviour = BEHAVIOUR_CONTINUE
     return store_null()
 
-TYPES = {
+NODES = {
     _SEQUENCE: {
         "name": _SEQUENCE,
         "execution": eval_sequence,
@@ -380,7 +380,7 @@ def default_context():
 
 def syntax_tree():
     """Initialize a default syntax tree."""
-    root = Node(TYPES[_SEQUENCE], None)
+    root = Node(NODES[_SEQUENCE], None)
     return root
 
 

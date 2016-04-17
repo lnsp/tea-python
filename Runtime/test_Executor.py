@@ -1,21 +1,21 @@
 """Test package for Executor.py."""
 import unittest
 from Runtime import Executor
-from Runtime.Executor import Value, Node, store_null, datatypes, Identifier, Operator, Function
+from Runtime.Executor import Value, Node, store_null, TYPES, NODES, Identifier, Operator, Function
 
 
 
 def new_node(typename, data=None):
-    return Node(Executor.TYPES[typename], data)
+    return Node(NODES[typename], data)
     
 def new_literal(value):
     return new_node(Executor._LITERAL, value)
     
 null_literal = new_literal(store_null())
-int_literal = new_literal(Value(datatypes["int"], 0))
-true_literal = new_literal(Value(datatypes["bool"], True))
-false_literal = new_literal(Value(datatypes["bool"], False))
-string_literal = new_literal(Value(datatypes["string"], "works"))
+int_literal = new_literal(Value(TYPES["int"], 0))
+true_literal = new_literal(Value(TYPES["bool"], True))
+false_literal = new_literal(Value(TYPES["bool"], False))
+string_literal = new_literal(Value(TYPES["string"], "works"))
         
 
 class TestExecutor(unittest.TestCase):
@@ -25,7 +25,7 @@ class TestExecutor(unittest.TestCase):
         """Test the syntax_tree method."""
         syntax_tree = Executor.syntax_tree()
         self.assertTrue(syntax_tree is not None)
-        self.assertEqual(syntax_tree.type, Executor.TYPES[Executor._SEQUENCE])
+        self.assertEqual(syntax_tree.type, NODES[Executor._SEQUENCE])
 
     def test_namespace(self):
         """Test the Namespace class."""
@@ -84,7 +84,7 @@ class TestExecutor(unittest.TestCase):
         """Test the store_null method."""
         a = Executor.store_null()
         b = Executor.store_null()
-        self.assertEqual(a.datatype, Executor.datatypes["null"])
+        self.assertEqual(a.datatype, TYPES["null"])
         self.assertEqual(a.data, None)
         self.assertEqual(a, b)
         
@@ -205,9 +205,7 @@ class TestExecutor(unittest.TestCase):
         pass
 
     def test_operator_node(self):
-        """Test the operator node.
-        A operator has one or more call signatures, that match a function call.
-        """
+        """Test the operator node."""
         pass
 
     def test_identifier_node(self):
