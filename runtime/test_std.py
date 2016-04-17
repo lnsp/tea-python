@@ -100,3 +100,51 @@ class TestStd(unittest.TestCase):
         """Test the Object type."""
         self.assertEqual(std.Object.cast(object_value), object_value)
         self.assertRaises(std.CastError, std.Object.cast, missing_operator)
+        
+    def test_signature(self):
+        """Test the signature class."""
+        expected_values = [
+            std.Value(std.Integer, None, "x"),
+            std.Value(std.Float, None, "delta"),
+            std.Value(std.Float, -1.0, "phi"),
+        ]
+        sign = std.Signature(expected_values, "works!")
+        # Case 1: Too many arguments
+        first_case = [
+            std.Value(std.Integer, 3),
+            std.Value(std.Float, 3.0),
+            std.Value(std.Float, -3.0),
+            std.Value(std.Integer, 3.0),
+        ]
+        self.assertRaises(std.ArgumentError, sign.match, first_case)
+        
+        # Case 2: Too less arguments
+        second_case = [
+            std.Value(std.Integer, 3),
+        ]
+        self.assertRaises(std.ArgumentError, sign.match, second_case)
+        
+        # Case 3: Fitting arguments
+        third_case =  [
+            std.Value(std.Integer, 3),
+            std.Value(std.Integer, 0),
+            std.Value(std.Float, 0.0),
+        ]
+        third_case_result = [
+            std.Value(std.Integer, 3, "x"),
+            std.Value(std.Float, 0.0, "delta"),
+            std.Value(std.Float, 0.0, "phi"),
+        ]
+        self.assertEqual(sign.match(third_case), (third_case_result, "works!"))
+        
+        # Case 4: default values
+        fourth_case = [
+            std.Value(std.Integer, 3),
+            std.Value(std.Integer, 0),
+        ]
+        fourth_case_result = [
+            std.Value(std.Integer, 3, "x"),
+            std.Value(std.Float, 0.0, "delta"),
+            std.Value(std.Float, -1.0, "phi"),
+        ]
+        self.assertEqual(sign.match(fourth_case), (fourth_case_result, "works!"))
