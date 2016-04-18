@@ -1,16 +1,16 @@
 import unittest
-from runtime import ast, std
+from runtime import ast, env, lib
     
-null_literal = ast.Literal(std.Value(std.Null))
-int_literal = ast.Literal(std.Value(std.Integer, 0))
-true_literal = ast.Literal(std.Value(std.Boolean, True))
-false_literal = ast.Literal(std.Value(std.Boolean, False))
-string_literal = ast.Literal(std.Value(std.String, "Hallo Welt!", "identifier"))
+null_literal = ast.Literal(env.Value(env.Null))
+int_literal = ast.Literal(env.Value(lib.Integer, 0))
+true_literal = ast.Literal(env.Value(lib.Boolean, True))
+false_literal = ast.Literal(env.Value(lib.Boolean, False))
+string_literal = ast.Literal(env.Value(lib.String, "Hallo Welt!", "identifier"))
 
 class TestAst(unittest.TestCase):
     def test_sequence_node(self):
         """Test the sequence node."""
-        context = std.default_context()
+        context = env.empty_context()
         return_node = ast.Return()
         return_node.children = [true_literal]
         # empty sequence
@@ -33,7 +33,7 @@ class TestAst(unittest.TestCase):
 
     def test_conditional_node(self):
         """Test the conditional node."""
-        context = std.default_context()
+        context = env.empty_context()
         
         # Test bad conditional error
         bad_conditional = ast.Conditional()
@@ -50,7 +50,7 @@ class TestAst(unittest.TestCase):
 
     def test_branch_node(self):
         """Test the branch node."""
-        context = std.default_context()
+        context = env.empty_context()
         # always evaluates
         true_cond = ast.Conditional()
         true_cond.children = [true_literal, string_literal]
@@ -75,7 +75,7 @@ class TestAst(unittest.TestCase):
         break_node = ast.Break()
         return_node = ast.Return()
         return_node.children = [true_literal]
-        context = std.default_context()
+        context = env.empty_context()
         
         # check for exception
         bad_loop = ast.Loop()
@@ -98,13 +98,13 @@ class TestAst(unittest.TestCase):
     def test_return_node(self):
         """Test the return node."""
         # test empty return node
-        context = std.default_context()
+        context = env.empty_context()
         empty_return = ast.Return()
         self.assertEqual(empty_return.eval(context), null_literal.value)
         self.assertEqual(context.behaviour, ast.Behaviour.Return)
         
         # test return with value
-        context = std.default_context()
+        context = env.empty_context()
         value_return = ast.Return()
         value_return.add(true_literal)
         self.assertEqual(value_return.eval(context), true_literal.value)
@@ -113,7 +113,7 @@ class TestAst(unittest.TestCase):
 
     def test_break_node(self):
         """Test the break node."""
-        context = std.default_context()
+        context = env.empty_context()
         break_node = ast.Break()
         self.assertEqual(break_node.eval(context), null_literal.value)
         self.assertEqual(context.behaviour, ast.Behaviour.Break)
@@ -121,7 +121,7 @@ class TestAst(unittest.TestCase):
 
     def test_continue_node(self):
         """Test the continue node."""
-        context = std.default_context()
+        context = env.empty_context()
         continue_node = ast.Continue()
         self.assertEqual(continue_node.eval(context), null_literal.value)
         self.assertEqual(context.behaviour, ast.Behaviour.Continue)
@@ -139,35 +139,35 @@ class TestAst(unittest.TestCase):
             def eval(self, context):
                 s = 0
                 for c in self.children: s += c.eval(context).data
-                return std.Value(std.Integer, s)
+                return env.Value(lib.Integer, s)
         
         sum_function = SumNode()
-        sgn1 = std.Value(std.Integer, None, "a")
-        sgn2 = std.Value(std.Integer, None, "b")
+        sgn1 = env.Value(lib.Integer, None, "a")
+        sgn2 = env.Value(lib.Integer, None, "b")
         sum_function.children = [
             ast.Identifier("a"),
             ast.Identifier("b"),
         ]
-        context = std.default_context()
-        func = std.Function([
-            std.Signature([sgn1, sgn2], sum_function),
+        context = env.empty_context()
+        func = env.Function([
+            env.Signature([sgn1, sgn2], sum_function),
         ], "my_func")
         context.store(func)
         
         arg1 = SumNode()
         arg1.children = [
-            ast.Literal(std.Value(std.Integer, 1)),
-            ast.Literal(std.Value(std.Integer, 2)),
+            ast.Literal(env.Value(lib.Integer, 1)),
+            ast.Literal(env.Value(lib.Integer, 2)),
         ]
         arg2 = SumNode()
         arg2.children = [
-            ast.Literal(std.Value(std.Integer, 3)),
-            ast.Literal(std.Value(std.Integer, 4)),
+            ast.Literal(env.Value(lib.Integer, 3)),
+            ast.Literal(env.Value(lib.Integer, 4)),
         ]
         call_node = ast.Call("my_func")
         call_node.children = [arg1, arg2]
         
-        self.assertEqual(call_node.eval(context), std.Value(std.Integer, 10))
+        self.assertEqual(call_node.eval(context), env.Value(lib.Integer, 10))
         bad_node = ast.Call("missing")
         self.assertRaises(Exception, bad_node.eval, context)
         
@@ -185,43 +185,44 @@ class TestAst(unittest.TestCase):
             def eval(self, context):
                 s = 0
                 for c in self.children: s += c.eval(context).data
-                return std.Value(std.Integer, s)
+                return env.Value(lib.Integer, s)
         
         sum_function = SumNode()
-        sgn1 = std.Value(std.Integer, None, "a")
-        sgn2 = std.Value(std.Integer, None, "b")
+        sgn1 = env.Value(lib.Integer, None, "a")
+        sgn2 = env.Value(lib.Integer, None, "b")
         sum_function.children = [
             ast.Identifier("a"),
             ast.Identifier("b"),
         ]
-        context = std.default_context()
-        func = std.Function([
-            std.Signature([sgn1, sgn2], sum_function),
+        context = env.empty_context()
+        func = env.Function([
+            env.Signature([sgn1, sgn2], sum_function),
         ])
-        op = std.Operator(func, "+")
+        op = env.Operator(func, "+")
         context.store(op)
         
         arg1 = SumNode()
         arg1.children = [
-            ast.Literal(std.Value(std.Integer, 1)),
-            ast.Literal(std.Value(std.Integer, 2)),
+            ast.Literal(env.Value(lib.Integer, 1)),
+            ast.Literal(env.Value(lib.Integer, 2)),
         ]
         arg2 = SumNode()
         arg2.children = [
-            ast.Literal(std.Value(std.Integer, 3)),
-            ast.Literal(std.Value(std.Integer, 4)),
+            ast.Literal(env.Value(lib.Integer, 3)),
+            ast.Literal(env.Value(lib.Integer, 4)),
         ]
         call_node = ast.Operation("+")
         call_node.children = [arg1, arg2]
         
-        self.assertEqual(call_node.eval(context), std.Value(std.Integer, 10))
+        self.assertEqual(call_node.eval(context), env.Value(lib.Integer, 10))
         bad_node = ast.Operation("?")
         self.assertRaises(Exception, bad_node.eval, context)
         
     def test_cast_node(self):
         """Test the cast node."""
-        context = std.default_context()
-        cast_node = ast.Cast(std.Integer.name)
+        context = env.empty_context()
+        context.store(lib.Integer)
+        cast_node = ast.Cast(lib.Integer.name)
         cast_node.children = [null_literal]
         self.assertEqual(cast_node.eval(context), int_literal.value)
         bad_node = ast.Cast("missing")
@@ -229,7 +230,7 @@ class TestAst(unittest.TestCase):
 
     def test_identifier_node(self):
         """Test the identifier node."""
-        context = std.default_context()
+        context = env.empty_context()
         # Search in local ns
         context.store(string_literal.value)
         ident_node = ast.Identifier(string_literal.value.name)
@@ -245,7 +246,7 @@ class TestAst(unittest.TestCase):
 
     def test_literal_node(self):
         """Test the literal node."""
-        context = std.default_context()
+        context = env.empty_context()
         self.assertEqual(null_literal.eval(context), null_literal.value)
         self.assertEqual(string_literal.eval(context), string_literal.value)
         self.assertEqual(true_literal.eval(context), true_literal.value)
@@ -267,7 +268,7 @@ class TestAst(unittest.TestCase):
                 context.store(string_literal.value)
                 return string_literal.eval(context)
                 
-        context = std.default_context()
+        context = env.empty_context()
         access_node = AccessNode()
         result = ast.run_in_substitution(access_node, context)
         self.assertEqual(result, string_literal.value)

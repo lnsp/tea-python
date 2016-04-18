@@ -1,5 +1,5 @@
 """Eval an abstract syntax tree."""
-from runtime import std
+from runtime import env, lib
 
 class Behaviour:
     Default = "default"
@@ -41,7 +41,7 @@ class Sequence(Node):
     def eval(self, context):
         """Evaluate a sequence of statements."""
         context.behaviour = Behaviour.Default
-        value = std.Value(std.Null)
+        value = env.Value(env.Null)
 
         for item in self.children:
             value = item.eval(context)
@@ -74,7 +74,7 @@ class Conditional(Node):
     def eval(self, context):
         """Evaluate a conditional (if [0] then [1])."""
         correct = self.children[0].eval(context)
-        if correct.datatype is not std.Boolean:
+        if correct.data not in (True, False):
             raise Exception("Bad conditional")
         else:
             if correct.data:
@@ -95,7 +95,7 @@ class Loop(Node):
             if bhv == Behaviour.Return: return cond
             else:
                 context.behaviour = Behaviour.Default
-                if bhv == Behaviour.Break: return std.Value(std.Null)
+                if bhv == Behaviour.Break: return env.Value(env.Null)
             cond = Conditional.eval(self, context)
         return store_null()
 
@@ -193,7 +193,7 @@ class Break(Node):
     def eval(self, context):
         """Evaluate a break statement."""
         context.behaviour = Behaviour.Break
-        return std.Value(std.Null)
+        return env.Value(env.Null)
 
 class Continue(Node):
     name = "continue"
@@ -204,7 +204,7 @@ class Continue(Node):
     def eval(self, context):
         """Evaluate a continue statement."""
         context.behaviour = Behaviour.Continue
-        return std.Value(std.Null)
+        return env.Value(env.Null)
 
 def syntax_tree():
     """Initialize a default syntax tree."""
