@@ -164,12 +164,11 @@ def mul_function():
 MulFunction = mul_function()
 MulOperator = Operator(MulFunction, "*")
 
-default_types = [
-    Integer, Float, Boolean, String, List, Set, Map, Object, Func
-]
-default_operators = [
+components = [
+    # Types
+    Integer, Float, Boolean, String, List, Set, Map, Object, Func,
+    # Operators
     AddOperator, SubOperator, MulOperator,
-]
-default_functions = [
+    # Functions
     AddFunction, SubFunction, MulFunction,
 ]
