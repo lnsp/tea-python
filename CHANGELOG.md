@@ -5,7 +5,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 ## [Unreleased]
 ### Added
 - Operators
-  - `add`
+  - `add` (`+`)
+- Meta-functions (prefixed with `#`)
 - Tree-based type hierarchy
 
 ### Changed
