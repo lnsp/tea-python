@@ -4,11 +4,12 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 ### Added
-- Add operator (`+`)
+- Operators
+  - `add`
 - Tree-based type hierarchy
 
 ### Changed
-
+- Light bindings between the standard runtime environment and the runtime library
 
 ## [v0.0.3]
 ### Added
