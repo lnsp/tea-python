@@ -1,9 +1,10 @@
 """Unit test for runtime.env"""
 import unittest
+import collections
 from runtime import env, ast, lib
 
-INT_VALUE = env.Value(lib.INTEGER, 1)
-FLOAT_VALUE = env.Value(lib.FLOAT, 1.0)
+INT_VALUE = env.Value(lib.INTEGER, 1, "x")
+FLOAT_VALUE = env.Value(lib.FLOAT, 1.0, "y")
 STRING_VALUE = env.Value(lib.STRING, "Hello", "identifier")
 LIST_VALUE = env.Value(lib.LIST, ["H", "e", "l", "l", "o"])
 SET_VALUE = env.Value(lib.SET, set(LIST_VALUE.data))
@@ -15,6 +16,7 @@ USELESS_OPERATOR = env.Operator(None, "+")
 ANOTHER_USELESS_OPERATOR = env.Operator(None, "?")
 USELESS_FUNCTION = env.Value(lib.FUNCTION, None)
 OBJECT_VALUE = env.Value(lib.OBJECT, None)
+LIBRARY = collections.namedtuple("Library", "EXPORTS")
 
 
 class TestEnv(unittest.TestCase):
@@ -40,14 +42,35 @@ class TestEnv(unittest.TestCase):
         # check independence
         sub.store(MISSING_INT_VALUE)
         sub.store(ANOTHER_USELESS_OPERATOR)
-        self.assertRaises(Exception, namespace.find, "id", MISSING_INT_VALUE.name)
-        self.assertRaises(Exception, namespace.find, "op", ANOTHER_USELESS_OPERATOR.symbol)
+        self.assertRaises(Exception, namespace.find,
+                          "id", MISSING_INT_VALUE.name)
+        self.assertRaises(Exception, namespace.find, "op",
+                          ANOTHER_USELESS_OPERATOR.symbol)
 
-    def test_type(self):
-        """Test the Type class."""
+    def test_datatype(self):
+        """Test the Datatype class."""
         self.assertTrue(lib.INTEGER.kind_of(lib.NUMBER))
         self.assertTrue(lib.FLOAT.kind_of(lib.NUMBER))
         self.assertTrue(lib.INTEGER.kind_of(env.ANY))
+
+    def test_context(self):
+        """Test the Context class."""
+        namespace = env.Namespace(None)
+        context = env.Context(namespace)
+        context.store(INT_VALUE)
+        self.assertEqual(context.find("id", INT_VALUE.name), INT_VALUE)
+        self.assertRaises(Exception, context.find, "id", STRING_VALUE.name)
+        custom_library = LIBRARY(EXPORTS=[STRING_VALUE])
+        context.load(custom_library)
+        self.assertEqual(context.find("id", STRING_VALUE.name), STRING_VALUE)
+        self.assertIs(context.substitute(), namespace)
+        self.assertIsNot(context.namespace, namespace)
+
+    def test_value(self):
+        """Test the Value class."""
+        self.assertNotEqual(INT_VALUE, FLOAT_VALUE)
+        self.assertEqual(INT_VALUE, INT_VALUE)
+        self.assertEqual(str(NULL_VALUE), "<Value ? <T null> *(None)>")
 
     def test_signature(self):
         """Test the signature class."""
