@@ -47,7 +47,7 @@ class Sequence(Node):
     def eval(self, context):
         """Evaluate a sequence of statements."""
         context.behaviour = DEFAULT_BEHAVIOUR
-        value = env.Value(env.Null)
+        value = env.Value(env.NULL)
 
         for item in self.children:
             value = item.eval(context)
@@ -109,9 +109,9 @@ class Loop(Node):
             else:
                 context.behaviour = DEFAULT_BEHAVIOUR
                 if bhv is BREAK_BEHAVIOUR:
-                    return env.Value(env.Null)
+                    return env.Value(env.NULL)
             cond = Conditional.eval(self, context)
-        return env.Value(env.Null)
+        return env.Value(env.NULL)
 
 
 class Operation(Node):
@@ -222,7 +222,7 @@ class Break(Node):
     def eval(cls, context):
         """Evaluate a break statement."""
         context.behaviour = BREAK_BEHAVIOUR
-        return env.Value(env.Null)
+        return env.Value(env.NULL)
 
 
 class Continue(Node):
@@ -236,7 +236,7 @@ class Continue(Node):
     def eval(cls, context):
         """Evaluate a continue statement."""
         context.behaviour = CONTINUE_BEHAVIOUR
-        return env.Value(env.Null)
+        return env.Value(env.NULL)
 
 
 def syntax_tree():
