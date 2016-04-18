@@ -3,8 +3,11 @@ import unittest
 from runtime import env, lib
 
 int_value = env.Value(lib.Integer, 1)
+int2_value = env.Value(lib.Integer, 2)
 float_value = env.Value(lib.Float, 1.0)
+float2_value = env.Value(lib.Float, 2.0)
 string_value = env.Value(lib.String, "Hello", "identifier")
+string1_value = env.Value(lib.String, "Hello1")
 list_value = env.Value(lib.List, ["H", "e", "l", "l", "o"])
 set_value = env.Value(lib.Set, set(list_value.data))
 bool_value = env.Value(lib.Boolean, True, "b")
@@ -64,3 +67,36 @@ class TestLib(unittest.TestCase):
         """Test the Object type."""
         self.assertEqual(lib.Object.cast(object_value), object_value)
         self.assertRaises(env.CastError, lib.Object.cast, missing_operator)
+        
+    def test_add_operation(self):
+        """Test the add operator / function."""
+        add_op = lib.AddOperator
+        context = env.empty_context()
+        
+        # Case 1: Two int values -> int value
+        args = [
+            int_value,
+            int_value,
+        ]
+        self.assertEqual(add_op.eval(args, context), int2_value)
+        
+        # Case 2: Two float values -> float value
+        args = [
+            float_value,
+            float_value,
+        ]
+        self.assertEqual(add_op.eval(args, context), float2_value)
+        
+        # Case 3: First int, second float -> int
+        args = [
+            int_value,
+            float_value,
+        ]
+        self.assertEqual(add_op.eval(args, context), int2_value)
+        
+        # Case 4: string + int -> string
+        args = [
+            string_value,
+            int_value,
+        ]
+        self.assertEqual(add_op.eval(args, context), string1_value)
