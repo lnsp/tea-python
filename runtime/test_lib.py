@@ -100,3 +100,17 @@ class TestLib(unittest.TestCase):
             int_value,
         ]
         self.assertEqual(add_op.eval(args, context), string1_value)
+    def test_sub_operation(self):
+        """Test the sub operator / function."""
+        sub_op = lib.SubOperator
+        context = env.empty_context()
+        
+        # Case 1: Two int values -> int value
+        args = [int2_value, int_value]
+        self.assertEqual(sub_op.eval(args, context), int_value)
+        # Case 2: Two float values -> float
+        args = [float2_value, float_value]
+        self.assertEqual(sub_op.eval(args, context), float_value)
+        # Case 3: First float, second int -> float
+        args = [float2_value, int_value]
+        self.assertEqual(sub_op.eval(args, context), float_value)
