@@ -86,6 +86,7 @@ def cast_object(value):
     raise CastError(value, Object)
 
 Object = Type("object", cast_object, Any)
+        
 
 def add_function():
     def add(context):
@@ -95,15 +96,17 @@ def add_function():
         b = t.cast(context.find("id", "b"))
         return Value(t, a.data + b.data)
         
+    add_node = FunctionBinding(add)
+        
     signatures = [
         Signature([
             Value(Number, None, "a"),
             Value(Number, None, "b"),
-        ], add),
+        ], add_node),
         Signature([
             Value(String, None, "a"),
             Value(Any, None, "b"),
-        ], add),
+        ], add_node),
     ]
     return Function(signatures, "#add")
 
