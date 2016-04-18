@@ -108,7 +108,7 @@ class Operation(Node):
 
     def eval(self, context):
         """Evaluate an operator and return the result."""
-        operator = context.find("op", symbol)
+        operator = context.find("op", self.symbol)
         if operator is not None:
             args = [child.eval(context) for child in self.children]
             return operator.eval(args, context)
