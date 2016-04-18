@@ -1,5 +1,5 @@
 """Eval an abstract syntax tree."""
-from runtime import env, lib
+from runtime import env
 
 
 class Behaviour:
@@ -51,7 +51,7 @@ class Sequence(Node):
 
         for item in self.children:
             value = item.eval(context)
-            if (context.behaviour != Behaviour.Default):
+            if context.behaviour != Behaviour.Default:
                 break
 
         return value
@@ -109,7 +109,7 @@ class Loop(Node):
                 if bhv == Behaviour.Break:
                     return env.Value(env.Null)
             cond = Conditional.eval(self, context)
-        return store_null()
+        return env.Value(env.Null)
 
 
 class Operation(Node):
