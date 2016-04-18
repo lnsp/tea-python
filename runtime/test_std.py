@@ -179,3 +179,30 @@ class TestStd(unittest.TestCase):
             std.Signature([std.Value(std.String, None, "str")], identifier_literal),
         ])
         self.assertEqual(func.eval(args, context), string_value)
+        
+        # Check function sandboxing
+        class CustomNode(ast.Node):
+            name = "custom"
+            
+            def __init__(self):
+                super().__init__()
+            
+            def eval(self, context):
+                context.store(std.Value(std.Integer, 1, "x"))
+                return std.Value(std.Null)
+        func = std.Function([
+            std.Signature([], CustomNode()),
+        ])
+        self.assertRaises(Exception, context.find, "id", "x")
+        
+    def test_operator(self):
+        """Test the operator class."""
+        context = std.default_context()
+        int_literal = ast.Literal(int_value)
+        # Test forwarding
+        func = std.Function([
+            std.Signature([], int_literal)
+        ])
+        operator = std.Operator(func, "+")
+        self.assertEqual(str(operator), "<Operator (+)>")
+        self.assertEqual(operator.eval([], context), int_value)
