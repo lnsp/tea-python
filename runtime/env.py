@@ -54,15 +54,19 @@ class Namespace:
 class Context:
     """A context for temporary storage."""
 
-    def __init__(self, namespace):
-        self.ns = namespace
-        self.globalns = namespace
+    def __init__(self, ns):
+        self.ns = ns
+        self.globalns = ns
         self.behaviour = "default"
         self.flags = []
 
     def store(self, item):
         """Forwards to Namespace.store"""
         return self.ns.store(item)
+
+    def load(self, library):
+        """Loads a library into the current namespace."""
+        self.ns.store_all(library.components)
 
     def find(self, space, key):
         """Forwards to Namespace.find"""
