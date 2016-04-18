@@ -1,5 +1,5 @@
 """Parse an tokenized expression into an AST."""
-from runtime import ast, std
+from runtime import ast
 
 
 def generate(tokens):
@@ -11,10 +11,4 @@ def generate(tokens):
 def demo_syntax_tree():
     """Initialize a demo syntax tree."""
     tree = ast.syntax_tree()
-
-    literal_node = ast.Literal(std.Value(std.Boolean, True))
-    cast_node = ast.Cast(std.Integer.name)
-    cast_node.add(literal_node)
-    tree.add(cast_node)
-
     return tree
