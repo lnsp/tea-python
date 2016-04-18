@@ -1,12 +1,10 @@
 """Eval an abstract syntax tree."""
 from runtime import env
 
-
-class Behaviour:
-    Default = "default"
-    Return = "return"
-    Break = "break"
-    Continue = "continue"
+DEFAULT_BEHAVIOUR = "default"
+RETURN_BEHAVIOUR = "return"
+BREAK_BEHAVIOUR = "break"
+CONTINUE_BEHAVIOUR = "continue"
 
 
 def run_in_substitution(node, context):
@@ -24,12 +22,14 @@ class Node:
         self.children = []
 
     def add(self, node):
+        """Adds a leaf to this node."""
         self.children.append(node)
 
     def __str__(self):
         return "<Node (%s)>" % (type(self).name)
 
     def tree_to_string(self, root=0):
+        """Generates a tree-string from this node."""
         path_ws = " " * root
         my_path = path_ws + "|\n" + path_ws + "+-" + \
             ("+" if len(self.children) > 0 else "-") + "-"
@@ -46,12 +46,12 @@ class Sequence(Node):
 
     def eval(self, context):
         """Evaluate a sequence of statements."""
-        context.behaviour = Behaviour.Default
+        context.behaviour = DEFAULT_BEHAVIOUR
         value = env.Value(env.Null)
 
         for item in self.children:
             value = item.eval(context)
-            if context.behaviour != Behaviour.Default:
+            if context.behaviour is not DEFAULT_BEHAVIOUR:
                 break
 
         return value
@@ -74,6 +74,7 @@ class Branch(Node):
 
 
 class Conditional(Node):
+    """A conditional node."""
     name = "conditional"
 
     def __init__(self):
@@ -92,6 +93,7 @@ class Conditional(Node):
 
 
 class Loop(Node):
+    """A loop node."""
     name = "loop"
 
     def __init__(self):
@@ -102,17 +104,18 @@ class Loop(Node):
         cond = Conditional.eval(self, context)
         while cond != False:
             bhv = context.behaviour
-            if bhv == Behaviour.Return:
+            if bhv is RETURN_BEHAVIOUR:
                 return cond
             else:
-                context.behaviour = Behaviour.Default
-                if bhv == Behaviour.Break:
+                context.behaviour = DEFAULT_BEHAVIOUR
+                if bhv is BREAK_BEHAVIOUR:
                     return env.Value(env.Null)
             cond = Conditional.eval(self, context)
         return env.Value(env.Null)
 
 
 class Operation(Node):
+    """A operation node calling an operator."""
     name = "operation"
 
     def __init__(self, symbol):
@@ -129,6 +132,7 @@ class Operation(Node):
 
 
 class Call(Node):
+    """A function call node."""
     name = "call"
 
     def __init__(self, identity):
@@ -145,6 +149,7 @@ class Call(Node):
 
 
 class Identifier(Node):
+    """A node representing an identifier."""
     name = "identifier"
 
     def __init__(self, identity):
@@ -160,6 +165,7 @@ class Identifier(Node):
 
 
 class Literal(Node):
+    """A node with a explicit value."""
     name = "literal"
 
     def __init__(self, value):
@@ -172,6 +178,7 @@ class Literal(Node):
 
 
 class Cast(Node):
+    """A type cast node."""
     name = "cast"
 
     def __init__(self, target):
@@ -188,6 +195,7 @@ class Cast(Node):
 
 
 class Return(Node):
+    """A return node."""
     name = "return"
 
     def __init__(self):
@@ -199,31 +207,35 @@ class Return(Node):
         Changes the behaviour context to 'RETURN'.
         """
         value = Sequence.eval(self, context)
-        context.behaviour = Behaviour.Return
+        context.behaviour = RETURN_BEHAVIOUR
         return value
 
 
 class Break(Node):
+    """A break node."""
     name = "break"
 
     def __init__(self):
         super().__init__()
 
-    def eval(self, context):
+    @classmethod
+    def eval(cls, context):
         """Evaluate a break statement."""
-        context.behaviour = Behaviour.Break
+        context.behaviour = BREAK_BEHAVIOUR
         return env.Value(env.Null)
 
 
 class Continue(Node):
+    """A continue node."""
     name = "continue"
 
     def __init__(self):
         super().__init__()
 
-    def eval(self, context):
+    @classmethod
+    def eval(cls, context):
         """Evaluate a continue statement."""
-        context.behaviour = Behaviour.Continue
+        context.behaviour = CONTINUE_BEHAVIOUR
         return env.Value(env.Null)
 
 
