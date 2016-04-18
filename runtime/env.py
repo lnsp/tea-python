@@ -169,6 +169,13 @@ class Function(object):
     def __str__(self):
         return "<Function *(%s)>" % self.name
 
+class FunctionBinding(object):
+    def __init__(self, fnc):
+        self.fnc = fnc
+        
+    def eval(self, context):
+        return self.fnc(context)
+
 class Operator(object):
     """A operator with a collection of signatures and functions."""
     
