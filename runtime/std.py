@@ -317,3 +317,30 @@ Object = Type("object", cast_object, Any)
 default_types = [
     Integer, Float, Boolean, String, List, Set, Map, Object, Null, Func
 ]
+
+def add_operator():
+    def add(context):
+        """Add two number values."""
+        a = context.find("id", "a")
+        t = a.datatype
+        b = t.cast(context.find("id", "b"))
+        return Value(t, a.data + b.data)
+        
+    signatures = [
+        Signature([
+            Value(Number, None, "a"),
+            Value(Number, None, "b"),
+        ], add),
+        Signature([
+            Value(String, None, "a"),
+            Value(Any, None, "b"),
+        ], add),
+    ]
+    
+    return Operator(Function(signatures), "+")
+    
+AddOperator = add_operator()
+    
+default_operators = [
+    AddOperator,
+]
