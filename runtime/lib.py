@@ -109,16 +109,34 @@ def add_function():
         ], add_node),
     ]
     return Function(signatures, "#add")
+    
+def sub_function():
+    def sub(context):
+        """Subtract two number values."""
+        a = context.find("id", "a")
+        t = a.datatype
+        b = t.cast(context.find("id", "b"))
+        return Value(t, a.data - b.data)
+    sub_node = FunctionBinding(sub)
+    signatures = [
+        Signature([
+            Value(Number, None, "a"),
+            Value(Number, None, "b"),
+        ]),
+    ]
+    return Function(signatures, "#sub")
 
 AddFunction = add_function()
 AddOperator = Operator(AddFunction, "+")
+SubFunction = sub_function()
+SubOperator = Operator(SubFunction, "-")
     
 default_types = [
     Integer, Float, Boolean, String, List, Set, Map, Object, Func
 ]
 default_operators = [
-    AddOperator,
+    AddOperator, SubOperator,
 ]
 default_functions = [
-    AddFunction,
+    AddFunction, SubFunction,
 ]
