@@ -1,6 +1,7 @@
 """Parse an tokenized expression into an AST."""
 from runtime import ast, std
 
+
 def generate(tokens):
     """Parse the tokens to AST notation."""
     # TODO: Implement parser
@@ -15,5 +16,5 @@ def demo_syntax_tree():
     cast_node = ast.Cast(std.Integer.name)
     cast_node.add(literal_node)
     tree.add(cast_node)
-    
+
     return tree

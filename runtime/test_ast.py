@@ -1,13 +1,16 @@
 import unittest
 from runtime import ast, env, lib
-    
+
 null_literal = ast.Literal(env.Value(env.Null))
 int_literal = ast.Literal(env.Value(lib.Integer, 0))
 true_literal = ast.Literal(env.Value(lib.Boolean, True))
 false_literal = ast.Literal(env.Value(lib.Boolean, False))
-string_literal = ast.Literal(env.Value(lib.String, "Hallo Welt!", "identifier"))
+string_literal = ast.Literal(
+    env.Value(lib.String, "Hallo Welt!", "identifier"))
+
 
 class TestAst(unittest.TestCase):
+
     def test_sequence_node(self):
         """Test the sequence node."""
         context = env.empty_context()
@@ -16,31 +19,30 @@ class TestAst(unittest.TestCase):
         # empty sequence
         empty_seq = ast.Sequence()
         self.assertEqual(empty_seq.eval(context), null_literal.value)
-        
+
         # non-empty sequence
         non_seq = ast.Sequence()
         non_seq.children = [null_literal, true_literal]
         self.assertEqual(non_seq.eval(context), true_literal.value)
         non_seq.children = [true_literal, null_literal]
         self.assertEqual(non_seq.eval(context), null_literal.value)
-        
+
         # sequence with return
         ret_seq = ast.Sequence()
         ret_seq.children = [return_node, null_literal]
         self.assertEqual(ret_seq.eval(context), true_literal.value)
         self.assertEqual(ret_seq.__str__(), "<Node (sequence)>")
-        
 
     def test_conditional_node(self):
         """Test the conditional node."""
         context = env.empty_context()
-        
+
         # Test bad conditional error
         bad_conditional = ast.Conditional()
-        bad_conditional.add(null_literal) # if None:
-        bad_conditional.add(null_literal) # then None
+        bad_conditional.add(null_literal)  # if None:
+        bad_conditional.add(null_literal)  # then None
         self.assertRaises(Exception, bad_conditional.eval, context)
-        
+
         # Test correct result
         good_conditional = ast.Conditional()
         good_conditional.add(true_literal)
@@ -76,18 +78,18 @@ class TestAst(unittest.TestCase):
         return_node = ast.Return()
         return_node.children = [true_literal]
         context = env.empty_context()
-        
+
         # check for exception
         bad_loop = ast.Loop()
         bad_loop.children = [null_literal, true_literal]
         self.assertRaises(Exception, bad_loop.eval, context)
-        
-        # check for break 
+
+        # check for break
         break_loop = ast.Loop()
         break_loop.children = [true_literal, break_node]
         self.assertEqual(break_loop.eval(context), null_literal.value)
         self.assertEqual(context.behaviour, ast.Behaviour.Default)
-        
+
         # check for return
         return_loop = ast.Loop()
         return_loop.children = [true_literal, return_node]
@@ -102,7 +104,7 @@ class TestAst(unittest.TestCase):
         empty_return = ast.Return()
         self.assertEqual(empty_return.eval(context), null_literal.value)
         self.assertEqual(context.behaviour, ast.Behaviour.Return)
-        
+
         # test return with value
         context = env.empty_context()
         value_return = ast.Return()
@@ -132,15 +134,16 @@ class TestAst(unittest.TestCase):
         # Create sample namespace
         class SumNode(ast.Node):
             name = "sum"
-            
+
             def __init__(self):
                 super().__init__()
-            
+
             def eval(self, context):
                 s = 0
-                for c in self.children: s += c.eval(context).data
+                for c in self.children:
+                    s += c.eval(context).data
                 return env.Value(lib.Integer, s)
-        
+
         sum_function = SumNode()
         sgn1 = env.Value(lib.Integer, None, "a")
         sgn2 = env.Value(lib.Integer, None, "b")
@@ -153,7 +156,7 @@ class TestAst(unittest.TestCase):
             env.Signature([sgn1, sgn2], sum_function),
         ], "my_func")
         context.store(func)
-        
+
         arg1 = SumNode()
         arg1.children = [
             ast.Literal(env.Value(lib.Integer, 1)),
@@ -166,11 +169,10 @@ class TestAst(unittest.TestCase):
         ]
         call_node = ast.Call("my_func")
         call_node.children = [arg1, arg2]
-        
+
         self.assertEqual(call_node.eval(context), env.Value(lib.Integer, 10))
         bad_node = ast.Call("missing")
         self.assertRaises(Exception, bad_node.eval, context)
-        
 
     def test_operation_node(self):
         """Test the operation node."""
@@ -178,15 +180,16 @@ class TestAst(unittest.TestCase):
         # Create sample namespace
         class SumNode(ast.Node):
             name = "sum"
-            
+
             def __init__(self):
                 super().__init__()
-            
+
             def eval(self, context):
                 s = 0
-                for c in self.children: s += c.eval(context).data
+                for c in self.children:
+                    s += c.eval(context).data
                 return env.Value(lib.Integer, s)
-        
+
         sum_function = SumNode()
         sgn1 = env.Value(lib.Integer, None, "a")
         sgn2 = env.Value(lib.Integer, None, "b")
@@ -200,7 +203,7 @@ class TestAst(unittest.TestCase):
         ])
         op = env.Operator(func, "+")
         context.store(op)
-        
+
         arg1 = SumNode()
         arg1.children = [
             ast.Literal(env.Value(lib.Integer, 1)),
@@ -213,11 +216,11 @@ class TestAst(unittest.TestCase):
         ]
         call_node = ast.Operation("+")
         call_node.children = [arg1, arg2]
-        
+
         self.assertEqual(call_node.eval(context), env.Value(lib.Integer, 10))
         bad_node = ast.Operation("?")
         self.assertRaises(Exception, bad_node.eval, context)
-        
+
     def test_cast_node(self):
         """Test the cast node."""
         context = env.empty_context()
@@ -235,11 +238,11 @@ class TestAst(unittest.TestCase):
         context.store(string_literal.value)
         ident_node = ast.Identifier(string_literal.value.name)
         self.assertEqual(ident_node.eval(context), string_literal.value)
-        
+
         # Search in parent ns
         context.substitute()
         self.assertEqual(ident_node.eval(context), string_literal.value)
-        
+
         # Identifier does not exist
         bad_node = ast.Identifier("missing")
         self.assertRaises(Exception, bad_node.eval, context)
@@ -251,25 +254,27 @@ class TestAst(unittest.TestCase):
         self.assertEqual(string_literal.eval(context), string_literal.value)
         self.assertEqual(true_literal.eval(context), true_literal.value)
         self.assertEqual(false_literal.eval(context), false_literal.value)
-        
+
     def test_syntax_tree(self):
         """Test the syntax_tree method."""
         syntax_tree = ast.syntax_tree()
         self.assertTrue(syntax_tree is not None)
         self.assertEqual(syntax_tree.name, ast.Sequence.name)
-        
+
     def test_run_in_substitution(self):
         """Test the run_in_substitution method."""
         class AccessNode(ast.Node):
+
             def __init__(self):
                 super().__init__()
-                
+
             def eval(self, context):
                 context.store(string_literal.value)
                 return string_literal.eval(context)
-                
+
         context = env.empty_context()
         access_node = AccessNode()
         result = ast.run_in_substitution(access_node, context)
         self.assertEqual(result, string_literal.value)
-        self.assertRaises(Exception, context.find, "id", string_literal.value.name)
+        self.assertRaises(Exception, context.find, "id",
+                          string_literal.value.name)
