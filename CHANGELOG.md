@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Meta-functions (prefixed with `#`)
 - Tree-based type hierarchy
 - Python-function to Tea-function bindings
+- Context-based library import
 
 ### Changed
 - Light bindings between the runtime environment and the runtime library
