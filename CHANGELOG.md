@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
   - `add` (`+`)
 - Meta-functions (prefixed with `#`)
 - Tree-based type hierarchy
+- Python-function to Tea-function bindings
 
 ### Changed
 - Light bindings between the runtime environment and the runtime library
