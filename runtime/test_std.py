@@ -101,11 +101,17 @@ class TestStd(unittest.TestCase):
         self.assertEqual(std.Object.cast(object_value), object_value)
         self.assertRaises(std.CastError, std.Object.cast, missing_operator)
         
+    def test_type(self):
+        """Test the Type class."""
+        self.assertTrue(std.Integer.kind_of(std.Number))
+        self.assertTrue(std.Float.kind_of(std.Number))
+        self.assertTrue(std.Integer.kind_of(std.Any))
+        
     def test_signature(self):
         """Test the signature class."""
         expected_values = [
-            std.Value(std.Integer, None, "x"),
-            std.Value(std.Float, None, "delta"),
+            std.Value(std.Number, None, "x"),
+            std.Value(std.Number, None, "delta"),
             std.Value(std.Float, -1.0, "phi"),
         ]
         sign = std.Signature(expected_values, "works!")
@@ -132,7 +138,7 @@ class TestStd(unittest.TestCase):
         ]
         third_case_result = [
             std.Value(std.Integer, 3, "x"),
-            std.Value(std.Float, 0.0, "delta"),
+            std.Value(std.Integer, 0, "delta"),
             std.Value(std.Float, 0.0, "phi"),
         ]
         self.assertEqual(sign.match(third_case), (third_case_result, "works!"))
@@ -144,7 +150,7 @@ class TestStd(unittest.TestCase):
         ]
         fourth_case_result = [
             std.Value(std.Integer, 3, "x"),
-            std.Value(std.Float, 0.0, "delta"),
+            std.Value(std.Integer, 0, "delta"),
             std.Value(std.Float, -1.0, "phi"),
         ]
         self.assertEqual(sign.match(fourth_case), (fourth_case_result, "works!"))
