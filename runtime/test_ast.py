@@ -130,20 +130,52 @@ class TestAST(unittest.TestCase):
     def test_call_node(self):
         """Test the function node."""
         # Create sample namespace
+        class SumNode(ast.Node):
+            name = "sum"
+            
+            def __init__(self):
+                super().__init__()
+            
+            def eval(self, context):
+                s = 0
+                for c in self.children: s += c.eval(context).data
+                return std.Value(std.Integer, s)
+        
+        sum_function = SumNode()
+        sgn1 = std.Value(std.Integer, None, "a")
+        sgn2 = std.Value(std.Integer, None, "b")
+        sum_function.children = [
+            ast.Identifier("a"),
+            ast.Identifier("b"),
+        ]
         context = std.default_context()
         func = std.Function([
-            std.Signature([], int_literal),
+            std.Signature([sgn1, sgn2], sum_function),
         ], "my_func")
         context.store(func)
+        
+        arg1 = SumNode()
+        arg1.children = [
+            ast.Literal(std.Value(std.Integer, 1)),
+            ast.Literal(std.Value(std.Integer, 2)),
+        ]
+        arg2 = SumNode()
+        arg2.children = [
+            ast.Literal(std.Value(std.Integer, 3)),
+            ast.Literal(std.Value(std.Integer, 4)),
+        ]
         call_node = ast.Call("my_func")
-        self.assertEqual(call_node.eval(context), int_literal.value)
+        call_node.children = [arg1, arg2]
+        
+        self.assertEqual(call_node.eval(context), std.Value(std.Integer, 10))
         bad_node = ast.Call("missing")
         self.assertRaises(Exception, bad_node.eval, context)
         
 
     def test_operation_node(self):
         """Test the operation node."""
-        pass
+        # Create sample namespace
+        context = std.default_context()
         
     def test_cast_node(self):
         """Test the cast node."""
