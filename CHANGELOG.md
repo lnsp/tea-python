@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 ### Added
 - Operators
   - `add` (`+`)
+  - `sub` (`-`)
 - Meta-functions (prefixed with `#`)
 - Tree-based type hierarchy
 - Python-function to Tea-function bindings
