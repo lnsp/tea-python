@@ -65,7 +65,7 @@ class Context:
 
     def load(self, library):
         """Loads a library into the current namespace."""
-        self.namespace.store_all(library.components)
+        self.namespace.store_all(library.EXPORTS)
 
     def find(self, space, key):
         """Forwards to Namespace.find"""

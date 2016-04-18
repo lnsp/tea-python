@@ -174,7 +174,7 @@ def _mul_operation():
 MUL_FUNCTION = _mul_operation()
 MUL_OPERATOR = Operator(MUL_FUNCTION, "*")
 
-COMPONENTS = [
+EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
     # Operators
