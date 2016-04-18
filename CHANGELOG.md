@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org).
 
+## [Unreleased]
+### Added
+
+### Changed
+
+
 ## [v0.0.3]
 ### Added
 - String literals
@@ -25,5 +31,6 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Wrong CLI version number
 
 
-[v0.0.3]: https://gitlab.com/lsp/tea/compare/v0.0.2...v0.0.3
-[v0.0.2]: https://gitlab.com/lsp/tea/compare/v0.0.1...v0.0.2
+[Unreleased]: https://github.com/lnsp/tea/compare/v0.0.3...master
+[v0.0.3]: https://github.com/lnsp/tea/compare/v0.0.2...v0.0.3
+[v0.0.2]: https://github.com/lnsp/tea/compare/v0.0.1...v0.0.2
