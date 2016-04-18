@@ -7,7 +7,7 @@ true_literal = ast.Literal(std.Value(std.Boolean, True))
 false_literal = ast.Literal(std.Value(std.Boolean, False))
 string_literal = ast.Literal(std.Value(std.String, "Hallo Welt!", "identifier"))
 
-class TestAST(unittest.TestCase):
+class TestAst(unittest.TestCase):
     def test_sequence_node(self):
         """Test the sequence node."""
         context = std.default_context()
