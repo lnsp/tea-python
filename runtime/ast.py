@@ -99,8 +99,8 @@ class Loop(Node):
             cond = Conditional.eval(self, context)
         return store_null()
 
-class Operator(Node):
-    name = "operator"
+class Operation(Node):
+    name = "operation"
     
     def __init__(self, symbol):
         super().__init__()

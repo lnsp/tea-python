@@ -129,10 +129,20 @@ class TestAST(unittest.TestCase):
 
     def test_call_node(self):
         """Test the function node."""
-        pass
+        # Create sample namespace
+        context = std.default_context()
+        func = std.Function([
+            std.Signature([], int_literal),
+        ], "my_func")
+        context.store(func)
+        call_node = ast.Call("my_func")
+        self.assertEqual(call_node.eval(context), int_literal.value)
+        bad_node = ast.Call("missing")
+        self.assertRaises(Exception, bad_node.eval, context)
+        
 
-    def test_operator_node(self):
-        """Test the operator node."""
+    def test_operation_node(self):
+        """Test the operation node."""
         pass
         
     def test_cast_node(self):
