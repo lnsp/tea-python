@@ -1,174 +1,184 @@
-from runtime.env import *
+"""The standard runtime library."""
+from runtime.env import (Datatype, Value, Function, Operator,
+                         Signature, FunctionBinding, CastError, ANY, NULL)
 
-Number = Type("*number", None, Any)
+NUMBER = Datatype("*number", None, ANY)
 
 
 def cast_integer(value):
-    if type(value) is Value:
-        if value.datatype in (Float, Integer):
-            return Value(Integer, int(value.data))
-        if value.datatype is Boolean:
-            return Value(Integer, 1 if value.data else 0)
-        if value.datatype is Null:
-            return Value(Integer, 0)
-    raise CastError(value, Integer)
+    """Casts a value to an INTEGER."""
+    if isinstance(value, Value):
+        if value.datatype in (FLOAT, INTEGER):
+            return Value(INTEGER, int(value.data))
+        if value.datatype is BOOLEAN:
+            return Value(INTEGER, 1 if value.data else 0)
+        if value.datatype is NULL:
+            return Value(INTEGER, 0)
+    raise CastError(value, INTEGER)
 
-Integer = Type("int", cast_integer, Number)
+INTEGER = Datatype("int", cast_integer, NUMBER)
 
 
 def cast_float(value):
-    if type(value) is Value:
-        if value.datatype in (Float, Integer):
-            return Value(Float, float(value.data))
-        if value.datatype is Null:
-            return Value(Float, 0.0)
-    raise CastError(value, Float)
+    """Casts a value to a FLOAT."""
+    if isinstance(value, Value):
+        if value.datatype in (FLOAT, INTEGER):
+            return Value(FLOAT, float(value.data))
+        if value.datatype is NULL:
+            return Value(FLOAT, 0.0)
+    raise CastError(value, FLOAT)
 
-Float = Type("float", cast_float, Number)
+FLOAT = Datatype("float", cast_float, NUMBER)
 
 
 def cast_string(value):
-    if type(value) is Value:
-        if value.datatype in (Integer, Float, String):
-            return Value(String, str(value.data))
-        if value.datatype is Boolean:
-            return Value(String, "true" if value.data else "false")
-        if value.datatype is Null:
-            return Value(String, "null")
-    raise CastError(value, String)
+    """Casts a value to a STRING."""
+    if isinstance(value, Value):
+        if value.datatype in (INTEGER, FLOAT, STRING):
+            return Value(STRING, str(value.data))
+        if value.datatype is BOOLEAN:
+            return Value(STRING, "true" if value.data else "false")
+        if value.datatype is NULL:
+            return Value(STRING, "null")
+    raise CastError(value, STRING)
 
-String = Type("string", cast_string, Any)
+STRING = Datatype("string", cast_string, ANY)
 
 
 def cast_boolean(value):
-    if type(value) is Value:
-        if value.datatype is Integer:
-            return Value(Boolean, True if value.data > 0 else False)
-        if value.datatype is Boolean:
-            return Value(Boolean, bool(value.data))
-        if value.datatype is Null:
-            return Value(Null, False)
-    raise CastError(value, Boolean)
+    """Casts a value to a BOOLEAN."""
+    if isinstance(value, Value):
+        if value.datatype is INTEGER:
+            return Value(BOOLEAN, True if value.data > 0 else False)
+        if value.datatype is BOOLEAN:
+            return Value(BOOLEAN, bool(value.data))
+        if value.datatype is NULL:
+            return Value(NULL, False)
+    raise CastError(value, BOOLEAN)
 
-Boolean = Type("bool", cast_boolean, Any)
+BOOLEAN = Datatype("bool", cast_boolean, ANY)
 
 
-def cast_func(value):
-    if type(value) is Value:
-        if value.datatype is Func:
-            return Value(Func, value.data)
-    raise CastError(value, Func)
+def cast_function(value):
+    """Casts a value to a FUNCTION."""
+    if isinstance(value, Value):
+        if value.datatype is FUNCTION:
+            return Value(FUNCTION, value.data)
+    raise CastError(value, FUNCTION)
 
-Func = Type("func", cast_func, Any)
+FUNCTION = Datatype("func", cast_function, ANY)
 
 
 def cast_list(value):
-    if type(value) is Value:
-        if value.datatype in (List, String):
-            return Value(List, list(value.data))
-    raise CastError(value, List)
+    """Casts a value to a LIST."""
+    if isinstance(value, Value):
+        if value.datatype in (LIST, STRING):
+            return Value(LIST, list(value.data))
+    raise CastError(value, LIST)
 
-List = Type("list", cast_list, Any)
+LIST = Datatype("LIST", cast_list, ANY)
 
 
 def cast_map(value):
-    if type(value) is Value:
-        if value.datatype in Map:
-            return Value(Map, map(value.data))
-    raise CastError(value, Map)
+    """Casts a value to a MAP."""
+    if isinstance(value, Value):
+        if value.datatype is MAP:
+            return Value(MAP, dict(value.data))
+    raise CastError(value, MAP)
 
-Map = Type("map", cast_map, Any)
+MAP = Datatype("map", cast_map, ANY)
 
 
 def cast_set(value):
-    if type(value) is Value:
-        if value.datatype in (Set, List):
-            return Value(Set, set(value.data))
-    raise CastError(value, Set)
+    """Casts a value to a SET."""
+    if isinstance(value, Value):
+        if value.datatype in (SET, LIST):
+            return Value(SET, set(value.data))
+    raise CastError(value, SET)
 
-Set = Type("set", cast_set, Any)
+SET = Datatype("set", cast_set, ANY)
 
 
 def cast_object(value):
-    if type(value) is Value:
-        return Value(Object, value.data)
-    raise CastError(value, Object)
+    """Casts a value to an OBJECT."""
+    if isinstance(value, Value):
+        return Value(OBJECT, value.data)
+    raise CastError(value, OBJECT)
 
-Object = Type("object", cast_object, Any)
+OBJECT = Datatype("object", cast_object, ANY)
 
 
-def add_function():
+def _add_operation():
+    """The add operation."""
     def add(context):
         """Add two number values."""
-        a = context.find("id", "a")
-        t = a.datatype
-        b = t.cast(context.find("id", "b"))
-        return Value(t, a.data + b.data)
+        var_a = context.find("id", "a")
+        var_b = var_a.datatype.cast(context.find("id", "b"))
+        return Value(var_a.datatype, var_a.data + var_b.data)
 
     add_node = FunctionBinding(add)
 
     signatures = [
         Signature([
-            Value(Number, None, "a"),
-            Value(Number, None, "b"),
+            Value(NUMBER, None, "a"),
+            Value(NUMBER, None, "b"),
         ], add_node),
         Signature([
-            Value(String, None, "a"),
-            Value(Any, None, "b"),
+            Value(STRING, None, "a"),
+            Value(ANY, None, "b"),
         ], add_node),
     ]
     return Function(signatures, "#add")
 
-AddFunction = add_function()
-AddOperator = Operator(AddFunction, "+")
+ADD_FUNCTION = _add_operation()
+ADD_OPERATOR = Operator(ADD_FUNCTION, "+")
 
 
-def sub_function():
+def _sub_function():
+    """The sub operation."""
     def sub(context):
         """Subtract two number values."""
-        a = context.find("id", "a")
-        t = a.datatype
-        b = t.cast(context.find("id", "b"))
-        return Value(t, a.data - b.data)
+        var_a = context.find("id", "a")
+        var_b = var_a.datatype.cast(context.find("id", "b"))
+        return Value(var_a.datatype, var_a.data - var_b.data)
 
     sub_node = FunctionBinding(sub)
     signatures = [
         Signature([
-            Value(Number, None, "a"),
-            Value(Number, None, "b"),
+            Value(NUMBER, None, "a"),
+            Value(NUMBER, None, "b"),
         ], sub_node),
     ]
     return Function(signatures, "#sub")
 
-SubFunction = sub_function()
-SubOperator = Operator(SubFunction, "-")
+SUB_FUNCTION = _sub_function()
+SUB_OPERATOR = Operator(SUB_FUNCTION, "-")
 
 
-def mul_function():
+def _mul_operation():
     def mul(context):
         """Multiply two numbers."""
-        a = context.find("id", "a")
-        t = a.datatype
-        b = t.cast(context.find("id", "b"))
-        return Value(t, a.data * b.data)
+        var_a = context.find("id", "a")
+        var_b = var_a.datatype.cast(context.find("id", "b"))
+        return Value(var_a.datatype, var_a.data * var_b.data)
 
     mul_node = FunctionBinding(mul)
     signatures = [
         Signature([
-            Value(Number, None, "a"),
-            Value(Number, None, "b"),
+            Value(NUMBER, None, "a"),
+            Value(NUMBER, None, "b"),
         ], mul_node),
     ]
     return Function(signatures, "#mul")
 
-MulFunction = mul_function()
-MulOperator = Operator(MulFunction, "*")
+MUL_FUNCTION = _mul_operation()
+MUL_OPERATOR = Operator(MUL_FUNCTION, "*")
 
-components = [
-    # Types
-    Integer, Float, Boolean, String, List, Set, Map, Object, Func,
+COMPONENTS = [
+    # Datatypes
+    INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
     # Operators
-    AddOperator, SubOperator, MulOperator,
-    # Functions
-    AddFunction, SubFunction, MulFunction,
+    ADD_OPERATOR, SUB_OPERATOR, MUL_OPERATOR,
+    # FUNCTIONtions
+    ADD_FUNCTION, SUB_FUNCTION, MUL_FUNCTION,
 ]
