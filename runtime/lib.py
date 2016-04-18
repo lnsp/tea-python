@@ -117,12 +117,13 @@ def sub_function():
         t = a.datatype
         b = t.cast(context.find("id", "b"))
         return Value(t, a.data - b.data)
+    
     sub_node = FunctionBinding(sub)
     signatures = [
         Signature([
             Value(Number, None, "a"),
             Value(Number, None, "b"),
-        ]),
+        ], sub_node),
     ]
     return Function(signatures, "#sub")
 
