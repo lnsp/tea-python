@@ -182,11 +182,11 @@ class Function(object):
         for sgn in self.signatures:
             try:
                 values, fnc = sgn.match(args)
-                orig, context.ns = context.ns, Namespace(self.source_ns)
+                original, context.namespace = context.namespace, Namespace(self.source_ns)
                 # place args in namespace
-                context.ns.store_all(values)
+                context.namespace.store_all(values)
                 result = fnc.eval(context)
-                context.ns = orig
+                context.namespace = original
                 return result
             except (ArgumentError, ArgumentCastError):
                 pass

@@ -11,7 +11,7 @@ def run_in_substitution(node, context):
     """Run the node in a subtituted namespace."""
     parent = context.substitute()
     result = node.eval(context)
-    context.ns = parent
+    context.namespace = parent
     return result
 
 
