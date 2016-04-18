@@ -128,30 +128,27 @@ class Signature(object):
             raise ArgumentError(expected_n, called_n)
         
         # Fill the argument list with trash
-        args = [Value(Null) for x in range(expected_n)]
+        args = []
         
         # Iterate until max arguments reached
         for n in range(expected_n):
             expected_var = self.expected[n]
             expected_type = expected_var.datatype
-            
-            # Unchanged if expected type is Null
-            if not expected_type.kind_of(Null):
-                # Still arguments to go
-                if called_n > n:
-                    got_var = called[n]
-                    got_type = got_var.datatype
-                    if not got_type.kind_of(expected_type):
-                        raise ArgumentCastError(expected_var.datatype, got_var.datatype)
-                    var = got_type.cast(got_var)
-                # Not enough arguments given, looking for default values
-                elif expected_var.data != None:
-                    var = expected_type.cast(expected_var)
-                # Not enough arguments given, no default values
-                else:
-                    raise ArgumentError(expected_n, called_n)
-                var.name = expected_var.name
-                args[n] = var
+            # Still arguments to go
+            if called_n > n:
+                got_var = called[n]
+                got_type = got_var.datatype
+                if not got_type.kind_of(expected_type):
+                    raise ArgumentCastError(expected_var.datatype, got_var.datatype)
+                var = got_type.cast(got_var)
+            # Not enough arguments given, looking for default values
+            elif expected_var.data != None:
+                var = expected_type.cast(expected_var)
+            # Not enough arguments given, no default values
+            else:
+                raise ArgumentError(expected_n, called_n)
+            var.name = expected_var.name
+            args.append(var)
         return args, self.function
     def __str__(self):
         return "<Signature (%s)>" % ",".join(self.expected.name)
