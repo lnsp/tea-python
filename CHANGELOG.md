@@ -9,7 +9,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Tree-based type hierarchy
 
 ### Changed
-- Light bindings between the standard runtime environment and the runtime library
+- Light bindings between the runtime environment and the runtime library
+- Seperated the runtime environment from the runtime library
 
 ## [v0.0.3]
 ### Added
