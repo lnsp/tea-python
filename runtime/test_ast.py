@@ -179,7 +179,12 @@ class TestAST(unittest.TestCase):
         
     def test_cast_node(self):
         """Test the cast node."""
-        pass
+        context = std.default_context()
+        cast_node = ast.Cast(std.Integer.name)
+        cast_node.children = [null_literal]
+        self.assertEqual(cast_node.eval(context), int_literal.value)
+        bad_node = ast.Cast("missing")
+        self.assertRaises(Exception, bad_node.eval, context)
 
     def test_identifier_node(self):
         """Test the identifier node."""
