@@ -4,9 +4,10 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 ### Added
-- Operators
+- New Operators
   - `add` (`+`)
   - `sub` (`-`)
+  - `mul` (`*`)
 - Meta-functions (prefixed with `#`)
 - Tree-based type hierarchy
 - Python-function to Tea-function bindings
