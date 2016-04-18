@@ -4,7 +4,8 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 ### Added
-- Add operator ('+')
+- Add operator (`+`)
+- Tree-based type hierarchy
 
 ### Changed
 
