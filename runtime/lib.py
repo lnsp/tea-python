@@ -110,6 +110,9 @@ def add_function():
     ]
     return Function(signatures, "#add")
     
+AddFunction = add_function()
+AddOperator = Operator(AddFunction, "+")
+
 def sub_function():
     def sub(context):
         """Subtract two number values."""
@@ -127,17 +130,35 @@ def sub_function():
     ]
     return Function(signatures, "#sub")
 
-AddFunction = add_function()
-AddOperator = Operator(AddFunction, "+")
 SubFunction = sub_function()
 SubOperator = Operator(SubFunction, "-")
+
+def mul_function():
+    def mul(context):
+        """Multiply two numbers."""
+        a = context.find("id", "a")
+        t = a.datatype
+        b = t.cast(context.find("id", "b"))
+        return Value(t, a.data * b.data)
+    
+    mul_node = FunctionBinding(mul)
+    signatures = [
+        Signature([
+            Value(Number, None, "a"),
+            Value(Number, None, "b"),
+        ], mul_node),
+    ]
+    return Function(signatures, "#mul")
+    
+MulFunction = mul_function()
+MulOperator = Operator(MulFunction, "*")
     
 default_types = [
     Integer, Float, Boolean, String, List, Set, Map, Object, Func
 ]
 default_operators = [
-    AddOperator, SubOperator,
+    AddOperator, SubOperator, MulOperator,
 ]
 default_functions = [
-    AddFunction, SubFunction,
+    AddFunction, SubFunction, MulFunction,
 ]
