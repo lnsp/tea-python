@@ -2,7 +2,7 @@
 """Command line runtime for Tea."""
 
 import runtime.lib
-from runtime import tokenizer, parser, env
+from runtime import lexer, parser, env
 
 TEA_VERSION = "0.0.4-dev"
 TEA_TITLE = "Tea @" + TEA_VERSION
@@ -17,9 +17,9 @@ def interpret(expression, context):
         context.flags.append("exit")
         return
 
-    tokens = tokenizer.apply(expression)
+    tokens = lexer.run(expression)
     tree = parser.generate(tokens)
-    return tree.eval(context)
+    return ', '.join((str(e) for e in tokens))
 
 
 def main():
