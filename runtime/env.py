@@ -206,6 +206,11 @@ class FunctionBinding(object):
         """Evaluates the binding node."""
         return self.fnc(context)
 
+class RuntimeException(Exception):
+    """A runtime exception."""
+
+    def __init__(self, message):
+        super().__init__(message)
 
 class Operator(object):
     """A operator with a collection of signatures and functions."""
