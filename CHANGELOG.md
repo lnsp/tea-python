@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Tree-based type hierarchy
 - Python-function to Tea-function bindings
 - Context-based library import
+- Variable declarations
 
 ### Changed
 - Light bindings between the runtime environment and the runtime library
