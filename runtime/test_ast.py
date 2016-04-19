@@ -258,6 +258,14 @@ class TestAst(unittest.TestCase):
         self.assertEqual(TRUE_LITERAL.eval(context), TRUE_LITERAL.value)
         self.assertEqual(FALSE_LITERAL.eval(context), FALSE_LITERAL.value)
 
+    def test_declaration_node(self):
+        """Test the declaration node."""
+        context = env.empty_context()
+        decl_node = ast.Declaration("val", lib.INTEGER)
+        self.assertEqual(decl_node.eval(context), INT_LITERAL.value)
+        self.assertEqual(context.find("id", "val"), INT_LITERAL.value)
+        self.assertRaises(env.RuntimeException, decl_node.eval, context)
+
     def test_syntax_tree(self):
         """Test the syntax_tree method."""
         syntax_tree = ast.syntax_tree()
