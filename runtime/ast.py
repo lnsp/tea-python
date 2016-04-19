@@ -238,6 +238,22 @@ class Continue(Node):
         context.behaviour = CONTINUE_BEHAVIOUR
         return env.Value(env.NULL)
 
+class Declaration(Node):
+    """A declaration node."""
+
+    def __init__(self, name, datatype):
+        super().__init__()
+        self.name = name
+        self.datatype = datatype
+
+    def eval(self, context):
+        """Creates an entry in the local namespace."""
+        # Search in local namespace
+        if self.name in context.namespace.search_space["id"]:
+            raise env.RuntimeException("The name %s is already in use" % self.name)
+        casted_value = self.datatype.cast(env.Value(env.NULL))
+        casted_value.name = self.name
+        context.store(casted_value)
 
 def syntax_tree():
     """Initialize a default syntax tree."""
