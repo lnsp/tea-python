@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
   - `add` (`+`)
   - `sub` (`-`)
   - `mul` (`*`)
+  - `div` (`/`)
 - Meta-functions (prefixed with `#`)
 - Tree-based type hierarchy
 - Python-function to Tea-function bindings
