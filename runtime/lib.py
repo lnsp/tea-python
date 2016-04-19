@@ -40,7 +40,7 @@ def cast_string(value):
         if value.datatype is BOOLEAN:
             return Value(STRING, "true" if value.data else "false")
         if value.datatype is NULL:
-            return Value(STRING, "null")
+            return Value(STRING, "")
     raise CastError(value, STRING)
 
 STRING = Datatype("string", cast_string, ANY)
@@ -65,6 +65,8 @@ def cast_function(value):
     if isinstance(value, Value):
         if value.datatype is FUNCTION:
             return Value(FUNCTION, value.data)
+        if value.datatype is NULL:
+            return Value(FUNCTION, None)
     raise CastError(value, FUNCTION)
 
 FUNCTION = Datatype("func", cast_function, ANY)
@@ -75,6 +77,8 @@ def cast_list(value):
     if isinstance(value, Value):
         if value.datatype in (LIST, STRING):
             return Value(LIST, list(value.data))
+        if value.datatype is NULL:
+            return Value(LIST, [])
     raise CastError(value, LIST)
 
 LIST = Datatype("LIST", cast_list, ANY)
@@ -85,6 +89,8 @@ def cast_map(value):
     if isinstance(value, Value):
         if value.datatype is MAP:
             return Value(MAP, dict(value.data))
+        if value.datatype is NULL:
+            return Value(MAP, dict())
     raise CastError(value, MAP)
 
 MAP = Datatype("map", cast_map, ANY)
@@ -95,6 +101,8 @@ def cast_set(value):
     if isinstance(value, Value):
         if value.datatype in (SET, LIST):
             return Value(SET, set(value.data))
+        if value.datatype is NULL:
+            return Value(SET, set())
     raise CastError(value, SET)
 
 SET = Datatype("set", cast_set, ANY)

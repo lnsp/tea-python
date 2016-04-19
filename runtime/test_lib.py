@@ -43,7 +43,7 @@ class TestLib(unittest.TestCase):
         self.assertEqual(lib.STRING.cast(BOOL_VALUE),
                          env.Value(lib.STRING, "true"))
         self.assertEqual(lib.STRING.cast(NULL_VALUE),
-                         env.Value(lib.STRING, "null"))
+                         env.Value(lib.STRING, ""))
         self.assertEqual(lib.STRING.cast(STRING_VALUE), STRING_VALUE)
         self.assertRaises(env.CastError, lib.STRING.cast,
                           env.Value(env.Function))
