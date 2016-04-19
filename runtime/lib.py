@@ -1,6 +1,7 @@
 """The standard runtime library."""
 from runtime.env import (Datatype, Value, Function, Operator,
-                         Signature, FunctionBinding, CastError, ANY, NULL)
+                         Signature, FunctionBinding, CastError, ANY, NULL,
+                         RuntimeException)
 
 NUMBER = Datatype("*number", None, ANY)
 
@@ -174,11 +175,32 @@ def _mul_operation():
 MUL_FUNCTION = _mul_operation()
 MUL_OPERATOR = Operator(MUL_FUNCTION, "*")
 
+def _div_operation():
+    def div(context):
+        """Divide two numbers."""
+        var_a = context.find("id", "a")
+        var_b = var_a.datatype.cast(context.find("id", "b"))
+        if var_b.data == 0:
+            raise RuntimeException("Can not divide by 0")
+        return Value(var_a.datatype, var_a.data / var_b.data)
+
+    div_node = FunctionBinding(div)
+    signatures = [
+        Signature([
+            Value(NUMBER, None, "a"),
+            Value(NUMBER, None, "b"),
+        ], div_node)
+    ]
+    return Function(signatures, "#div")
+
+DIV_FUNCTION = _div_operation()
+DIV_OPERATOR = Operator(DIV_FUNCTION, "/")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
     # Operators
-    ADD_OPERATOR, SUB_OPERATOR, MUL_OPERATOR,
+    ADD_OPERATOR, SUB_OPERATOR, MUL_OPERATOR, DIV_OPERATOR,
     # FUNCTIONtions
-    ADD_FUNCTION, SUB_FUNCTION, MUL_FUNCTION,
+    ADD_FUNCTION, SUB_FUNCTION, MUL_FUNCTION, DIV_FUNCTION,
 ]
