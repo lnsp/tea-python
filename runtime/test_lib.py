@@ -112,3 +112,18 @@ class TestLib(unittest.TestCase):
         # Case 3: First float, second int -> float
         args = [FLOAT2_VALUE, INT_VALUE]
         self.assertEqual(sub_op.eval(args, context), FLOAT_VALUE)
+
+    def test_mul_operation(self):
+        """Test the mul operator / function."""
+        mul_op = lib.MUL_OPERATOR
+        context = env.empty_context()
+
+        # Case 1: Two int values -> int
+        args = [INT_VALUE, INT2_VALUE]
+        self.assertEqual(mul_op.eval(args, context), INT2_VALUE)
+        # Case 2: Two float values -> float
+        args = [FLOAT2_VALUE, FLOAT_VALUE]
+        self.assertEqual(mul_op.eval(args, context), FLOAT2_VALUE)
+        # Case 3: First float, second int -> float
+        args = [FLOAT2_VALUE, INT_VALUE]
+        self.assertEqual(mul_op.eval(args, context), FLOAT2_VALUE)
