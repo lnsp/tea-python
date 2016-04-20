@@ -207,11 +207,30 @@ def _div_operation():
 DIV_FUNCTION = _div_operation()
 DIV_OPERATOR = Operator(DIV_FUNCTION, "/")
 
+def _equ_operation():
+    def equ(context):
+        """Checks if two values are equal."""
+        var_a = context.find("id", "a")
+        var_b = context.find("id", "b")
+        return Value(BOOLEAN, var_a == var_b)
+
+    equ_node = FunctionBinding(equ)
+    signatures = [
+        Signature([
+            Value(ANY, None, "a"),
+            Value(ANY, None, "b"),
+        ], equ_node)
+    ]
+    return Function(signatures, "#equ")
+
+EQU_FUNCTION = _equ_operation()
+EQU_OPERATOR = Operator(EQU_FUNCTION, "==")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
     # Operators
-    ADD_OPERATOR, SUB_OPERATOR, MUL_OPERATOR, DIV_OPERATOR,
+    ADD_OPERATOR, SUB_OPERATOR, MUL_OPERATOR, DIV_OPERATOR, EQU_OPERATOR,
     # Functions
-    ADD_FUNCTION, SUB_FUNCTION, MUL_FUNCTION, DIV_FUNCTION,
+    ADD_FUNCTION, SUB_FUNCTION, MUL_FUNCTION, DIV_FUNCTION, EQU_FUNCTION
 ]
