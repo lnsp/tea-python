@@ -1,6 +1,6 @@
 """The standard runtime library."""
 from runtime.env import (Datatype, Value, Function, Operator,
-                         Signature, FunctionBinding, CastError, ANY, NULL,
+                         Signature, FunctionBinding, CastException, ANY, NULL,
                          RuntimeException)
 
 NUMBER = Datatype("*number", None, ANY)
@@ -15,7 +15,7 @@ def cast_integer(value):
             return Value(INTEGER, 1 if value.data else 0)
         if value.datatype is NULL:
             return Value(INTEGER, 0)
-    raise CastError(value, INTEGER)
+    raise CastException(value, INTEGER)
 
 INTEGER = Datatype("int", cast_integer, NUMBER)
 
@@ -27,7 +27,7 @@ def cast_float(value):
             return Value(FLOAT, float(value.data))
         if value.datatype is NULL:
             return Value(FLOAT, 0.0)
-    raise CastError(value, FLOAT)
+    raise CastException(value, FLOAT)
 
 FLOAT = Datatype("float", cast_float, NUMBER)
 
@@ -41,7 +41,7 @@ def cast_string(value):
             return Value(STRING, "true" if value.data else "false")
         if value.datatype is NULL:
             return Value(STRING, "")
-    raise CastError(value, STRING)
+    raise CastException(value, STRING)
 
 STRING = Datatype("string", cast_string, ANY)
 
@@ -55,7 +55,7 @@ def cast_boolean(value):
             return Value(BOOLEAN, bool(value.data))
         if value.datatype is NULL:
             return Value(NULL, False)
-    raise CastError(value, BOOLEAN)
+    raise CastException(value, BOOLEAN)
 
 BOOLEAN = Datatype("bool", cast_boolean, ANY)
 
@@ -67,7 +67,7 @@ def cast_function(value):
             return Value(FUNCTION, value.data)
         if value.datatype is NULL:
             return Value(FUNCTION, None)
-    raise CastError(value, FUNCTION)
+    raise CastException(value, FUNCTION)
 
 FUNCTION = Datatype("func", cast_function, ANY)
 
@@ -79,7 +79,7 @@ def cast_list(value):
             return Value(LIST, list(value.data))
         if value.datatype is NULL:
             return Value(LIST, [])
-    raise CastError(value, LIST)
+    raise CastException(value, LIST)
 
 LIST = Datatype("LIST", cast_list, ANY)
 
@@ -91,7 +91,7 @@ def cast_map(value):
             return Value(MAP, dict(value.data))
         if value.datatype is NULL:
             return Value(MAP, dict())
-    raise CastError(value, MAP)
+    raise CastException(value, MAP)
 
 MAP = Datatype("map", cast_map, ANY)
 
@@ -103,7 +103,7 @@ def cast_set(value):
             return Value(SET, set(value.data))
         if value.datatype is NULL:
             return Value(SET, set())
-    raise CastError(value, SET)
+    raise CastException(value, SET)
 
 SET = Datatype("set", cast_set, ANY)
 
@@ -112,7 +112,7 @@ def cast_object(value):
     """Casts a value to an OBJECT."""
     if isinstance(value, Value):
         return Value(OBJECT, value.data)
-    raise CastError(value, OBJECT)
+    raise CastException(value, OBJECT)
 
 OBJECT = Datatype("object", cast_object, ANY)
 
@@ -212,6 +212,8 @@ def _equ_operation():
         """Checks if two values are equal."""
         var_a = context.find("id", "a")
         var_b = context.find("id", "b")
+        if var_a.datatype is not var_b.datatype:
+            raise RuntimeException("Two values of different types may not be compared.")
         return Value(BOOLEAN, var_a == var_b)
 
     equ_node = FunctionBinding(equ)

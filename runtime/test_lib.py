@@ -14,6 +14,7 @@ STRING1_VALUE = env.Value(lib.STRING, "Hello1")
 LIST_VALUE = env.Value(lib.LIST, ["H", "e", "l", "l", "o"])
 SET_VALUE = env.Value(lib.SET, set(LIST_VALUE.data))
 BOOL_VALUE = env.Value(lib.BOOLEAN, True, "b")
+FALSE_VALUE = env.Value(lib.BOOLEAN, False, None)
 TRUE_STRING_VALUE = env.Value(lib.STRING, "true")
 MISSING_INT_VALUE = env.Value(lib.INTEGER, 0, "missing")
 NULL_VALUE = env.Value(env.NULL)
@@ -30,13 +31,13 @@ class TestLib(unittest.TestCase):
         """Test the Integer type."""
         self.assertEqual(lib.INTEGER.cast(INT_VALUE), INT_VALUE)
         self.assertEqual(lib.INTEGER.cast(FLOAT_VALUE), INT_VALUE)
-        self.assertRaises(env.CastError, lib.INTEGER.cast, STRING_VALUE)
+        self.assertRaises(env.CastException, lib.INTEGER.cast, STRING_VALUE)
 
     def test_float(self):
         """Test the FLOAT type."""
         self.assertEqual(lib.FLOAT.cast(FLOAT_VALUE), FLOAT_VALUE)
         self.assertEqual(lib.FLOAT.cast(INT_VALUE), FLOAT_VALUE)
-        self.assertRaises(env.CastError, lib.FLOAT.cast, STRING_VALUE)
+        self.assertRaises(env.CastException, lib.FLOAT.cast, STRING_VALUE)
 
     def test_string(self):
         """Test the STRING type."""
@@ -47,36 +48,36 @@ class TestLib(unittest.TestCase):
         self.assertEqual(lib.STRING.cast(NULL_VALUE),
                          env.Value(lib.STRING, ""))
         self.assertEqual(lib.STRING.cast(STRING_VALUE), STRING_VALUE)
-        self.assertRaises(env.CastError, lib.STRING.cast,
+        self.assertRaises(env.CastException, lib.STRING.cast,
                           env.Value(env.Function))
 
     def test_boolean(self):
         """Test the BOOLEAN type."""
         self.assertEqual(lib.BOOLEAN.cast(BOOL_VALUE), BOOL_VALUE)
         self.assertEqual(lib.BOOLEAN.cast(INT_VALUE), BOOL_VALUE)
-        self.assertRaises(env.CastError, lib.BOOLEAN.cast, FLOAT_VALUE)
+        self.assertRaises(env.CastException, lib.BOOLEAN.cast, FLOAT_VALUE)
 
     def test_func(self):
         """Test the FUNCTION type."""
         self.assertEqual(lib.FUNCTION.cast(USELESS_FUNCTION), USELESS_FUNCTION)
-        self.assertRaises(env.CastError, lib.FUNCTION.cast, INT_VALUE)
+        self.assertRaises(env.CastException, lib.FUNCTION.cast, INT_VALUE)
 
     def test_list(self):
         """Test the LIST type."""
         self.assertEqual(lib.LIST.cast(LIST_VALUE), LIST_VALUE)
         self.assertEqual(lib.LIST.cast(STRING_VALUE), LIST_VALUE)
-        self.assertRaises(env.CastError, lib.LIST.cast, BOOL_VALUE)
+        self.assertRaises(env.CastException, lib.LIST.cast, BOOL_VALUE)
 
     def test_set(self):
         """Test the SET type."""
         self.assertEqual(lib.SET.cast(SET_VALUE), SET_VALUE)
         self.assertEqual(lib.SET.cast(LIST_VALUE), SET_VALUE)
-        self.assertRaises(env.CastError, lib.SET.cast, BOOL_VALUE)
+        self.assertRaises(env.CastException, lib.SET.cast, BOOL_VALUE)
 
     def test_object(self):
         """Test the OBJECT type."""
         self.assertEqual(lib.OBJECT.cast(OBJECT_VALUE), OBJECT_VALUE)
-        self.assertRaises(env.CastError, lib.OBJECT.cast,
+        self.assertRaises(env.CastException, lib.OBJECT.cast,
                           ANOTHER_USELESS_OPERATOR)
 
     def test_add_operation(self):
@@ -150,4 +151,3 @@ class TestLib(unittest.TestCase):
         # Case 5: Division by  0 float
         args = [FLOAT_VALUE, FLOAT0_VALUE]
         self.assertRaises(lib.RuntimeException, div_op.eval, args, context)
-        

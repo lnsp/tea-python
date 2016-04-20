@@ -101,15 +101,15 @@ class Value(object):
         return "<Value ? %s *(%s)>" % (self.datatype, self.name)
 
 
-class ArgumentError(Exception):
-    """ArgumentError is raised when the number of arguments do not match the signature."""
+class ArgumentException(Exception):
+    """ArgumentException is raised when the number of arguments do not match the signature."""
 
     def __init__(self, expected, got):
         message = "Too " + ("many" if expected < got else "less") + "arguments"
         super().__init__("%s: expected %d, got %d" % (message, expected, got))
 
 
-class ArgumentCastError(Exception):
+class ArgumentCastException(Exception):
     """ArgumentCastError is raised when the type of arguments do not match the signature."""
 
     def __init__(self, expected, got):
@@ -131,7 +131,7 @@ class Signature(object):
 
         # Too many arguments
         if number_of_expected < number_of_args:
-            raise ArgumentError(number_of_expected, number_of_args)
+            raise ArgumentException(number_of_expected, number_of_args)
 
         # Fill the argument list with trash
         matched_args = []
@@ -145,7 +145,7 @@ class Signature(object):
                 arg = args[index]
                 arg_type = arg.datatype
                 if not arg_type.kind_of(expected_type):
-                    raise ArgumentCastError(
+                    raise ArgumentCastException(
                         expected_type, arg_type)
                 var = arg_type.cast(arg)
             # Not enough arguments given, looking for default values
@@ -153,7 +153,7 @@ class Signature(object):
                 var = expected_type.cast(expected)
             # Not enough arguments given, no default values
             else:
-                raise ArgumentError(number_of_expected, number_of_args)
+                raise ArgumentException(number_of_expected, number_of_args)
             var.name = expected.name
             matched_args.append(var)
         return matched_args, self.function
@@ -162,8 +162,8 @@ class Signature(object):
         return "<Signature (%s)>" % ",".join(self.expected.name)
 
 
-class FunctionError(Exception):
-    """A FunctionError is raised when no matching signature was found or a similar error occured."""
+class FunctionException(Exception):
+    """Raised when no matching signature was found or a similar error occured."""
 
     def __init__(self, function, message="No signature found"):
         super().__init__("%s in %s" % (message, function))
@@ -188,9 +188,9 @@ class Function(object):
                 result = fnc.eval(context)
                 context.namespace = original
                 return result
-            except (ArgumentError, ArgumentCastError):
+            except (ArgumentException, ArgumentCastException):
                 pass
-        raise FunctionError(self)
+        raise FunctionException(self)
 
     def __str__(self):
         return "<Function *(%s)>" % self.name
@@ -247,7 +247,7 @@ class Datatype(object):
         return "<T %s>" % self.name
 
 
-class CastError(Exception):
+class CastException(Exception):
     """A CastError is raised when a value can not be casted to another type."""
 
     def __init__(self, value, datatype):

@@ -87,13 +87,13 @@ class TestEnv(unittest.TestCase):
             env.Value(lib.FLOAT, -3.0),
             env.Value(lib.INTEGER, 3.0),
         ]
-        self.assertRaises(env.ArgumentError, sign.match, first_case)
+        self.assertRaises(env.ArgumentException, sign.match, first_case)
 
         # Case 2: Too less arguments
         second_case = [
             env.Value(lib.INTEGER, 3),
         ]
-        self.assertRaises(env.ArgumentError, sign.match, second_case)
+        self.assertRaises(env.ArgumentException, sign.match, second_case)
 
         # Case 3: Fitting arguments
         third_case = [
@@ -127,7 +127,7 @@ class TestEnv(unittest.TestCase):
 
         # FUNCTIONtion without signatures
         func = env.Function([])
-        self.assertRaises(env.FunctionError, func.eval, [], context)
+        self.assertRaises(env.FunctionException, func.eval, [], context)
 
         # FUNCTIONtion with one signature, perfect match
         identifier_literal = ast.Identifier("str")
