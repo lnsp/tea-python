@@ -15,11 +15,15 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Context-based library import
 - Variable declarations, assignments
 - Tests for `runtime.lexer`
+- New, shiny logo
+- Travis CI integration for build status and tests
 
 ### Changed
 - Light bindings between the runtime environment and the runtime library
 - Seperated the runtime environment from the runtime library
 - Renamed `runtime.tokenizer` to `runtime.lexer`
+- Rename all `...Error` to `...Exception` for better distinction
+- Massive code quality improvements, enhancements to style and structure
 
 ## [v0.0.3]
 ### Added
