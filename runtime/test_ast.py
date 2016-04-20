@@ -266,6 +266,23 @@ class TestAst(unittest.TestCase):
         self.assertEqual(context.find("id", "val"), INT_LITERAL.value)
         self.assertRaises(env.RuntimeException, decl_node.eval, context)
 
+    def test_assignment_node(self):
+        """Test the assignment node."""
+        context = env.empty_context()
+        context.store(env.Value(lib.INTEGER, 1, "value"))
+
+        missing_asgn = ast.Assignment("missing")
+        self.assertRaises(env.NamespaceException, missing_asgn.eval, context)
+
+        bad_asgn = ast.Assignment("value")
+        bad_asgn.add(STRING_LITERAL)
+        self.assertRaises(env.RuntimeException, bad_asgn.eval, context)
+
+        asgn_node = ast.Assignment("value")
+        asgn_node.add(INT_LITERAL)
+        self.assertEqual(asgn_node.eval(context), INT_LITERAL.value)
+        self.assertEqual(context.find("id", "value"), INT_LITERAL.value)
+
     def test_syntax_tree(self):
         """Test the syntax_tree method."""
         syntax_tree = ast.syntax_tree()
