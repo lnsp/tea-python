@@ -20,6 +20,7 @@ class TestLexer(unittest.TestCase):
                 TokenTuple(value=" ", kind=WHITESPACE),
                 TokenTuple(value="\"4\"", kind=STRING),
             ]),
+            ("3.14", [TokenTuple(value="3.14", kind=NUMBER)]),
         ]
         for (case, expected) in test_cases:
             self.assertEqual(run(case), expected)
