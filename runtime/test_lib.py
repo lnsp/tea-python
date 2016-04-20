@@ -5,8 +5,10 @@ from runtime import env, lib
 
 INT_VALUE = env.Value(lib.INTEGER, 1)
 INT2_VALUE = env.Value(lib.INTEGER, 2)
+INT0_VALUE = env.Value(lib.INTEGER, 0)
 FLOAT_VALUE = env.Value(lib.FLOAT, 1.0)
 FLOAT2_VALUE = env.Value(lib.FLOAT, 2.0)
+FLOAT0_VALUE = env.Value(lib.FLOAT, 0.0)
 STRING_VALUE = env.Value(lib.STRING, "Hello", "identifier")
 STRING1_VALUE = env.Value(lib.STRING, "Hello1")
 LIST_VALUE = env.Value(lib.LIST, ["H", "e", "l", "l", "o"])
@@ -127,3 +129,25 @@ class TestLib(unittest.TestCase):
         # Case 3: First float, second int -> float
         args = [FLOAT2_VALUE, INT_VALUE]
         self.assertEqual(mul_op.eval(args, context), FLOAT2_VALUE)
+
+    def test_div_operation(self):
+        """Test the div operator/ function."""
+        div_op = lib.DIV_OPERATOR
+        context = env.empty_context()
+
+        # Case 1: Two int values -> int
+        args = [INT_VALUE, INT_VALUE]
+        self.assertEqual(div_op.eval(args, context), INT_VALUE)
+        # Case 2: Two float values -> float
+        args = [FLOAT_VALUE, FLOAT_VALUE]
+        self.assertEqual(div_op.eval(args, context), FLOAT_VALUE)
+        # Case 3: One int, one float -> int
+        args = [INT_VALUE, FLOAT_VALUE]
+        self.assertEqual(div_op.eval(args, context), INT_VALUE)
+        # Case 4: Division by 0 int
+        args = [INT_VALUE, INT0_VALUE]
+        self.assertRaises(lib.RuntimeException, div_op.eval, args, context)
+        # Case 5: Division by  0 float
+        args = [FLOAT_VALUE, FLOAT0_VALUE]
+        self.assertRaises(lib.RuntimeException, div_op.eval, args, context)
+        
