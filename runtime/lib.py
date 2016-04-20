@@ -190,7 +190,10 @@ def _div_operation():
         var_b = var_a.datatype.cast(context.find("id", "b"))
         if var_b.data == 0:
             raise RuntimeException("Can not divide by 0")
-        return Value(var_a.datatype, var_a.data / var_b.data)
+        result = var_a.data / var_b.data
+        if var_a.datatype is INTEGER:
+            result = int(result)
+        return Value(var_a.datatype, result)
 
     div_node = FunctionBinding(div)
     signatures = [
