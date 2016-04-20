@@ -4,7 +4,7 @@
 import runtime.lib
 from runtime import lexer, parser, env
 
-TEA_VERSION = "0.0.4-dev"
+TEA_VERSION = "0.0.5-dev"
 TEA_TITLE = "Tea @" + TEA_VERSION
 CLI_SYMBOL = "#> "
 CLI_SPACE = " " * 3
