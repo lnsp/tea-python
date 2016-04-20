@@ -256,6 +256,23 @@ class Declaration(Node):
         context.store(casted_value)
         return casted_value
 
+class Assignment(Node):
+    """A assignment node."""
+
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+
+    def eval(self, context):
+        """Looks for a variable in the namespace and assigns a value to it."""
+        # Search for variable in namespace
+        variable = context.find("id", self.name)
+        value = self.children[0].eval()
+        if variable.datatype is value.datatype:
+            variable.data = value.data
+        else:
+            raise env.RuntimeException("Incompatible types")
+
 def syntax_tree():
     """Initialize a default syntax tree."""
     return Sequence()
