@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+## [v0.0.4]
+### Added
 - New Operators
   - `add` (`+`)
   - `sub` (`-`)
@@ -48,6 +53,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Wrong CLI version number
 
 
-[Unreleased]: https://github.com/lnsp/tea/compare/v0.0.3...master
+[Unreleased]: https://github.com/lnsp/tea/compare/v0.0.4...master
+[v0.0.4]: https://github.com/lnsp/tea/compare/v0.0.3...v0.0.4
 [v0.0.3]: https://github.com/lnsp/tea/compare/v0.0.2...v0.0.3
 [v0.0.2]: https://github.com/lnsp/tea/compare/v0.0.1...v0.0.2
