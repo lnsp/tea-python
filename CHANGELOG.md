@@ -13,11 +13,13 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Tree-based type hierarchy
 - Python-function to Tea-function bindings
 - Context-based library import
-- Variable declarations
+- Variable declarations, assignments
+- Tests for `runtime.lexer`
 
 ### Changed
 - Light bindings between the runtime environment and the runtime library
 - Seperated the runtime environment from the runtime library
+- Renamed `runtime.tokenizer` to `runtime.lexer`
 
 ## [v0.0.3]
 ### Added
