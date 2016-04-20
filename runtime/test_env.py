@@ -26,8 +26,8 @@ class TestEnv(unittest.TestCase):
         """Test the Namespace class."""
         namespace = env.Namespace(None)
         self.assertEqual(namespace.parent, None)
-        self.assertRaises(Exception, namespace.find, "id", "identifier")
-        self.assertRaises(Exception, namespace.find, "op", "operator")
+        self.assertRaises(env.NamespaceException, namespace.find, "id", "identifier")
+        self.assertRaises(env.NamespaceException, namespace.find, "op", "operator")
         # store example operator
         namespace.store(STRING_VALUE)
         namespace.store(USELESS_OPERATOR)
@@ -42,9 +42,9 @@ class TestEnv(unittest.TestCase):
         # check independence
         sub.store(MISSING_INT_VALUE)
         sub.store(ANOTHER_USELESS_OPERATOR)
-        self.assertRaises(Exception, namespace.find,
+        self.assertRaises(env.NamespaceException, namespace.find,
                           "id", MISSING_INT_VALUE.name)
-        self.assertRaises(Exception, namespace.find, "op",
+        self.assertRaises(env.NamespaceException, namespace.find, "op",
                           ANOTHER_USELESS_OPERATOR.symbol)
 
     def test_datatype(self):
@@ -59,7 +59,7 @@ class TestEnv(unittest.TestCase):
         context = env.Context(namespace)
         context.store(INT_VALUE)
         self.assertEqual(context.find("id", INT_VALUE.name), INT_VALUE)
-        self.assertRaises(Exception, context.find, "id", STRING_VALUE.name)
+        self.assertRaises(env.NamespaceException, context.find, "id", STRING_VALUE.name)
         custom_library = LIBRARY(EXPORTS=[STRING_VALUE])
         context.load(custom_library)
         self.assertEqual(context.find("id", STRING_VALUE.name), STRING_VALUE)
