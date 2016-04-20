@@ -1,6 +1,11 @@
 """A collection of classes that are part of the standard runtime environment."""
 
 
+class NamespaceException(Exception):
+    """A namespace exception."""
+    def __init__(self, msg="The item does not exist in the search space."):
+        super().__init__(msg)
+
 class Namespace:
     """A variable and operator namespace."""
 
@@ -23,7 +28,7 @@ class Namespace:
         if self.parent is not None:
             return self.parent.find(space, key)
         # return if nothing available
-        raise Exception("The item does not exist in this and upper namespaces")
+        raise NamespaceException()
 
     def store(self, item):
         """Stores a item in the specified search space."""
@@ -35,7 +40,7 @@ class Namespace:
         elif itemtype is Datatype:
             self.search_spaces["ty"][item.name] = item
         else:
-            raise Exception("Item cannot be stored in namespace")
+            raise NamespaceException("The item cannot be stored in namespace")
 
     def store_all(self, items):
         """Stores a list or tuple of items."""
