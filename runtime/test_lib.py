@@ -151,3 +151,15 @@ class TestLib(unittest.TestCase):
         # Case 5: Division by  0 float
         args = [FLOAT_VALUE, FLOAT0_VALUE]
         self.assertRaises(lib.RuntimeException, div_op.eval, args, context)
+
+    def test_equ_operation(self):
+        """Test the equ operator / function."""
+        equ_op = lib.EQU_OPERATOR
+        context = env.empty_context()
+
+        # Case 1: Two int values
+        args = [INT_VALUE, INT_VALUE]
+        self.assertEqual(equ_op.eval(args, context), BOOL_VALUE)
+        # Case 2: One float, one int
+        args = [FLOAT_VALUE, INT_VALUE]
+        self.assertRaises(lib.RuntimeException, equ_op.eval, args, context)
