@@ -1,0 +1,6 @@
+{
+  "name": "Tea",
+  "tagline": "A small, experimental programming language.",
+  "body": "# ![Tea](https://cloud.githubusercontent.com/assets/3391295/14614369/372907fa-05a1-11e6-8272-956c2cc447cb.png)\r\n\r\n[![Build Status](https://travis-ci.org/lnsp/tea.svg?branch=master)](https://travis-ci.org/lnsp/tea)\r\n\r\nTea is small and simple.\r\nIt was crafted for reading, extending and maintaining.\r\nThe interpreter is still in early-alpha and can only run ASTs.\r\n\r\n## A leafy example\r\n```tea\r\n// leafy.tea\r\nimport std.io;\r\n\r\nfunc sayHello(name: string): string {\r\n    return \"Hello, %s!\" % name;\r\n}\r\n\r\nfunc main(args: list) {\r\n    io.println(\"You called\", args.join(\",\"));\r\n    io.print(\"Please enter your name: \");\r\n    var name = io.readLine();\r\n    sayHello(name);\r\n}\r\n```\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
