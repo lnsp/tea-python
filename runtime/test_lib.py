@@ -168,7 +168,7 @@ class TestLib(unittest.TestCase):
         """Test the and operator / function."""
         and_op = lib.AND_OPERATOR
         context = env.empty_context()
-        
+
         # Case 1: Two true
         args = [TRUE_VALUE, TRUE_VALUE]
         self.assertEqual(and_op.eval(args, context), TRUE_VALUE)
@@ -178,3 +178,19 @@ class TestLib(unittest.TestCase):
         # Case 3: One true, one false
         args = [TRUE_VALUE, FALSE_VALUE]
         self.assertEqual(and_op.eval(args, context), FALSE_VALUE)
+
+    def test_or_operation(self):
+        """Test the or operator / function."""
+        or_op = lib.OR_OPERATOR
+        context = env.empty_context()
+
+        # Case 1: Two true
+        args = [TRUE_VALUE, TRUE_VALUE]
+        self.assertEqual(or_op.eval(args, context), TRUE_VALUE)
+        # Case 2: Two false
+        args = [FALSE_VALUE, FALSE_VALUE]
+        self.assertEqual(or_op.eval(args, context), FALSE_VALUE)
+        # Case 3: One false, one true
+        args = [TRUE_VALUE, FALSE_VALUE]
+        self.assertEqual(or_op.eval(args, context), TRUE_VALUE)
+        
