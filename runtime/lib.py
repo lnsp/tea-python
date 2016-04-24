@@ -244,7 +244,7 @@ def _and_operation():
     ]
     return Function(signatures, "#and")
 
-AND_FUNCTION = _and_operation
+AND_FUNCTION = _and_operation()
 AND_OPERATOR = Operator(AND_FUNCTION, "&&")
 
 EXPORTS = [
