@@ -247,6 +247,25 @@ def _and_operation():
 AND_FUNCTION = _and_operation()
 AND_OPERATOR = Operator(AND_FUNCTION, "&&")
 
+def _or_operation():
+    def or_o(context):
+        """Returns true if one value is true."""
+        var_a = context.find("id", "a")
+        var_b = context.find("id", "b")
+        return Value(BOOLEAN, var_a.data or var_b.data)
+
+    or_node = FunctionBinding(or_o)
+    signatures = [
+        Signature([
+            Value(BOOLEAN, None, "a"),
+            Value(BOOLEAN, None, "b"),
+        ], or_node),
+    ]
+    return Function(signatures, "#or")
+
+OR_FUNCTION = _or_operation()
+OR_OPERATOR = Operator(OR_FUNCTION, "||")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
