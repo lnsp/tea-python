@@ -228,6 +228,25 @@ def _equ_operation():
 EQU_FUNCTION = _equ_operation()
 EQU_OPERATOR = Operator(EQU_FUNCTION, "==")
 
+def _and_operation():
+    def and_o(context):
+        """Returns true if both values are true."""
+        var_a = context.find("id", "a")
+        var_b = context.find("id", "b")
+        return Value(BOOLEAN, var_a.data and var_b.data)
+
+    and_node = FunctionBinding(and_o)
+    signatures = [
+        Signature([
+            Value(BOOLEAN, None, "a"),
+            Value(BOOLEAN, None, "b"),
+        ], and_node),
+    ]
+    return Function(signatures, "#and")
+
+AND_FUNCTION = _and_operation
+AND_OPERATOR = Operator(AND_FUNCTION, "&&")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
