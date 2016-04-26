@@ -208,3 +208,20 @@ class TestLib(unittest.TestCase):
         # Case 3: One false, one true
         args = [TRUE_VALUE, FALSE_VALUE]
         self.assertEqual(xor_op.eval(args, context), TRUE_VALUE)
+
+    def test_neq_operation(self):
+        """Test the neq operator / function."""
+        neq_op = lib.NEQ_OPERATOR
+        context = env.empty_context()
+
+        # Case 1: Two int values
+        args = [INT_VALUE, INT_VALUE]
+        self.assertEqual(neq_op.eval(args, context), FALSE_VALUE)
+
+        # Case 2: Two different ints
+        args = [INT0_VALUE, INT2_VALUE]
+        self.assertEqual(neq_op.eval(args, context), TRUE_VALUE)
+
+        # Case 3: One int, one float
+        args = [INT_VALUE, FLOAT_VALUE]
+        self.assertRaises(env.RuntimeException, neq_op.eval, args, context)
