@@ -285,6 +285,26 @@ def _xor_operation():
 XOR_FUNCTION = _xor_operation()
 XOR_OPERATOR = Operator(XOR_FUNCTION, "^|")
 
+def _neq_operation():
+    def neq(context):
+        """Returns true if both values are unequal."""
+        var_a = context.find("id", "a")
+        var_b = context.find("id", "b")
+        if var_a.datatype is not var_b.datatype:
+            raise RuntimeException("Two values of different types may not be compared.")
+        return Value(BOOLEAN, var_a != var_b)
+    neq_node = FunctionBinding(neq)
+    signatures = [
+        Signature([
+            Value(ANY, None, "a"),
+            Value(ANY, None, "b"),
+        ], neq_node),
+    ]
+    return Function(signatures, "#neq")
+
+NEQ_FUNCTION = _neq_operation()
+NEQ_OPERATOR = Operator(NEQ_FUNCTION, "!=")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
