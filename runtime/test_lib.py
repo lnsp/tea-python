@@ -193,4 +193,18 @@ class TestLib(unittest.TestCase):
         # Case 3: One false, one true
         args = [TRUE_VALUE, FALSE_VALUE]
         self.assertEqual(or_op.eval(args, context), TRUE_VALUE)
-        
+
+    def test_xor_operation(self):
+        """Test the xor operator / function."""
+        xor_op = lib.XOR_OPERATOR
+        context = env.empty_context()
+
+        # Case 1: Both true
+        args = [TRUE_VALUE, TRUE_VALUE]
+        self.assertEqual(xor_op.eval(args, context), FALSE_VALUE)
+        # Case 2: Two false
+        args = [FALSE_VALUE, FALSE_VALUE]
+        self.assertEqual(xor_op.eval(args, context), FALSE_VALUE)
+        # Case 3: One false, one true
+        args = [TRUE_VALUE, FALSE_VALUE]
+        self.assertEqual(xor_op.eval(args, context), TRUE_VALUE)
