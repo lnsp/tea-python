@@ -266,6 +266,25 @@ def _or_operation():
 OR_FUNCTION = _or_operation()
 OR_OPERATOR = Operator(OR_FUNCTION, "||")
 
+def _xor_operation():
+    def xor(context):
+        """Returns true if one of the two values is true."""
+        var_a = context.find("id", "a")
+        var_b = context.find("id", "b")
+        return Value(BOOLEAN, (var_a.data or var_b.data) and var_a.data != var_b.data)
+
+    xor_node = FunctionBinding(xor)
+    signatures = [
+        Signature([
+            Value(BOOLEAN, None, "a"),
+            Value(BOOLEAN, None, "b"),
+        ], xor_node),
+    ]
+    return Function(signatures, "#xor")
+
+XOR_FUNCTION = _xor_operation()
+XOR_OPERATOR = Operator(XOR_FUNCTION, "^|")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
