@@ -163,6 +163,9 @@ class TestLib(unittest.TestCase):
         # Case 2: One float, one int
         args = [FLOAT_VALUE, INT_VALUE]
         self.assertRaises(lib.RuntimeException, equ_op.eval, args, context)
+        # Case 3: Two different int values
+        args = [INT0_VALUE, INT2_VALUE]
+        self.assertEqual(equ_op.eval(args, context), FALSE_VALUE)
 
     def test_and_operation(self):
         """Test the and operator / function."""
