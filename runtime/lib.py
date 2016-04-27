@@ -305,6 +305,28 @@ def _neq_operation():
 NEQ_FUNCTION = _neq_operation()
 NEQ_OPERATOR = Operator(NEQ_FUNCTION, "!=")
 
+def _sm_operation():
+    def smaller(context):
+        """Returns true if one value is smaller than the other."""
+        var_a = context.find("id", "a")
+        var_b = context.find("id", "b")
+        return Value(BOOLEAN, var_a.data < var_b.data)
+    sm_node = FunctionBinding(smaller)
+    signatures = [
+        Signature([
+            Value(NUMBER, None, "a"),
+            Value(NUMBER, None, "b"),
+        ], sm_node),
+        Signature([
+            Value(STRING, None, "a"),
+            Value(STRING, None, "b"),
+        ], sm_node),
+    ]
+    return Function(signatures, "#sm")
+
+SM_FUNCTION = _sm_operation()
+SM_OPERATOR = Operator(SM_FUNCTION, "<")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
