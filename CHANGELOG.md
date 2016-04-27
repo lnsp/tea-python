@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - New operators
   - `and` (`&&`)
   - `or` (`||`)
+  - `xor` (`^|`)
+  - `equ` (`==`)
+  - `neq` (`!=`)
 
 ### Changed
 
