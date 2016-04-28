@@ -327,6 +327,28 @@ def _sm_operation():
 SM_FUNCTION = _sm_operation()
 SM_OPERATOR = Operator(SM_FUNCTION, "<")
 
+def _lg_operation():
+    def larger(context):
+        """Returns true if a is larger than b."""
+        var_a = context.find("id", "a")
+        var_b = context.find("id", "b")
+        return Value(BOOLEAN, var_a.data < var_b.data)
+    lg_node = FunctionBinding(larger)
+    signatures = [
+        Signature([
+            Value(NUMBER, None, "a"),
+            Value(NUMBER, None, "b"),
+        ], lg_node),
+        Signature([
+            Value(STRING, None, "a"),
+            Value(STRING, None, "b"),
+        ], lg_node),
+    ]
+    return Function(signatures, "#lg")
+
+LG_FUNCTION = _lg_operation()
+LG_OPERATOR = Operator(SM_FUNCTION, ">")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
