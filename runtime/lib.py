@@ -332,7 +332,7 @@ def _lg_operation():
         """Returns true if a is larger than b."""
         var_a = context.find("id", "a")
         var_b = context.find("id", "b")
-        return Value(BOOLEAN, var_a.data < var_b.data)
+        return Value(BOOLEAN, var_a.data > var_b.data)
     lg_node = FunctionBinding(larger)
     signatures = [
         Signature([
@@ -347,7 +347,7 @@ def _lg_operation():
     return Function(signatures, "#lg")
 
 LG_FUNCTION = _lg_operation()
-LG_OPERATOR = Operator(SM_FUNCTION, ">")
+LG_OPERATOR = Operator(LG_FUNCTION, ">")
 
 EXPORTS = [
     # Datatypes
