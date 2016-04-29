@@ -334,3 +334,56 @@ class TestLib(unittest.TestCase):
         # Case 4.3: One larger, one smaller string
         args = [STRING1_VALUE, STRING_VALUE]
         self.assertEqual(lg_op.eval(args, context), TRUE_VALUE)
+
+    def test_sme_operation(self):
+        """Test the sme operation."""
+        sme_op = lib.SME_OPERATOR
+        context = env.empty_context()
+
+        # Case 1.1: Two equal ints
+        args = [INT_VALUE, INT_VALUE]
+        self.assertEqual(sme_op.eval(args, context), TRUE_VALUE)
+
+        # Case 1.2: One smaller, one larger int
+        args = [INT0_VALUE, INT2_VALUE]
+        self.assertEqual(sme_op.eval(args, context), TRUE_VALUE)
+
+        # Case 1.3: One larger, one smaller int
+        args = [INT2_VALUE, INT0_VALUE]
+        self.assertEqual(sme_op.eval(args, context), FALSE_VALUE)
+
+        # Case 2.1: Two equal floats
+        args = [FLOAT_VALUE, FLOAT_VALUE]
+        self.assertEqual(sme_op.eval(args, context), TRUE_VALUE)
+
+        # Case 2.2: One smaller, one larger float
+        args = [FLOAT0_VALUE, FLOAT2_VALUE]
+        self.assertEqual(sme_op.eval(args, context), TRUE_VALUE)
+
+        # Case 2.3: One larger, one smaller float
+        args = [FLOAT2_VALUE, FLOAT0_VALUE]
+        self.assertEqual(sme_op.eval(args, context), FALSE_VALUE)
+
+        # Case 3.1: Two equal int / float
+        args = [FLOAT_VALUE, INT_VALUE]
+        self.assertEqual(sme_op.eval(args, context), TRUE_VALUE)
+
+        # Case 3.2: One larger float, one smaller int
+        args = [FLOAT2_VALUE, INT0_VALUE]
+        self.assertEqual(sme_op.eval(args, context), FALSE_VALUE)
+
+        # Case 3.3: One smaller float, one larger int
+        args = [FLOAT0_VALUE, INT2_VALUE]
+        self.assertEqual(sme_op.eval(args, context), TRUE_VALUE)
+
+        # Case 4.1: Two equal strings
+        args = [STRING_VALUE, STRING_VALUE]
+        self.assertEqual(sme_op.eval(args, context), TRUE_VALUE)
+
+        # Case 4.2: One smaller, one larger string
+        args = [STRING_VALUE, STRING1_VALUE]
+        self.assertEqual(sme_op.eval(args, context), TRUE_VALUE)
+
+        # Case 4.3: One larger, one smaller string
+        args = [STRING1_VALUE, STRING_VALUE]
+        self.assertEqual(sme_op.eval(args, context), FALSE_VALUE)
