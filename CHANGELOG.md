@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
   - `neq` (`!=`)
   - `sm` (`<`)
   - `lg` (`>`)
+  - `sme` (`<=`)
 
 ### Changed
 
