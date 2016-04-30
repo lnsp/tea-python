@@ -371,6 +371,28 @@ def _sme_operation():
 SME_FUNCTION = _sme_operation()
 SME_OPERATOR = Operator(SME_FUNCTION, "<=")
 
+def _lge_operation():
+    def lge(context):
+        """Returns true if a is larger or equal to b."""
+        var_a = context.find("id", "a")
+        var_b = context.find("id", "b")
+        return Value(BOOLEAN, var_a.data >= var_b.data)
+    lge_node = FunctionBinding(lge)
+    signatures = [
+        Signature([
+            Value(NUMBER, None, "a"),
+            Value(NUMBER, None, "b"),
+        ], lge_node),
+        Signature([
+            Value(STRING, None, "a"),
+            Value(STRING, None, "b"),
+        ], lge_node),
+    ]
+    return Function(signatures, "#lge")
+
+LGE_FUNCTION = _lge_operation()
+LGE_OPERATOR = Operator(LGE_FUNCTION, ">=")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
