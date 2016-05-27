@@ -406,6 +406,9 @@ def _unmi_operation():
     ]
     return Function(signatures, "#unmi")
 
+UNMI_FUNCTION = _unmi_operation()
+UNMI_OPERATOR = Operator(UNMI_FUNCTION, "-")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
