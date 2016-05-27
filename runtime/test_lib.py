@@ -6,9 +6,11 @@ from runtime import env, lib
 INT_VALUE = env.Value(lib.INTEGER, 1)
 INT2_VALUE = env.Value(lib.INTEGER, 2)
 INT0_VALUE = env.Value(lib.INTEGER, 0)
+INTM_VALUE = env.Value(lib.INTEGER, -1)
 FLOAT_VALUE = env.Value(lib.FLOAT, 1.0)
 FLOAT2_VALUE = env.Value(lib.FLOAT, 2.0)
 FLOAT0_VALUE = env.Value(lib.FLOAT, 0.0)
+FLOATM_VALUE = env.Value(lib.FLOAT, -1.0)
 STRING_VALUE = env.Value(lib.STRING, "Hello", "identifier")
 STRING1_VALUE = env.Value(lib.STRING, "Hello1")
 LIST_VALUE = env.Value(lib.LIST, ["H", "e", "l", "l", "o"])
@@ -440,3 +442,27 @@ class TestLib(unittest.TestCase):
         # Case 4.3: One larger, one smaller string
         args = [STRING1_VALUE, STRING_VALUE]
         self.assertEqual(lge_op.eval(args, context), TRUE_VALUE)
+
+    def test_unmi_operation(self):
+        unmi_op = lib.UNMI_OPERATOR
+        context = env.empty_context()
+
+        # Case 1.1: - (1) -> -1
+        args = [INT_VALUE]
+        self.assertEqual(unmi_op.eval(args, context), INTM_VALUE)
+        # Case 1.2: - (-1) -> 1
+        args = [INTM_VALUE]
+        self.assertEqual(unmi_op.eval(args, context), INT_VALUE)
+        # Case 1.3: - (0) -> 0
+        args = [INT0_VALUE]
+        self.assertEqual(unmi_op.eval(args, context), INT0_VALUE)
+
+        # Case 2.1: - (1.0) -> 1.0
+        args = [FLOAT_VALUE]
+        self.assertEqual(unmi_op.eval(args, context), FLOATM_VALUE)
+        # Case 2.2: - (-1.0) -> 1.0
+        args = [FLOATM_VALUE]
+        self.assertEqual(unmi_op.eval(args, context), FLOAT_VALUE)
+        # Case 2.3: - (0.0) -> 0.0
+        args = [FLOAT0_VALUE]
+        self.assertEqual(unmi_op.eval(args, context), FLOAT0_VALUE)
