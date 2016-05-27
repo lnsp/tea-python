@@ -393,6 +393,19 @@ def _lge_operation():
 LGE_FUNCTION = _lge_operation()
 LGE_OPERATOR = Operator(LGE_FUNCTION, ">=")
 
+def _unmi_operation():
+    def unmi(context):
+        """Inverts the numeric value."""
+        var_a = context.find("id", "a")
+        return Value(var_a.datatype, -var_a.data)
+    unmi_node = FunctionBinding(unmi)
+    signatures = [
+        Signature([
+            Value(NUMBER, None, "a"),
+        ], unmi_node)
+    ]
+    return Function(signatures, "#unmi")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
