@@ -466,3 +466,13 @@ class TestLib(unittest.TestCase):
         # Case 2.3: - (0.0) -> 0.0
         args = [FLOAT0_VALUE]
         self.assertEqual(unmi_op.eval(args, context), FLOAT0_VALUE)
+
+    def test_unpl_operation(self):
+        unpl_op = lib.UNPL_OPERATOR
+        context = env.empty_context()
+        # Case 1: 1 -> 1
+        args = [INT_VALUE]
+        self.assertEqual(unpl_op.eval(args, context), INT_VALUE)
+        # Case 2: 1.0 -> 1.0
+        args = [FLOAT_VALUE]
+        self.assertEqual(unpl_op.eval(args, context), FLOAT_VALUE)
