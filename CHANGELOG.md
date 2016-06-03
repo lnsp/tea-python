@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
   - `sme` (`<=`)
   - `lge` (`>=`)
   - `unmi` (`-`)
+  - `unpl` (`+`)
 
 ### Changed
 
