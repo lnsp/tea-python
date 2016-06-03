@@ -409,6 +409,19 @@ def _unmi_operation():
 UNMI_FUNCTION = _unmi_operation()
 UNMI_OPERATOR = Operator(UNMI_FUNCTION, "-")
 
+def _unpl_operator():
+    def unpl(context):
+        """Does nothing special. Added for code consistency."""
+        var_a = context.find("id", "a")
+        return Value(var_a.datatype, var_a.data)
+    unpl_node = FunctionBinding(unpl)
+    signatures = [
+        Signature([
+            Value(NUMBER, None, "a"),
+        ], unpl_node)
+    ]
+    return FunctionBinding(signatures, "#unpl")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
