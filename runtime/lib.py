@@ -420,7 +420,7 @@ def _unpl_operation():
             Value(NUMBER, None, "a"),
         ], unpl_node)
     ]
-    return FunctionBinding(signatures, "#unpl")
+    return Function(signatures, "#unpl")
 
 UNPL_FUNCTION = _unpl_operation()
 UNPL_OPERATOR = Operator(UNPL_FUNCTION, "+")
