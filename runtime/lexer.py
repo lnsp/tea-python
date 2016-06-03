@@ -18,7 +18,7 @@ class TokenTuple(collections.namedtuple("Token", ["value", "kind"])):
     """A lexed token."""
     __slots__ = ()
     def __str__(self):
-        return "%s (%s)" % (str(self.kind), self.value)
+        return "%s '%s'" % (str(self.kind), self.value)
     def __eq__(self, other):
         if isinstance(other, TokenTuple):
             return self.kind is other.kind and other.value == self.value
