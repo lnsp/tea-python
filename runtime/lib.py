@@ -409,7 +409,7 @@ def _unmi_operation():
 UNMI_FUNCTION = _unmi_operation()
 UNMI_OPERATOR = Operator(UNMI_FUNCTION, "-")
 
-def _unpl_operator():
+def _unpl_operation():
     def unpl(context):
         """Does nothing special. Added for code consistency."""
         var_a = context.find("id", "a")
@@ -421,6 +421,9 @@ def _unpl_operator():
         ], unpl_node)
     ]
     return FunctionBinding(signatures, "#unpl")
+
+UNPL_FUNCTION = _unpl_operation()
+UNPL_OPERATOR = Operator(UNPL_FUNCTION, "+")
 
 EXPORTS = [
     # Datatypes
