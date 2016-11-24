@@ -425,6 +425,22 @@ def _unpl_operation():
 UNPL_FUNCTION = _unpl_operation()
 UNPL_OPERATOR = Operator(UNPL_FUNCTION, "+")
 
+def _uninv_operation():
+    def uninv(context):
+        """Inverts a bool value."""
+        var_a = context.find("id", "a")
+        return Value(var_a.datatype, not var_a.data)
+    uninv_node = FunctionBinding(uninv)
+    signatures = [
+        Signature([
+            Value(BOOLEAN, None, "a"),
+        ], uninv_node)
+    ]
+    return Function(signatures, "#uninv")
+
+UNINV_FUNCTION = _uninv_operation()
+UNINV_OPERATOR = Operator(UNINV_FUNCTION, "!")
+
 EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION,
@@ -432,10 +448,10 @@ EXPORTS = [
     ADD_OPERATOR, SUB_OPERATOR, MUL_OPERATOR, DIV_OPERATOR, EQU_OPERATOR,
     AND_OPERATOR, OR_OPERATOR, XOR_OPERATOR, NEQ_OPERATOR,
     SM_OPERATOR, LG_OPERATOR, SME_OPERATOR, LGE_OPERATOR,
-    UNMI_OPERATOR, UNPL_OPERATOR,
+    UNMI_OPERATOR, UNPL_OPERATOR, UNINV_OPERATOR,
     # Functions
     ADD_FUNCTION, SUB_FUNCTION, MUL_FUNCTION, DIV_FUNCTION, EQU_FUNCTION,
     AND_FUNCTION, OR_FUNCTION, XOR_FUNCTION, NEQ_FUNCTION,
     SM_FUNCTION, LG_FUNCTION, SME_FUNCTION, LGE_FUNCTION,
-    UNMI_FUNCTION, UNPL_FUNCTION,
+    UNMI_FUNCTION, UNPL_FUNCTION, UNINV_FUNCTION,
 ]

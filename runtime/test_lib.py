@@ -476,3 +476,13 @@ class TestLib(unittest.TestCase):
         # Case 2: 1.0 -> 1.0
         args = [FLOAT_VALUE]
         self.assertEqual(unpl_op.eval(args, context), FLOAT_VALUE)
+
+    def test_uninv_operation(self):
+        uninv_op = lib.UNINV_OPERATOR
+        context = env.empty_context()
+
+        args = [TRUE_VALUE]
+        self.assertEqual(uninv_op.eval(args, context), FALSE_VALUE)
+
+        args = [FALSE_VALUE]
+        self.assertEqual(uninv_op.eval(args, context), TRUE_VALUE)
