@@ -4,6 +4,12 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 ### Added
+- Add new syntax parser
+  - Does not support many operators yet
+  - Does not support operator precedence
+  - Does not support declaring and calling functions
+  - Does support variable declarations
+  - Does support multiple statements
 - New operators
   - `and` (`&&`)
   - `or` (`||`)
@@ -16,6 +22,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
   - `lge` (`>=`)
   - `unmi` (`-`)
   - `unpl` (`+`)
+  - `uninv` (`!`)
 
 ### Changed
 

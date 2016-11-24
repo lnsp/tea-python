@@ -24,6 +24,9 @@ class Node:
         """Adds a leaf to this node."""
         self.children.append(node)
 
+    def add_front(self, node):
+        self.children = [node] + self.children
+
     def get_str_rep(self, depth):
         rep = "<Node (%s)" % type(self).name
         for i in self.children:
@@ -276,10 +279,7 @@ class Assignment(Node):
         # Search for variable in namespace
         variable = context.find("id", self.name)
         value = self.children[0].eval(context)
-        if variable.datatype is value.datatype:
-            variable.data = value.data
-        else:
-            raise env.RuntimeException("Incompatible types")
+        variable.data = variable.datatype.cast(value).data
         return value
 
 def syntax_tree():
