@@ -265,4 +265,4 @@ def empty_context():
 
 # Types that belong to the REnv, not to the RLib
 ANY = Datatype("*any", None)
-NULL = Datatype("null", None, ANY)
+NULL = Datatype("null", lambda x: Value(NULL), ANY)

@@ -18,8 +18,9 @@ def interpret(expression, context):
         return
 
     tokens = lexer.run(expression)
+    print('Generated tokens:', ', '.join((str(e) for e in tokens)))
     tree = parser.generate(tokens)
-    return ', '.join((str(e) for e in tokens))
+    return tree
 
 
 def main():

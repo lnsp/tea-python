@@ -6,7 +6,6 @@ RETURN_BEHAVIOUR = "return"
 BREAK_BEHAVIOUR = "break"
 CONTINUE_BEHAVIOUR = "continue"
 
-
 def run_in_substitution(node, context):
     """Run the node in a subtituted namespace."""
     parent = context.substitute()
@@ -25,8 +24,15 @@ class Node:
         """Adds a leaf to this node."""
         self.children.append(node)
 
+    def get_str_rep(self, depth):
+        rep = "<Node (%s)" % type(self).name
+        for i in self.children:
+            rep += "\n" + (" " * depth)
+            rep += i.get_str_rep(depth+2)
+        return rep + ">"
+
     def __str__(self):
-        return "<Node (%s)>" % (type(self).name)
+        return self.get_str_rep(2)
 
     def tree_to_string(self, root=0):
         """Generates a tree-string from this node."""
@@ -210,7 +216,6 @@ class Return(Node):
         context.behaviour = RETURN_BEHAVIOUR
         return value
 
-
 class Break(Node):
     """A break node."""
     name = "break"
@@ -223,7 +228,6 @@ class Break(Node):
         """Evaluate a break statement."""
         context.behaviour = BREAK_BEHAVIOUR
         return env.Value(env.NULL)
-
 
 class Continue(Node):
     """A continue node."""
@@ -240,6 +244,7 @@ class Continue(Node):
 
 class Declaration(Node):
     """A declaration node."""
+    name = "declaration"
 
     def __init__(self, name, datatype):
         super().__init__()
@@ -251,13 +256,16 @@ class Declaration(Node):
         # Search in local namespace
         if self.name in context.namespace.search_spaces["id"]:
             raise env.RuntimeException("The name %s is already in use" % self.name)
-        casted_value = self.datatype.cast(env.Value(env.NULL))
+        # Search for type
+        datatype = context.find("ty", self.datatype)
+        casted_value = datatype.cast(env.Value(env.NULL))
         casted_value.name = self.name
         context.store(casted_value)
         return casted_value
 
 class Assignment(Node):
     """A assignment node."""
+    name = "assignment"
 
     def __init__(self, name):
         super().__init__()
