@@ -25,6 +25,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
   - `uninv` (`!`)
 
 ### Changed
+- Enable auto-casting on assignment
 
 ## [v0.0.4]
 ### Added
