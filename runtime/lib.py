@@ -17,7 +17,7 @@ def cast_integer(value):
             return Value(INTEGER, 0)
     raise CastException(value, INTEGER)
 
-INTEGER = Datatype("int", cast_integer, NUMBER)
+INTEGER = Datatype("int", cast_integer, NUMBER, lambda x: "%d" % x)
 
 
 def cast_float(value):
@@ -29,13 +29,15 @@ def cast_float(value):
             return Value(FLOAT, 0.0)
     raise CastException(value, FLOAT)
 
-FLOAT = Datatype("float", cast_float, NUMBER)
+FLOAT = Datatype("float", cast_float, NUMBER, lambda x: "%f" % x)
 
 
 def cast_string(value):
     """Casts a value to a STRING."""
     if isinstance(value, Value):
-        if value.datatype in (INTEGER, FLOAT, STRING):
+        if value.datatype is INTEGER:
+            return Value(STRING, "%d" % value.data)
+        if value.datatype in (FLOAT, STRING):
             return Value(STRING, str(value.data))
         if value.datatype is BOOLEAN:
             return Value(STRING, "true" if value.data else "false")
@@ -43,8 +45,7 @@ def cast_string(value):
             return Value(STRING, "")
     raise CastException(value, STRING)
 
-STRING = Datatype("string", cast_string, ANY)
-
+STRING = Datatype("string", cast_string, ANY, lambda x: "\"" + x + "\"")
 
 def cast_boolean(value):
     """Casts a value to a BOOLEAN."""
@@ -57,7 +58,7 @@ def cast_boolean(value):
             return Value(BOOLEAN, False)
     raise CastException(value, BOOLEAN)
 
-BOOLEAN = Datatype("bool", cast_boolean, ANY)
+BOOLEAN = Datatype("bool", cast_boolean, ANY, lambda x: "true" if x else "false")
 
 
 def cast_function(value):
@@ -69,7 +70,7 @@ def cast_function(value):
             return Value(FUNCTION, None)
     raise CastException(value, FUNCTION)
 
-FUNCTION = Datatype("func", cast_function, ANY)
+FUNCTION = Datatype("func", cast_function, ANY, lambda x: "function")
 
 
 def cast_list(value):
@@ -81,7 +82,7 @@ def cast_list(value):
             return Value(LIST, [])
     raise CastException(value, LIST)
 
-LIST = Datatype("LIST", cast_list, ANY)
+LIST = Datatype("LIST", cast_list, ANY, lambda x: "list")
 
 
 def cast_map(value):
@@ -93,7 +94,7 @@ def cast_map(value):
             return Value(MAP, dict())
     raise CastException(value, MAP)
 
-MAP = Datatype("map", cast_map, ANY)
+MAP = Datatype("map", cast_map, ANY, lambda x: "map")
 
 
 def cast_set(value):
@@ -105,7 +106,7 @@ def cast_set(value):
             return Value(SET, set())
     raise CastException(value, SET)
 
-SET = Datatype("set", cast_set, ANY)
+SET = Datatype("set", cast_set, ANY, lambda x: "set")
 
 
 def cast_object(value):
@@ -114,7 +115,7 @@ def cast_object(value):
         return Value(OBJECT, value.data)
     raise CastException(value, OBJECT)
 
-OBJECT = Datatype("object", cast_object, ANY)
+OBJECT = Datatype("object", cast_object, ANY, lambda x: "object")
 
 
 def _add_operation():

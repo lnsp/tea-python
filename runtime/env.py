@@ -9,8 +9,8 @@ class RuntimeException(Exception):
 
 class NamespaceException(RuntimeException):
     """A namespace exception."""
-    def __init__(self, msg="The item does not exist in the search space."):
-        super().__init__(msg)
+    def __init__(self, item):
+        super().__init__("%s does not exist in the search space." % item)
 
 class Namespace:
     """A variable and operator namespace."""
@@ -34,7 +34,7 @@ class Namespace:
         if self.parent is not None:
             return self.parent.find(space, key)
         # return if nothing available
-        raise NamespaceException()
+        raise NamespaceException(key)
 
     def store(self, item):
         """Stores a item in the specified search space."""
@@ -46,7 +46,7 @@ class Namespace:
         elif itemtype is Datatype:
             self.search_spaces["ty"][item.name] = item
         else:
-            raise NamespaceException("The item cannot be stored in namespace")
+            raise RuntimeException("The item cannot be stored in namespace")
 
     def store_all(self, items):
         """Stores a list or tuple of items."""
@@ -107,6 +107,9 @@ class Value(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def format(self):
+        return self.datatype.format(self.data)
 
     def __str__(self):
         return "<Value ? %s *(%s)>" % (self.datatype, self.name)
@@ -249,10 +252,14 @@ class Operator(object):
 class Datatype(object):
     """A type representing a basic type."""
 
-    def __init__(self, name, cast=None, parent=None):
+    def __init__(self, name, cast=None, parent=None, format=None):
         self.name = name
         self.cast = cast
         self.parent = parent
+        self.format = format
+
+    def format(self, value):
+        return self.format(value)
 
     def kind_of(self, itemtype):
         """Checks if the type is related to the specified type."""
@@ -279,4 +286,4 @@ def empty_context():
 
 # Types that belong to the REnv, not to the RLib
 ANY = Datatype("*any", None)
-NULL = Datatype("null", lambda x: Value(NULL), ANY)
+NULL = Datatype("null", lambda x: Value(NULL), ANY, lambda x: "null")
