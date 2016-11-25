@@ -54,7 +54,7 @@ def cast_boolean(value):
         if value.datatype is BOOLEAN:
             return Value(BOOLEAN, bool(value.data))
         if value.datatype is NULL:
-            return Value(NULL, False)
+            return Value(BOOLEAN, False)
     raise CastException(value, BOOLEAN)
 
 BOOLEAN = Datatype("bool", cast_boolean, ANY)
