@@ -5,7 +5,7 @@ import collections
 REGEX_LPRT = r"^\($"
 REGEX_RPRT = r"^\)$"
 #REGEX_OPERATOR = r"^([+\-*/:]?|([+\-*/%]=)|)$"
-REGEX_OPERATOR = r"^([+\-*/=:]?|([+\-*/%]=)|)$"
+REGEX_OPERATOR = r"^([+\-*/=:<>!]?|([+\-*/%]=)|)+$"
 REGEX_WHITESPACE = r"^\s+$"
 REGEX_NUMBER = r"^\-?[0-9]+(\.[0-9]*)?$"
 REGEX_IDENTIFIER = r"^(#|[a-zA-Z_])+([0-9a-zA-Z_]+)?$"
