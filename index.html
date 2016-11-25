@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>Tea by lnsp</title>
+    <title>Tea by TeaLang</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -12,10 +12,10 @@
   <body>
     <section class="page-header">
       <h1 class="project-name">Tea</h1>
-      <h2 class="project-tagline">A small, experimental programming language.</h2>
-      <a href="https://github.com/lnsp/tea" class="btn">View on GitHub</a>
-      <a href="https://github.com/lnsp/tea/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/lnsp/tea/tarball/master" class="btn">Download .tar.gz</a>
+      <h2 class="project-tagline">A programming language governed by KISS principles.</h2>
+      <a href="https://github.com/TeaLang/tea" class="btn">View on GitHub</a>
+      <a href="https://github.com/TeaLang/tea/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/TeaLang/tea/tarball/master" class="btn">Download .tar.gz</a>
     </section>
 
     <section class="main-content">
@@ -23,31 +23,38 @@
 <a id="" class="anchor" href="#" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><img src="https://cloud.githubusercontent.com/assets/3391295/14614369/372907fa-05a1-11e6-8272-956c2cc447cb.png" alt="Tea">
 </h1>
 
-<p><a href="https://travis-ci.org/lnsp/tea"><img src="https://travis-ci.org/lnsp/tea.svg?branch=master" alt="Build Status"></a></p>
+<p><a href="https://travis-ci.org/TeaLang/tea"><img src="https://travis-ci.org/TeaLang/tea.svg?branch=master" alt="Build Status"></a></p>
 
-<p>Tea is small and simple.
-It was crafted for reading, extending and maintaining.
-The interpreter is still in early-alpha and can only run ASTs.</p>
+<p>Code written in Tea is simple and small, even Tea itself is short (less than 3000 lines of code).
+It was crafted for reading, extending and maintaining.</p>
 
 <h2>
-<a id="a-leafy-example" class="anchor" href="#a-leafy-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>A leafy example</h2>
+<a id="how-about-a-little-taste-of-tea" class="anchor" href="#how-about-a-little-taste-of-tea" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How about a little taste of Tea?</h2>
 
-<div class="highlight highlight-source-tea"><pre><span class="pl-c">// leafy.tea</span>
+<div class="highlight highlight-source-tea"><pre><span class="pl-c">// tasty.tea</span>
 <span class="pl-k">import</span> std.io;
 
-func <span class="pl-en">sayHello</span>(name<span class="pl-k">:</span> string)<span class="pl-k">:</span> string {
-    <span class="pl-k">return</span> <span class="pl-s"><span class="pl-pds">"</span>Hello, %s!<span class="pl-pds">"</span></span> <span class="pl-k">%</span> name;
+func <span class="pl-en">greet</span>(greeting, name<span class="pl-k">:</span> string)<span class="pl-k">:</span> string {
+    <span class="pl-k">return</span> <span class="pl-s"><span class="pl-pds">"</span>%s, %s!<span class="pl-pds">"</span></span> <span class="pl-k">%</span> [greeting, name];
 }
 
-func <span class="pl-en">main</span>(<span class="pl-smi">args</span><span class="pl-k">:</span> <span class="pl-smi">list</span>) {
-    <span class="pl-smi">io</span>.<span class="pl-en">println</span>(<span class="pl-s"><span class="pl-pds">"</span>You called<span class="pl-pds">"</span></span>, <span class="pl-smi">args</span>.<span class="pl-c1">join</span>(<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>));
-    <span class="pl-smi">io</span>.<span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Please enter your name: <span class="pl-pds">"</span></span>);
-    <span class="pl-k">var</span> name <span class="pl-k">=</span> <span class="pl-smi">io</span>.<span class="pl-en">readLine</span>();
-    <span class="pl-en">sayHello</span>(name);
+<span class="pl-smi">io</span>.<span class="pl-en">println</span>(<span class="pl-s"><span class="pl-pds">"</span>You called<span class="pl-pds">"</span></span>, <span class="pl-smi">args</span>.<span class="pl-c1">join</span>(<span class="pl-s"><span class="pl-pds">"</span>,<span class="pl-pds">"</span></span>));
+<span class="pl-smi">io</span>.<span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Please enter your name: <span class="pl-pds">"</span></span>);
+<span class="pl-k">var</span> name<span class="pl-k">:</span> string <span class="pl-k">=</span> <span class="pl-smi">io</span>.<span class="pl-en">readln</span>();
+
+<span class="pl-k">if</span> (<span class="pl-en">length</span>(<span class="pl-en">trim</span>(name)) <span class="pl-k">==</span> <span class="pl-c1">0</span>) {
+    <span class="pl-smi">io</span>.<span class="pl-en">println</span>(<span class="pl-s"><span class="pl-pds">"</span>Ok, I won't greet you :(<span class="pl-pds">"</span></span>);
+} <span class="pl-k">else</span> {
+    <span class="pl-smi">io</span>.<span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>How many times? <span class="pl-pds">"</span></span>);
+    <span class="pl-k">var</span> times<span class="pl-k">:</span> int <span class="pl-k">=</span> <span class="pl-smi">io</span>.<span class="pl-en">readln</span>();
+
+    <span class="pl-k">for</span> (i<span class="pl-k">:</span> int <span class="pl-k">=</span> <span class="pl-c1">0</span>; i <span class="pl-k">&lt;</span> times; i <span class="pl-k">+=</span> <span class="pl-c1">1</span>) {
+        <span class="pl-en">print</span>(<span class="pl-en">greet</span>(<span class="pl-s"><span class="pl-pds">"</span>Hello<span class="pl-pds">"</span></span>, name));
+    }
 }</pre></div>
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/lnsp/tea">Tea</a> is maintained by <a href="https://github.com/lnsp">lnsp</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/TeaLang/tea">Tea</a> is maintained by <a href="https://github.com/TeaLang">TeaLang</a>.</span>
 
         <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
