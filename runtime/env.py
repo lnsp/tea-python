@@ -1,7 +1,13 @@
 """A collection of classes that are part of the standard runtime environment."""
 
+class RuntimeException(Exception):
+    """A runtime exception."""
 
-class NamespaceException(Exception):
+    def __init__(self, message):
+        super().__init__("RuntimeException: " + message)
+
+
+class NamespaceException(RuntimeException):
     """A namespace exception."""
     def __init__(self, msg="The item does not exist in the search space."):
         super().__init__(msg)
@@ -211,13 +217,7 @@ class FunctionBinding(object):
         """Evaluates the binding node."""
         return self.fnc(context)
 
-class RuntimeException(Exception):
-    """A runtime exception."""
-
-    def __init__(self, message):
-        super().__init__(message)
-
-class OperatorException(Exception):
+class OperatorException(RuntimeException):
     """A operator exception."""
 
     def __init__(self, op):
@@ -266,7 +266,7 @@ class Datatype(object):
         return "<T %s>" % self.name
 
 
-class CastException(Exception):
+class CastException(RuntimeException):
     """A CastError is raised when a value can not be casted to another type."""
 
     def __init__(self, value, datatype):
