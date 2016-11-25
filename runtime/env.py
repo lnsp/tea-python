@@ -238,7 +238,7 @@ class Operator(object):
         for fnc in self.functions:
             try:
                 return fnc.eval(args, context)
-            except:
+            except FunctionException:
                 pass
         raise OperatorException(self.symbol)
 
