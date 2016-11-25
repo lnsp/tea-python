@@ -54,6 +54,13 @@ def generate_expression(stream):
         elif token.kind == lexer.STRING:
             value = env.Value(lib.STRING, data=token.value)
             operand_stack.append(ast.Literal(value))
+        elif token.kind == lexer.SEPERATOR:
+            while len(operator_stack) > 0 and operator_stack[-1] != "(":
+                operator = operator_stack.pop()
+                arg_count = get_arg_count(operator.symbol)
+                for j in range(arg_count):
+                    operator.add_front(operand_stack.pop())
+                operand_stack.append(operator)
         elif token.kind == lexer.IDENTIFIER:
             if i < max and stream[i+1].kind == lexer.LPRT:
                 operator_stack.append(ast.Call(token.value))
@@ -70,10 +77,10 @@ def generate_expression(stream):
                 symbol = operator_stack[-1].symbol
                 other_prec = get_precedence(symbol)
                 if is_left_associative(symbol):
-                    if other_prec < prec:
+                    if prec <= other_prec:
                         break
                 else:
-                    if other_prec <= prec:
+                    if prec < other_prec:
                         break
                 operator = operator_stack.pop()
                 arg_count = get_arg_count(symbol)
@@ -96,7 +103,7 @@ def generate_expression(stream):
             if len(operator_stack) > 0 and type(operator_stack[-1]) is ast.Call:
                 function = operator_stack.pop()
                 while len(operand_stack) > 0 and operand_stack[-1] != "(":
-                    function.add(operand_stack.pop())
+                    function.add_front(operand_stack.pop())
                 operand_stack.pop()
                 operand_stack.append(function)
             else:
