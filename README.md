@@ -17,11 +17,13 @@ func greet(greeting, name: string): string {
 io.println("You called", args.join(","));
 io.print("Please enter your name: ");
 var name: string = io.readln();
+
 if (length(trim(name)) == 0) {
     io.println("Ok, I won't greet you :(");
 } else {
     io.print("How many times? ");
     var times: int = io.readln();
+    
     for (i: int = 0; i < times; i += 1) {
         print(greet("Hello", name));
     }
