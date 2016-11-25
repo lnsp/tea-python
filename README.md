@@ -2,12 +2,12 @@
 
 [![Build Status](https://travis-ci.org/TeaLang/tea.svg?branch=master)](https://travis-ci.org/TeaLang/tea)
 
-Tea is small, code written in Tea simple and short.
+Code written in Tea is simple and small, even Tea itself is short (less than 3000 lines of code).
 It was crafted for reading, extending and maintaining.
 
-## A leafy example
+## How about a little taste of Tea?
 ```tea
-// leafy.tea
+// tasty.tea
 import std.io;
 
 func greet(greeting, name: string): string {
