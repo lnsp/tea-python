@@ -31,6 +31,9 @@ class InvalidCondition(Exception):
     def __init__(self, msg="Invalid condition"):
         super().__init__(msg)
 
+def is_assignment(token):
+    return token != None and token.kind is lexer.OPERATOR and token.value == "="
+
 def find_statement(stream, start):
     end_index = start
     for j in range(start+1, len(stream)):
@@ -64,7 +67,11 @@ def find_matching_prt(stream, start):
                 return i
     return -1
 
-def get_arg_count(operator):
+def get_arg_count(operator, last_token):
+    if operator in ["+", "-"]:
+        if last_token == None or last_token.kind is lexer.OPERATOR:
+            return 1
+        return 2
     count = {"+": 2, "-": 2, "*": 2, "/": 2}
     if operator not in count:
         raise UnknownOperator(operator)
@@ -191,7 +198,7 @@ def generate_declaration(stream):
     if end < 5:
         return decl, end
 
-    if stream[3].kind != lexer.ASSIGNMENT:
+    if not is_assignment(stream[3]):
         raise InvalidAssignment()
 
     sequ = ast.Sequence()
@@ -209,7 +216,7 @@ def generate_assignment(stream):
         raise InvalidAssignment()
 
     name_token, equ_token = stream[0], stream[1]
-    if name_token.kind != lexer.IDENTIFIER or equ_token.kind != lexer.ASSIGNMENT:
+    if name_token.kind != lexer.IDENTIFIER or not is_assignment(equ_token):
         raise InvalidAssignment()
 
     expr, offset = generate_expression(stream[2:])
@@ -283,7 +290,7 @@ def generate_sequence(stream):
                 sequence.add(decl)
                 i += offset + 1
             else:
-                if i < max and stream[i+1].kind == lexer.ASSIGNMENT:
+                if i < max and is_assignment(stream[i+1]):
                     assgn, offset = generate_assignment(stream[i:])
                     sequence.add(assgn)
                     i += offset

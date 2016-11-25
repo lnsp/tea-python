@@ -5,7 +5,7 @@ import collections
 REGEX_LPRT = r"^\($"
 REGEX_RPRT = r"^\)$"
 #REGEX_OPERATOR = r"^([+\-*/:]?|([+\-*/%]=)|)$"
-REGEX_OPERATOR = r"^[+\-*/:]$"
+REGEX_OPERATOR = r"^([+\-*/=:]?|([+\-*/%]=)|)$"
 REGEX_WHITESPACE = r"^\s+$"
 REGEX_NUMBER = r"^\-?[0-9]+(\.[0-9]*)?$"
 REGEX_IDENTIFIER = r"^(#|[a-zA-Z_])+([0-9a-zA-Z_]+)?$"
@@ -14,7 +14,6 @@ REGEX_STMT = r"^;$"
 REGEX_SEPERATOR = r"^,$"
 REGEX_RBLOCK = r"^}$"
 REGEX_LBLOCK = r"^{$"
-REGEX_ASSIGNMENT = r"^=$"
 
 class TokenType(collections.namedtuple("TokenType", ["name", "match"])):
     """A type of a token."""
@@ -42,13 +41,12 @@ STATEMENT = TokenType("statement", lambda item: re.match(REGEX_STMT, item))
 SEPERATOR = TokenType("seperator", lambda item: re.match(REGEX_SEPERATOR, item))
 LBLOCK = TokenType("left_block", lambda item: re.match(REGEX_LBLOCK, item))
 RBLOCK = TokenType("right_block", lambda item: re.match(REGEX_RBLOCK, item))
-ASSIGNMENT = TokenType("assignment", lambda item: re.match(REGEX_ASSIGNMENT, item))
 
 # not parsing, but needed type
 FUNCTION = TokenType("function", lambda item: False)
 
 TOKEN_TYPES = [
-    WHITESPACE, OPERATOR, IDENTIFIER, NUMBER, STRING, LPRT, RPRT, STATEMENT, SEPERATOR, FUNCTION, LBLOCK, RBLOCK, ASSIGNMENT
+    WHITESPACE, OPERATOR, IDENTIFIER, NUMBER, STRING, LPRT, RPRT, STATEMENT, SEPERATOR, FUNCTION, LBLOCK, RBLOCK,
 ]
 
 def run(expression):
