@@ -16,19 +16,29 @@ def run_in_substitution(node, context):
 
 class Node:
     """A generic node in the abstract syntax tree."""
+    name = "base_node"
 
     def __init__(self):
         self.children = []
+        self.tags = {}
 
     def add(self, node):
         """Adds a leaf to this node."""
         self.children.append(node)
 
+    def tag(self, tag, value=None):
+        if value is None:
+            return self.tags[tag]
+        self.tags[tag] = value
+
     def add_front(self, node):
         self.children = [node] + self.children
 
+    def describe(self):
+        return type(self).name
+
     def get_str_rep(self, depth):
-        rep = "<Node (%s)" % type(self).name
+        rep = "%s (%d)" % (self.describe(), len(self.children))
         for i in self.children:
             rep += "\n" + (" " * depth)
             rep += i.get_str_rep(depth+2)
@@ -127,6 +137,9 @@ class Operation(Node):
     """A operation node calling an operator."""
     name = "operation"
 
+    def describe(self):
+        return "operation %s" % self.symbol
+
     def __init__(self, symbol):
         super().__init__()
         self.symbol = symbol
@@ -143,6 +156,9 @@ class Operation(Node):
 class Call(Node):
     """A function call node."""
     name = "call"
+
+    def describe(self):
+        return "call %s" % self.identity
 
     def __init__(self, identity):
         super().__init__()
@@ -161,6 +177,9 @@ class Identifier(Node):
     """A node representing an identifier."""
     name = "identifier"
 
+    def describe(self):
+        return "identifier %s" % self.identity
+
     def __init__(self, identity):
         super().__init__()
         self.identity = identity
@@ -177,6 +196,9 @@ class Literal(Node):
     """A node with a explicit value."""
     name = "literal"
 
+    def describe(self):
+        return "literal %s" % str(self.value.data)
+
     def __init__(self, value):
         super().__init__()
         self.value = value
@@ -189,6 +211,9 @@ class Literal(Node):
 class Cast(Node):
     """A type cast node."""
     name = "cast"
+
+    def describe(self):
+        return "cast %s" % self.target
 
     def __init__(self, target):
         super().__init__()
@@ -249,6 +274,9 @@ class Declaration(Node):
     """A declaration node."""
     name = "declaration"
 
+    def describe(self):
+        return "declaration %s: %s" % (self.name, self.datatype)
+
     def __init__(self, name, datatype):
         super().__init__()
         self.name = name
@@ -269,6 +297,9 @@ class Declaration(Node):
 class Assignment(Node):
     """A assignment node."""
     name = "assignment"
+
+    def describe(self):
+        return "assignment %s" % self.name
 
     def __init__(self, name):
         super().__init__()
