@@ -1,5 +1,5 @@
 """Parse an tokenized expression into an AST."""
-from runtime import ast, lexer, env, lib
+from runtime import ast, lexer, env, lib, flags
 
 class ParseException(Exception):
     def __init__(self, msg):
@@ -70,7 +70,8 @@ def find_matching_prt(stream, start):
     level = 1
     max = len(stream)
     for i in range(start, max):
-        #print("scanned", str(stream[i]), ":", level)
+        if flags.debug:
+            print("scanned", str(stream[i]), ":", level)
         if stream[i].kind == lexer.LPRT:
             level += 1
         elif stream[i].kind == lexer.RPRT:
@@ -81,20 +82,24 @@ def find_matching_prt(stream, start):
 
 def get_arg_count(operator, last_token):
     if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.NUMBER]):
-        print("unary operator because of", last_token)
+        if flags.debug:
+            print("unary operator because of", last_token)
         return 1
     elif operator in ["!"]:
         return 1
-    print("binary because of", last_token)
+    if flags.debug:
+        print("binary because of", last_token)
     return 2
 
 def is_left_associative(operator, last_token):
     if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.NUMBER]):
-        print("right associative because of", last_token)
+        if flags.debug:
+            print("right associative because of", last_token)
         return False
     elif operator in ["!", "^"]:
         return False
-    print("left associative because of", last_token)
+    if flags.debug:
+        print("left associative because of", last_token)
     return True
 
 def get_precedence(operator, last_token):
@@ -132,16 +137,23 @@ def generate_expression(stream):
         operand_stack.append(operator)
 
     for i in range(max + 1):
-        print("======== NEXT TOKEN")
-        print("Operands: ", ', '.join(str(e) for e in operand_stack))
-        print("Operators:", ', '.join(str(e) for e in operator_stack))
         last_token = token
         token = stream[i]
+
+        if flags.debug:
+            print(">>> Parsing next token:", token)
+            print("Operands: ", ', '.join(str(e) for e in operand_stack))
+            print("Operators:", ', '.join(str(e) for e in operator_stack))
+
         if token.kind == lexer.NUMBER:
-            value = env.Value(lib.FLOAT, data=float(token.value))
+            value = None
+            if '.' in token.value:
+                value = env.Value(lib.FLOAT, data=int(token.value))
+            else:
+                value = env.Value(lib.INTEGER, data=float(token.value))
             operand_stack.append(ast.Literal(value))
         elif token.kind == lexer.STRING:
-            value = env.Value(lib.STRING, data=token.value)
+            value = env.Value(lib.STRING, data=token.value.strip("\""))
             operand_stack.append(ast.Literal(value))
         elif token.kind == lexer.SEPERATOR:
             while len(operator_stack) > 0 and operator_stack[-1] != "(":
@@ -169,13 +181,15 @@ def generate_expression(stream):
             new_operator.tag("arg_count", arg_count)
             new_operator.tag("left_associative", left_associative)
 
-            print("adding operator", new_operator.symbol, "to", len(operator_stack))
+            if flags.debug:
+                print("adding operator", new_operator.symbol, "to", len(operator_stack))
 
             while len(operator_stack) > 0 and (type(operator_stack[-1]) is ast.Operation):
                 other = operator_stack[-1]
                 other_prec = operator_stack[-1].tag("precedence")
 
-                print("comparing precedence of ", new_operator.symbol, prec, "to", other.symbol, other_prec)
+                if flags.debug:
+                    print("comparing precedence of ", new_operator.symbol, prec, "to", other.symbol, other_prec)
 
                 if left_associative:
                     if prec > other_prec:
@@ -186,7 +200,8 @@ def generate_expression(stream):
                 pop_off_operator()
 
             operator_stack.append(new_operator)
-            print("pushed operator on stack")
+            if flags.debug:
+                print("pushed operator on stack")
         elif token.kind == lexer.LPRT:
             operand_stack.append(token.value)
             operator_stack.append(token.value)
@@ -218,8 +233,9 @@ def generate_expression(stream):
     while len(operator_stack) > 0:
         pop_off_operator()
 
-    print("Operands: ", ', '.join(str(e) for e in operand_stack))
-    print("Operators:", ', '.join(str(e) for e in operator_stack))
+    if flags.debug:
+        print("Operands: ", ', '.join(str(e) for e in operand_stack))
+        print("Operators:", ', '.join(str(e) for e in operator_stack))
     if len(operand_stack) > 1:
         raise InvalidExpression()
 
@@ -353,12 +369,32 @@ def generate_sequence(stream):
         i += 1
     return sequence, i
 
+def optimize_ast(root):
+    for i in range(len(root.children)):
+        node = root.children[i]
+        if type(node) is ast.Operation and node.symbol == ":":
+            values = node.children
+            datatype = values.pop().identity
+            if flags.debug:
+                print("Replacing cast of %s" % datatype)
+            node = ast.Cast(datatype)
+            node.children = values
+            root.children[i] = node
+        else:
+            optimize_ast(node)
 
 def generate(tokens):
     """Parse the tokens to AST notation."""
     # clean off whitespaces
     clean = [t for t in tokens if t.kind != lexer.WHITESPACE]
+    if flags.debug:
+        print("Optimized tokens:", '; '.join(str(e) for e in clean))
     sequ, _ = generate_sequence(clean)
+    if flags.debug:
+        print("Optimizing AST ...")
+    optimize_ast(sequ)
+    if flags.debug:
+        print("Final AST:", str(sequ))
     return sequ
 
 def demo_syntax_tree():

@@ -1,6 +1,7 @@
 """Split the expression into tokens."""
 import re
 import collections
+from runtime import flags
 
 REGEX_LPRT = r"^\($"
 REGEX_RPRT = r"^\)$"
@@ -66,6 +67,9 @@ def run(expression):
             active_token = TokenTuple(value=character, kind=match_type(character))
 
     token_list.append(active_token)
+
+    if flags.debug:
+        print("Generated tokens:", '; '.join(str(e) for e in token_list))
     return token_list
 
 
