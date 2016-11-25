@@ -47,6 +47,7 @@ def generate_expression(stream):
     max = len(stream) - 1
     for i in range(max + 1):
         token = stream[i]
+        print("Parsing", token)
         if token.kind == lexer.NUMBER:
             value = env.Value(lib.FLOAT, data=float(token.value))
             operand_stack.append(ast.Literal(value))
@@ -54,7 +55,7 @@ def generate_expression(stream):
             value = env.Value(lib.STRING, data=token.value)
             operand_stack.append(ast.Literal(value))
         elif token.kind == lexer.IDENTIFIER:
-            if i < max and stream[i+1].kind == lexer.RPRT:
+            if i < max and stream[i+1].kind == lexer.LPRT:
                 operator_stack.append(ast.Call(token.value))
             else:
                 if token.value == "false":
@@ -81,25 +82,31 @@ def generate_expression(stream):
                 operand_stack.append(operator)
             operator_stack.append(ast.Operation(token.value))
         elif token.kind == lexer.LPRT:
+            operand_stack.append(token.value)
             operator_stack.append(token.value)
         elif token.kind == lexer.RPRT:
-            buffer = []
-            while len(stack) > 0 and stack[-1] != "(":
+            while len(operator_stack) > 0 and operator_stack[-1] != "(":
                 operator = operator_stack.pop()
                 arg_count = get_arg_count(operator.symbol)
                 for j in range(arg_count):
                     operator.add_front(operand_stack.pop())
-                buffer.append(operator)
+                operand_stack.append(operator)
             operator_stack.pop()
 
-            if operator_stack[-1] is ast.Call:
-                for op in buffer:
-                    operator_stack[-1].append(op)
+            if len(operator_stack) > 0 and type(operator_stack[-1]) is ast.Call:
+                function = operator_stack.pop()
+                while len(operand_stack) > 0 and operand_stack[-1] != "(":
+                    function.add(operand_stack.pop())
+                operand_stack.pop()
+                operand_stack.append(function)
             else:
-                operand_stack.append(buffer)
+                i = len(operand_stack) - 1
+                while i >= 0 and operand_stack[i] != "(":
+                    i -= 1
+                del operand_stack[i]
 
-        print("Operands: ", operand_stack)
-        print("Operators:", operator_stack)
+        print("Operands: ", ', '.join(str(e) for e in operand_stack))
+        print("Operators:", ', '.join(str(e) for e in operator_stack))
 
     while len(operator_stack) > 0:
         operator = operator_stack.pop()
