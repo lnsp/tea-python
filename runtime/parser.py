@@ -23,6 +23,47 @@ class InvalidAssignment(Exception):
     def __init__(self, msg="Invalid assignment"):
         super().__init__(msg)
 
+class InvalidBlock(Exception):
+    def __init__(self, msg="Missing block borders"):
+        super().__init__(msg)
+
+class InvalidCondition(Exception):
+    def __init__(self, msg="Invalid condition"):
+        super().__init__(msg)
+
+def find_statement(stream, start):
+    end_index = start
+    for j in range(start+1, len(stream)):
+        if stream[j].kind == lexer.STATEMENT:
+            end_index = j
+            break
+    return end_index
+
+def find_matching_block(stream, start):
+    level = 1
+    max = len(stream)
+    for i in range(start, max):
+        if stream[i].kind == lexer.LBLOCK:
+            level += 1
+        elif stream[i].kind == lexer.RBLOCK:
+            level -= 1
+            if level == 0:
+                return i
+    return -1
+
+def find_matching_prt(stream, start):
+    level = 1
+    max = len(stream)
+    for i in range(start, max):
+        #print("scanned", str(stream[i]), ":", level)
+        if stream[i].kind == lexer.LPRT:
+            level += 1
+        elif stream[i].kind == lexer.RPRT:
+            level -= 1
+            if level == 0:
+                return i
+    return -1
+
 def get_arg_count(operator):
     count = {"+": 2, "-": 2, "*": 2, "/": 2}
     if operator not in count:
@@ -47,7 +88,6 @@ def generate_expression(stream):
     max = len(stream) - 1
     for i in range(max + 1):
         token = stream[i]
-        print("Parsing", token)
         if token.kind == lexer.NUMBER:
             value = env.Value(lib.FLOAT, data=float(token.value))
             operand_stack.append(ast.Literal(value))
@@ -69,6 +109,8 @@ def generate_expression(stream):
                     operand_stack.append(ast.Literal(env.Value(lib.BOOLEAN, data=False)))
                 elif token.value == "true":
                     operand_stack.append(ast.Literal(env.Value(lib.BOOLEAN, data=True)))
+                elif token.value == "null":
+                    operand_stack.append(ast.Literal(env.Value(lib.NULL)))
                 else:
                     operand_stack.append(ast.Identifier(token.value))
         elif token.kind == lexer.OPERATOR:
@@ -111,9 +153,19 @@ def generate_expression(stream):
                 while i >= 0 and operand_stack[i] != "(":
                     i -= 1
                 del operand_stack[i]
+        elif token.kind == lexer.STATEMENT:
+            while len(operator_stack) > 0:
+                operator = operator_stack.pop()
+                arg_count = get_arg_count(operator.symbol)
+                for j in range(arg_count):
+                    operator.add_front(operand_stack.pop())
+                operand_stack.append(operator)
+            if len(operand_stack) > 1:
+                raise InvalidStatement()
+            return operand_stack[0], i
 
-        print("Operands: ", ', '.join(str(e) for e in operand_stack))
-        print("Operators:", ', '.join(str(e) for e in operator_stack))
+#        print("Operands: ", ', '.join(str(e) for e in operand_stack))
+#        print("Operators:", ', '.join(str(e) for e in operator_stack))
 
     while len(operator_stack) > 0:
         operator = operator_stack.pop()
@@ -122,20 +174,22 @@ def generate_expression(stream):
             operator.add_front(operand_stack.pop())
         operand_stack.append(operator)
 
-    return operand_stack[0]
+    return operand_stack[0], max
 
 def generate_declaration(stream):
-    if len(stream) < 3 or stream[0].kind != lexer.IDENTIFIER:
+    end = find_statement(stream, 0)
+
+    if end < 3 or stream[0].kind != lexer.IDENTIFIER:
         raise InvalidDeclaration()
 
     name_token, decl_token, type_token = stream[0], stream[1], stream[2]
 
     if decl_token.kind != lexer.OPERATOR or decl_token.value != ":" or type_token.kind != lexer.IDENTIFIER:
-            raise InvalidDeclaration()
+        raise InvalidDeclaration()
     decl = ast.Declaration(name_token.value, type_token.value)
 
-    if len(stream) < 5:
-        return decl
+    if end < 5:
+        return decl, end
 
     if stream[3].kind != lexer.ASSIGNMENT:
         raise InvalidAssignment()
@@ -143,12 +197,12 @@ def generate_declaration(stream):
     sequ = ast.Sequence()
     sequ.add(decl)
 
-    expr = generate_expression(stream[4:])
+    expr, _ = generate_expression(stream[4:])
     assgn = ast.Assignment(name_token.value)
     assgn.add(expr)
     sequ.add(assgn)
 
-    return sequ
+    return sequ, end
 
 def generate_assignment(stream):
     if len(stream) < 3:
@@ -158,20 +212,39 @@ def generate_assignment(stream):
     if name_token.kind != lexer.IDENTIFIER or equ_token.kind != lexer.ASSIGNMENT:
         raise InvalidAssignment()
 
-    expr = generate_expression(stream[2:])
+    expr, offset = generate_expression(stream[2:])
     assgn = ast.Assignment(name_token.value)
     assgn.add(expr)
 
-    return assgn
+    return assgn, 2 + offset
 
-def next_statement_end(stream, start):
-    end_index = start
-    for j in range(start+1, len(stream)):
-        if stream[j].kind == lexer.STATEMENT:
-            end_index = j
-            break
-    return end_index
+def generate_while(stream):
+    cond_start = stream[0]
+    if cond_start.kind != lexer.LPRT:
+        raise InvalidCondition()
 
+    #print(str(cond_start))
+    cond_end_index = find_matching_prt(stream, 1)
+    #print(str(cond_end_index))
+    if cond_end_index == -1:
+        raise InvalidCondition()
+
+
+    body_start_index = cond_end_index+1
+    body_start = stream[cond_end_index+1]
+
+    #print(body_start_index, str(body_start))
+    if body_start.kind != lexer.LBLOCK:
+        raise InvalidBlock()
+    body_end_index = find_matching_block(stream, body_start_index+1)
+
+    condition, cond_len = generate_expression(stream[1:cond_end_index])
+    body, offset = generate_sequence(stream[body_start_index+1:])
+    loop = ast.Loop()
+    loop.add(condition)
+    loop.add(body)
+
+    return loop, 4 + cond_len + offset
 
 def generate_sequence(stream):
     sequence = ast.Sequence()
@@ -187,61 +260,57 @@ def generate_sequence(stream):
             if token.value == "func":
                 raise NotImplemented()
             elif token.value == "return":
-                end_index = next_statement_end(stream, i)
-                if end_index == i:
-                    raise BadStatement()
+                expr, offset = generate_expression(stream[i+1:])
                 return_node = ast.Return()
-                return_node.add(generate_expression(stream[i+1:end_index]))
+                return_node.add(expr)
                 sequence.add(return_node)
-                i = end_index
+                i += offset + 1
             elif token.value == "continue":
                 sequence.add(ast.Continue())
             elif token.value == "break":
                 sequence.add(ast.Break())
             elif token.value == "while":
-                raise NotImplemented()
+                while_node, offset = generate_while(stream[i+1:])
+                sequence.add(while_node)
+                i += offset + 1
             elif token.value == "for":
                 raise NotImplemented()
             elif token.value == "import":
                 raise NotImplemented()
             elif token.value == "var":
-                end_index = next_statement_end(stream, i)
-                if end_index == i:
-                    raise BadStatement()
-                sequence.add(generate_declaration(stream[i+1:end_index]))
-                i = end_index
+                #print(stream)
+                decl, offset = generate_declaration(stream[i+1:])
+                sequence.add(decl)
+                i += offset + 1
             else:
                 if i < max and stream[i+1].kind == lexer.ASSIGNMENT:
-                    end_index = next_statement_end(stream, i)
-                    if end_index == i:
-                        raise BadStatement()
-                    sequence.add(generate_assignment(stream[i:end_index]))
-                    i = end_index
+                    assgn, offset = generate_assignment(stream[i:])
+                    sequence.add(assgn)
+                    i += offset
                 else:
-                    end_index = next_statement_end(stream, i)
-                    if end_index == i:
-                        raise BadStatement()
-                    sequence.add(generate_expression(stream[i:end_index]))
-                    i = end_index
+                    expr, offset = generate_expression(stream[i:])
+                    sequence.add(expr)
+                    i += offset
         elif token.kind == lexer.NUMBER or token.kind == lexer.STRING:
-            end_index = next_statement_end(stream, i)
-            if end_index == i:
-                raise BadStatement()
-            sequence.add(generate_expression(stream[i:end_index]))
-            i = end_index
+            expr, offset = generate_expression(stream[i:])
+            sequence.add(expr)
+            i += offset
         elif token.kind == lexer.LBLOCK:
-            raise NotImplemented()
+            sequ, offset = generate_sequence(stream[i+1:])
+            i += offset + 1
+            sequence.add(sequ)
         elif token.kind == lexer.RBLOCK:
-            return sequence
+            return sequence, i
         i += 1
-    return sequence
+    return sequence, i
 
 
 def generate(tokens):
     """Parse the tokens to AST notation."""
     # clean off whitespaces
     clean = [t for t in tokens if t.kind != lexer.WHITESPACE]
-    return generate_sequence(clean)
+    sequ, _ = generate_sequence(clean)
+    return sequ
 
 def demo_syntax_tree():
     """Initialize a demo syntax tree."""
