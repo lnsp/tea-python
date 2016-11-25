@@ -17,11 +17,14 @@ def interpret(expression, context):
         context.flags.append("exit")
         return
 
-    tokens = lexer.run(expression)
-    print('Generated tokens:', ', '.join((str(e) for e in tokens)))
-    tree = parser.generate(tokens)
-    print(tree)
-    return tree.eval(context).data
+    try:
+        tokens = lexer.run(expression)
+    #print('Generated tokens:', ', '.join((str(e) for e in tokens)))
+        tree = parser.generate(tokens)
+    #print(tree)
+        return tree.eval(context).data
+    except Exception as e:
+        return str(e)
 
 
 def main():
