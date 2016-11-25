@@ -21,9 +21,9 @@ def interpret(expression, context):
         tokens = lexer.run(expression)
         print('Generated tokens:', ', '.join((str(e) for e in tokens)))
         tree = parser.generate(tokens)
-    #print(tree)
+        print(tree)
         return tree.eval(context).data
-    except Exception as e:
+    except (env.FunctionException, env.OperatorException, env.RuntimeException, parser.ParseException) as e:
         return str(e)
 
 
