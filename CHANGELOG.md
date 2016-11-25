@@ -4,12 +4,11 @@ This project adheres to [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 ### Added
-- Add new syntax parser
-  - Does not support many operators yet
-  - Does not support operator precedence
-  - Does not support declaring and calling functions
-  - Does support variable declarations
-  - Does support multiple statements
+- Working token-to-AST parser
+- New `!exec` CLI command for code reuse
+- New `while` statement for basic loops
+- Support for comparison operators in lexer
+- Support for multi-bound operators like `+`
 - New operators
   - `and` (`&&`)
   - `or` (`||`)
@@ -23,9 +22,21 @@ This project adheres to [Semantic Versioning](https://semver.org).
   - `unmi` (`-`)
   - `unpl` (`+`)
   - `uninv` (`!`)
+- New persistent runtime flag storage
+- Advanced type formatting
+- Fibonacci demo script in compatible Tea
 
 ### Changed
+- Reduce print-statement console clustering, debug mode can be enabled via `!debug` CLI command
 - Enable auto-casting on assignment
+- Improve identifier parsing
+- Replace ADD and SUB operators with PLUS and minus to reflect their new roles
+- CLI now only catches exceptions that were raised by the Tea runtime
+
+### Fixed
+- Operator exception handling now handles multi-signatures bounds correctly
+- Null-to-boolean casting works correctly now
+- Equality operator parsing now generates one token instead of two
 
 ## [v0.0.4]
 ### Added
