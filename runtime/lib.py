@@ -140,7 +140,7 @@ def _add_operation():
     return Function(signatures, "#add")
 
 ADD_FUNCTION = _add_operation()
-ADD_OPERATOR = Operator(ADD_FUNCTION, "+")
+PLUS_OPERATOR = Operator(ADD_FUNCTION, "+")
 
 
 def _sub_function():
@@ -161,7 +161,7 @@ def _sub_function():
     return Function(signatures, "#sub")
 
 SUB_FUNCTION = _sub_function()
-SUB_OPERATOR = Operator(SUB_FUNCTION, "-")
+MINUS_OPERATOR = Operator(SUB_FUNCTION, "-")
 
 
 def _mul_operation():
@@ -407,7 +407,7 @@ def _unmi_operation():
     return Function(signatures, "#unmi")
 
 UNMI_FUNCTION = _unmi_operation()
-UNMI_OPERATOR = Operator(UNMI_FUNCTION, "-")
+MINUS_OPERATOR.add_function(UNMI_FUNCTION)
 
 def _unpl_operation():
     def unpl(context):
@@ -423,7 +423,7 @@ def _unpl_operation():
     return Function(signatures, "#unpl")
 
 UNPL_FUNCTION = _unpl_operation()
-UNPL_OPERATOR = Operator(UNPL_FUNCTION, "+")
+PLUS_OPERATOR.add_function(UNPL_FUNCTION)
 
 def _uninv_operation():
     def uninv(context):
@@ -445,15 +445,14 @@ EXPORTS = [
     # Datatypes
     INTEGER, FLOAT, BOOLEAN, STRING, LIST, SET, MAP, OBJECT, FUNCTION, ANY, NULL,
     # Operators
-    ADD_OPERATOR, SUB_OPERATOR, MUL_OPERATOR, DIV_OPERATOR, EQU_OPERATOR,
+    PLUS_OPERATOR, MINUS_OPERATOR, MUL_OPERATOR, DIV_OPERATOR, EQU_OPERATOR,
     AND_OPERATOR, OR_OPERATOR, XOR_OPERATOR, NEQ_OPERATOR,
     SM_OPERATOR, LG_OPERATOR, SME_OPERATOR, LGE_OPERATOR,
-    #UNMI_OPERATOR, UNPL_OPERATOR,
     UNINV_OPERATOR,
     # Functions
-    ADD_FUNCTION, SUB_FUNCTION, MUL_FUNCTION, DIV_FUNCTION, EQU_FUNCTION,
+    ADD_FUNCTION, UNPL_FUNCTION, SUB_FUNCTION, UNMI_FUNCTION,
+    MUL_FUNCTION, DIV_FUNCTION, EQU_FUNCTION,
     AND_FUNCTION, OR_FUNCTION, XOR_FUNCTION, NEQ_FUNCTION,
     SM_FUNCTION, LG_FUNCTION, SME_FUNCTION, LGE_FUNCTION,
-    #UNMI_FUNCTION, UNPL_FUNCTION,
     UNINV_FUNCTION,
 ]

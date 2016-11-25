@@ -217,16 +217,30 @@ class RuntimeException(Exception):
     def __init__(self, message):
         super().__init__(message)
 
+class OperatorException(Exception):
+    """A operator exception."""
+
+    def __init__(self, op):
+        super().__init__("Operator %s is not applicable." % op)
+
 class Operator(object):
     """A operator with a collection of signatures and functions."""
 
-    def __init__(self, function, symbol):
-        self.function = function
+    def __init__(self, base_function, symbol):
+        self.functions = [base_function]
         self.symbol = symbol
+
+    def add_function(self, fnc):
+        self.functions.append(fnc)
 
     def eval(self, args, context):
         """Evaluates the operator."""
-        return self.function.eval(args, context)
+        for fnc in self.functions:
+            try:
+                return fnc.eval(args, context)
+            except:
+                pass
+        raise OperatorException(self.symbol)
 
     def __str__(self):
         return "<Operator (%s)>" % self.symbol
