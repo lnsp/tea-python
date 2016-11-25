@@ -277,7 +277,7 @@ class TestAst(unittest.TestCase):
 
         bad_asgn = ast.Assignment("value")
         bad_asgn.add(STRING_LITERAL)
-        self.assertRaises(env.RuntimeException, bad_asgn.eval, context)
+        self.assertRaises(env.CastException, bad_asgn.eval, context)
 
         asgn_node = ast.Assignment("value")
         asgn_node.add(INT_LITERAL)
