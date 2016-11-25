@@ -149,10 +149,10 @@ class TestLib(unittest.TestCase):
         self.assertEqual(div_op.eval(args, context), INT_VALUE)
         # Case 4: Division by 0 int
         args = [INT_VALUE, INT0_VALUE]
-        self.assertRaises(lib.RuntimeException, div_op.eval, args, context)
+        self.assertRaises(env.RuntimeException, div_op.eval, args, context)
         # Case 5: Division by  0 float
         args = [FLOAT_VALUE, FLOAT0_VALUE]
-        self.assertRaises(lib.RuntimeException, div_op.eval, args, context)
+        self.assertRaises(env.RuntimeException, div_op.eval, args, context)
 
     def test_equ_operation(self):
         """Test the equ operator / function."""
@@ -164,7 +164,7 @@ class TestLib(unittest.TestCase):
         self.assertEqual(equ_op.eval(args, context), TRUE_VALUE)
         # Case 2: One float, one int
         args = [FLOAT_VALUE, INT_VALUE]
-        self.assertRaises(lib.RuntimeException, equ_op.eval, args, context)
+        self.assertRaises(env.RuntimeException, equ_op.eval, args, context)
         # Case 3: Two different int values
         args = [INT0_VALUE, INT2_VALUE]
         self.assertEqual(equ_op.eval(args, context), FALSE_VALUE)
