@@ -84,7 +84,7 @@ class TestLib(unittest.TestCase):
 
     def test_add_operation(self):
         """Test the add operator / function."""
-        add_op = lib.ADD_OPERATOR
+        add_op = lib.PLUS_OPERATOR
         context = env.empty_context()
 
         # Case 1: Two int values -> int value
@@ -105,7 +105,7 @@ class TestLib(unittest.TestCase):
 
     def test_sub_operation(self):
         """Test the sub operator / function."""
-        sub_op = lib.SUB_OPERATOR
+        sub_op = lib.MINUS_OPERATOR
         context = env.empty_context()
 
         # Case 1: Two int values -> int value
@@ -444,7 +444,7 @@ class TestLib(unittest.TestCase):
         self.assertEqual(lge_op.eval(args, context), TRUE_VALUE)
 
     def test_unmi_operation(self):
-        unmi_op = lib.UNMI_OPERATOR
+        unmi_op = lib.MINUS_OPERATOR
         context = env.empty_context()
 
         # Case 1.1: - (1) -> -1
@@ -468,7 +468,7 @@ class TestLib(unittest.TestCase):
         self.assertEqual(unmi_op.eval(args, context), FLOAT0_VALUE)
 
     def test_unpl_operation(self):
-        unpl_op = lib.UNPL_OPERATOR
+        unpl_op = lib.PLUS_OPERATOR
         context = env.empty_context()
         # Case 1: 1 -> 1
         args = [INT_VALUE]
