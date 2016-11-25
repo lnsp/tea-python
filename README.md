@@ -2,23 +2,28 @@
 
 [![Build Status](https://travis-ci.org/TeaLang/tea.svg?branch=master)](https://travis-ci.org/TeaLang/tea)
 
-Tea is small and simple.
+Tea is small, code written in Tea simple and short.
 It was crafted for reading, extending and maintaining.
-The interpreter is still in early-alpha and can only run ASTs.
 
 ## A leafy example
 ```tea
 // leafy.tea
 import std.io;
 
-func sayHello(name: string): string {
-    return "Hello, %s!" % name;
+func greet(greeting, name: string): string {
+    return "%s, %s!" % [greeting, name];
 }
 
-func main(args: list) {
-    io.println("You called", args.join(","));
-    io.print("Please enter your name: ");
-    var name = io.readLine();
-    sayHello(name);
+io.println("You called", args.join(","));
+io.print("Please enter your name: ");
+var name: string = io.readln();
+if (length(trim(name)) == 0) {
+    io.println("Ok, I won't greet you :(");
+} else {
+    io.print("How many times? ");
+    var times: int = io.readln();
+    for (i: int = 0; i < times; i += 1) {
+        print(greet("Hello", name));
+    }
 }
 ```
