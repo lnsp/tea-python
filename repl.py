@@ -12,6 +12,25 @@ CLI_SPACE = " " * 3
 CLI_RESULT = "<- "
 CLI_ERROR = "!! "
 
+class REPLDemoLib(object):
+    def _print_operation():
+        def do_print(context):
+            """Print a value."""
+            var_a = context.find("id", "a")
+            print(var_a.data)
+            return env.Value(env.NULL)
+        print_node = env.FunctionBinding(do_print)
+        signatures = [
+            env.Signature([
+                env.Value(env.ANY, None, "a"),
+            ], print_node)
+        ]
+        return env.Function(signatures, "print")
+    PRINT_FUNCTION = _print_operation()
+    EXPORTS = [
+        PRINT_FUNCTION,
+    ]
+
 def interpret(expression, context):
     """Interpret an expression by tokenizing, parsing and evaluating."""
     if expression == CLI_ESCAPE + "exit":
@@ -43,6 +62,7 @@ def main():
     # run REPL
     context = env.empty_context()
     context.load(runtime.lib)
+    context.load(REPLDemoLib)
     while "done" not in context.flags:
         output = interpret(input(CLI_SYMBOL), context)
         while "continue" in context.flags:
