@@ -12,7 +12,7 @@ REGEX_NUMBER = r"^\-?[0-9]+(\.[0-9]*)?$"
 REGEX_IDENTIFIER = r"^(#|[a-zA-Z_])+([0-9a-zA-Z_]+)?$"
 REGEX_STRING = r'^"[^\n\r"]*"?$'
 REGEX_STMT = r"^;$"
-REGEX_SEPERATOR = r"^,$"
+REGEX_SEPARATOR = r"^,$"
 REGEX_RBLOCK = r"^}$"
 REGEX_LBLOCK = r"^{$"
 
@@ -39,7 +39,7 @@ STRING = TokenType("string", lambda item: re.match(REGEX_STRING, item))
 LPRT = TokenType("left_parentheses", lambda item: re.match(REGEX_LPRT, item))
 RPRT = TokenType("right_parentheses", lambda item: re.match(REGEX_RPRT, item))
 STATEMENT = TokenType("statement", lambda item: re.match(REGEX_STMT, item))
-SEPERATOR = TokenType("seperator", lambda item: re.match(REGEX_SEPERATOR, item))
+SEPARATOR = TokenType("separator", lambda item: re.match(REGEX_SEPARATOR, item))
 LBLOCK = TokenType("left_block", lambda item: re.match(REGEX_LBLOCK, item))
 RBLOCK = TokenType("right_block", lambda item: re.match(REGEX_RBLOCK, item))
 
@@ -47,7 +47,7 @@ RBLOCK = TokenType("right_block", lambda item: re.match(REGEX_RBLOCK, item))
 FUNCTION = TokenType("function", lambda item: False)
 
 TOKEN_TYPES = [
-    WHITESPACE, OPERATOR, IDENTIFIER, NUMBER, STRING, LPRT, RPRT, STATEMENT, SEPERATOR, FUNCTION, LBLOCK, RBLOCK,
+    WHITESPACE, OPERATOR, IDENTIFIER, NUMBER, STRING, LPRT, RPRT, STATEMENT, SEPARATOR, FUNCTION, LBLOCK, RBLOCK,
 ]
 
 def run(expression):
