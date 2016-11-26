@@ -7,7 +7,9 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Working token-to-AST parser
 - New `!exec` CLI command for code reuse
 - New `while` statement for basic loops
+- New `if-else` statement for branching
 - Support for comparison operators in lexer
+- Support for multi-variable declarations
 - Support for multi-bound operators like `+`
 - New operators
   - `and` (`&&`)
@@ -25,13 +27,15 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - New persistent runtime flag storage
 - Advanced type formatting
 - Fibonacci demo script in compatible Tea
+- repl.py has now its own support library
 
 ### Changed
-- Reduce print-statement console clustering, debug mode can be enabled via `!debug` CLI command
+- Reduce print-statement console clustering, debug mode can be enabled via `\debug` CLI command
 - Enable auto-casting on assignment
 - Improve identifier parsing
 - Replace ADD and SUB operators with PLUS and minus to reflect their new roles
 - CLI now only catches exceptions that were raised by the Tea runtime
+- Use `\\` instead of `#` as escape symbol in REPL CLI
 
 ### Fixed
 - Operator exception handling now handles multi-signatures bounds correctly
