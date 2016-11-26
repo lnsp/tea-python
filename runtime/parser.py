@@ -24,8 +24,8 @@ class NotImplemented(ParseException):
         super().__init__(msg)
 
 class InvalidDeclaration(ParseException):
-    def __init__(self, msg="Invalid declaration"):
-        super().__init__(msg)
+    def __init__(self, msg):
+        super().__init__("Invalid declaration: Unexpected %s" % msg)
 
 class InvalidAssignment(ParseException):
     def __init__(self, msg="Invalid assignment"):
@@ -155,7 +155,7 @@ def generate_expression(stream):
         elif token.kind == lexer.STRING:
             value = env.Value(lib.STRING, data=token.value.strip("\""))
             operand_stack.append(ast.Literal(value))
-        elif token.kind == lexer.SEPERATOR:
+        elif token.kind == lexer.SEPARATOR:
             while len(operator_stack) > 0 and operator_stack[-1] != "(":
                 pop_off_operator()
         elif token.kind == lexer.IDENTIFIER:
@@ -242,30 +242,48 @@ def generate_expression(stream):
     return operand_stack[0], max
 
 def generate_declaration(stream):
+    if flags.debug:
+        print("Starting generating declaration")
     end = find_statement(stream, 0)
 
+    # declaration too short
     if end < 3 or stream[0].kind != lexer.IDENTIFIER:
-        raise InvalidDeclaration()
+        raise InvalidDeclaration(str(stream[0]))
 
-    name_token, decl_token, type_token = stream[0], stream[1], stream[2]
-
-    if decl_token.kind != lexer.OPERATOR or decl_token.value != ":" or type_token.kind != lexer.IDENTIFIER:
-        raise InvalidDeclaration()
-    decl = ast.Declaration(name_token.value, type_token.value)
-
-    if end < 5:
-        return decl, end
-
-    if not is_assignment(stream[3]):
-        raise InvalidAssignment()
-
+    declared_names = []
     sequ = ast.Sequence()
-    sequ.add(decl)
+    expr_begin = 1
 
-    expr, _ = generate_expression(stream[4:])
-    assgn = ast.Assignment(name_token.value)
-    assgn.add(expr)
-    sequ.add(assgn)
+    while expr_begin < end and ((stream[expr_begin].kind is lexer.SEPARATOR) or
+                                ((stream[expr_begin].kind is lexer.OPERATOR) and
+                                 (stream[expr_begin].value == ":"))):
+        if expr_begin > 1 and stream[expr_begin - 2].kind != lexer.SEPARATOR:
+            raise InvalidDeclaration(str(stream[expr_begin - 2]))
+        if stream[expr_begin - 1].kind is not lexer.IDENTIFIER:
+            raise InvalidDeclaration(str(stream[expr_begin - 1]))
+        declared_names.append(stream[expr_begin - 1].value)
+        expr_begin += 2
+
+    if stream[expr_begin - 1].kind is not lexer.IDENTIFIER:
+        raise InvalidDeclaration(str(stream[expr_begin - 1]))
+
+    datatype = stream[expr_begin - 1].value
+
+    expr = None
+    if is_assignment(stream[expr_begin]):
+        expr, _ = generate_expression(stream[expr_begin + 1:])
+
+    for name in declared_names:
+        decl = ast.Declaration(name, datatype)
+        sequ.add(decl)
+
+        if expr is not None:
+            assgn = ast.Assignment(name)
+            assgn.add(expr)
+            expr = assgn
+
+    if expr is not None:
+        sequ.add(expr)
 
     return sequ, end
 
