@@ -12,7 +12,7 @@ CLI_SPACE = " " * 3
 CLI_RESULT = "<- "
 CLI_ERROR = "!! "
 
-class REPLDemoLib(object):
+class CLISupportLib(object):
     def _print_operation():
         def do_print(context):
             """Print a value."""
@@ -62,7 +62,7 @@ def main():
     # run REPL
     context = env.empty_context()
     context.load(runtime.lib)
-    context.load(REPLDemoLib)
+    context.load(CLISupportLib)
     while "done" not in context.flags:
         output = interpret(input(CLI_SYMBOL), context)
         while "continue" in context.flags:
