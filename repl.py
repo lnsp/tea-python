@@ -6,6 +6,7 @@ from runtime import lexer, parser, env, flags
 
 TEA_VERSION = "0.0.5-dev"
 TEA_TITLE = "Tea @" + TEA_VERSION
+CLI_ESCAPE = "\\"
 CLI_SYMBOL = ">> "
 CLI_SPACE = " " * 3
 CLI_RESULT = "<- "
@@ -13,13 +14,13 @@ CLI_ERROR = "!! "
 
 def interpret(expression, context):
     """Interpret an expression by tokenizing, parsing and evaluating."""
-    if expression == "!exit":
+    if expression == CLI_ESCAPE + "exit":
         context.flags.append("exit")
         return
-    if expression == "!debug":
+    if expression == CLI_ESCAPE + "debug":
         flags.debug = not flags.debug
         return "Debug mode %s" % ("on" if flags.debug else "off")
-    if expression.startswith("!exec"):
+    if expression.startswith(CLI_ESCAPE + "exec"):
         # load file
         filename = expression.split(' ')[1]
         print("Executing %s" % filename)
