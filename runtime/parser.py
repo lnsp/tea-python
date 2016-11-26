@@ -81,7 +81,7 @@ def find_matching_prt(stream, start):
     return -1
 
 def get_arg_count(operator, last_token):
-    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.NUMBER]):
+    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.STRING]):
         if flags.debug:
             print("unary operator because of", last_token)
         return 1
@@ -92,7 +92,7 @@ def get_arg_count(operator, last_token):
     return 2
 
 def is_left_associative(operator, last_token):
-    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.NUMBER]):
+    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.STRING]):
         if flags.debug:
             print("right associative because of", last_token)
         return False
@@ -103,7 +103,7 @@ def is_left_associative(operator, last_token):
     return True
 
 def get_precedence(operator, last_token):
-    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.NUMBER]):
+    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.STRING]):
         return 7
     elif operator in ["^"]:
         return 6
@@ -283,22 +283,74 @@ def generate_assignment(stream):
 
     return assgn, 2 + offset
 
-def generate_while(stream):
+def generate_if(stream):
+    if flags.debug:
+        print("Starting generating if statement")
     cond_start = stream[0]
     if cond_start.kind != lexer.LPRT:
         raise InvalidCondition()
 
-    #print(str(cond_start))
     cond_end_index = find_matching_prt(stream, 1)
-    #print(str(cond_end_index))
+    if cond_end_index == 1:
+        raise InvalidCondition()
+
+    body_start_index = cond_end_index + 1
+    body_start = stream[body_start_index]
+
+    if body_start.kind != lexer.LBLOCK:
+        raise InvalidBlock()
+    body_end_index = find_matching_block(stream, body_start_index)
+
+    if flags.debug:
+        print("If-condition: " + ' '.join(str(e) for e in stream[1:cond_end_index]))
+    condition, cond_len = generate_expression(stream[1:cond_end_index])
+    body, body_len = generate_sequence(stream[body_start_index+1:])
+
+    branch_node = ast.Branch()
+    cond_node = ast.Conditional()
+    cond_node.add(condition)
+    cond_node.add(body)
+    branch_node.add(cond_node)
+
+    after_if = 5 + cond_len + body_len
+    if len(stream) <= after_if:
+        return branch_node, after_if
+
+    if stream[after_if].kind is not lexer.IDENTIFIER or stream[after_if].value != "else":
+        return branch_node, after_if
+
+    if flags.debug:
+        print("Going for possible else")
+
+    # check for else_if
+    if stream[after_if+1].kind is lexer.IDENTIFIER and stream[after_if+1].value == "if":
+        if flags.debug:
+            print("Found else-if")
+        elif_node, elif_len = generate_if(stream[after_if+2:])
+        branch_node.add(elif_node)
+        return branch_node, 2 + after_if + elif_len
+    else:
+        if flags.debug:
+            print("Found else starting with " + ' '.join(str(e) for e in stream[after_if+2:]))
+        else_body, else_body_len = generate_sequence(stream[after_if+2:])
+        branch_node.add(else_body)
+        return branch_node, 2 + after_if + else_body_len
+
+def generate_while(stream):
+    if flags.debug:
+        print("Starting generating while statement")
+    cond_start = stream[0]
+    if cond_start.kind != lexer.LPRT:
+        raise InvalidCondition()
+
+    cond_end_index = find_matching_prt(stream, 1)
     if cond_end_index == -1:
         raise InvalidCondition()
 
 
     body_start_index = cond_end_index+1
-    body_start = stream[cond_end_index+1]
+    body_start = stream[body_start_index]
 
-    #print(body_start_index, str(body_start))
     if body_start.kind != lexer.LBLOCK:
         raise InvalidBlock()
     body_end_index = find_matching_block(stream, body_start_index+1)
@@ -312,6 +364,8 @@ def generate_while(stream):
     return loop, 4 + cond_len + offset
 
 def generate_sequence(stream):
+    if flags.debug:
+        print("Starting generating sequence")
     sequence = ast.Sequence()
     stack = []
     queue = []
@@ -338,12 +392,15 @@ def generate_sequence(stream):
                 while_node, offset = generate_while(stream[i+1:])
                 sequence.add(while_node)
                 i += offset + 1
+            elif token.value == "if":
+                if_node, offset = generate_if(stream[i+1:])
+                sequence.add(if_node)
+                i += offset + 1
             elif token.value == "for":
                 raise NotImplemented()
             elif token.value == "import":
                 raise NotImplemented()
             elif token.value == "var":
-                #print(stream)
                 decl, offset = generate_declaration(stream[i+1:])
                 sequence.add(decl)
                 i += offset + 1
