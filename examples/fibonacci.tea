@@ -1,11 +1,10 @@
-var a, b, i: int;
-a = 1;
-i = 1;
+var a, b, i = 1;
+b = 0;
 
 while (i <= 10) {
 	print("fib(" + i + ") = " + a);
-	var c: int = a + b;
+	var tmp = a + b;
 	b = a;
-	a = c;
+	a = tmp;
 	i = i + 1;
 }
