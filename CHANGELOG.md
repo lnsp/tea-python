@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - New `while` statement for basic loops
 - New `if-else` statement for branching
 - Support for comparison operators in lexer
+- Support for type interference on declaration
 - Support for multi-variable declarations
 - Support for multi-bound operators like `+`
 - New operators
