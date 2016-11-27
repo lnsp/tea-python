@@ -46,14 +46,6 @@ class InvalidCondition(ParseException):
 def is_assignment(token):
     return token != None and token.kind is lexer.OPERATOR and token.value == "="
 
-def find_statement(stream, start):
-    end_index = start
-    for j in range(start+1, len(stream)):
-        if stream[j].kind == lexer.STATEMENT:
-            end_index = j
-            break
-    return end_index
-
 def find_matching_block(stream, start):
     level = 1
     max = len(stream)
@@ -244,7 +236,13 @@ def generate_expression(stream):
 def generate_declaration(stream):
     if flags.debug:
         print("Starting generating declaration")
-    end = find_statement(stream, 0)
+    end = 0
+    for j in range(len(stream)):
+        if stream[j].kind is lexer.STATEMENT:
+            end = j
+            break
+    if end == 0:
+        end = len(stream)
 
     # declaration too short
     if end < 3 or stream[0].kind != lexer.IDENTIFIER:
@@ -254,9 +252,14 @@ def generate_declaration(stream):
     sequ = ast.Sequence()
     expr_begin = 1
 
+    ignore_type = True
+
     while expr_begin < end and ((stream[expr_begin].kind is lexer.SEPARATOR) or
                                 ((stream[expr_begin].kind is lexer.OPERATOR) and
-                                 (stream[expr_begin].value == ":"))):
+                                 (stream[expr_begin].value == ":" or
+                                  (stream[expr_begin].value == "=" and ignore_type)))):
+        if (stream[expr_begin].kind is lexer.OPERATOR) and stream[expr_begin].value == ":":
+            ignore_type = False
         if expr_begin > 1 and stream[expr_begin - 2].kind != lexer.SEPARATOR:
             raise InvalidDeclaration(str(stream[expr_begin - 2]))
         if stream[expr_begin - 1].kind is not lexer.IDENTIFIER:
@@ -264,10 +267,14 @@ def generate_declaration(stream):
         declared_names.append(stream[expr_begin - 1].value)
         expr_begin += 2
 
-    if stream[expr_begin - 1].kind is not lexer.IDENTIFIER:
+    if not ignore_type and stream[expr_begin - 1].kind is not lexer.IDENTIFIER:
         raise InvalidDeclaration(str(stream[expr_begin - 1]))
 
-    datatype = stream[expr_begin - 1].value
+    datatype = "null"
+    if not ignore_type:
+        datatype = stream[expr_begin - 1].value
+    else:
+        expr_begin -= 2
 
     expr = None
     if is_assignment(stream[expr_begin]):
@@ -278,7 +285,7 @@ def generate_declaration(stream):
         sequ.add(decl)
 
         if expr is not None:
-            assgn = ast.Assignment(name)
+            assgn = ast.Assignment(name, ignore_type)
             assgn.add(expr)
             expr = assgn
 
