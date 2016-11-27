@@ -272,6 +272,10 @@ class Datatype(object):
     def __str__(self):
         return "<T %s>" % self.name
 
+class AssignmentException(RuntimeException):
+    """A AssignmentExxception is raised when a value datatype is not the same as the assigned one."""
+    def __init__(self, typeA, typeB):
+        super().__init__("%s can not be assigned to %s" % (typeA, typeB))
 
 class CastException(RuntimeException):
     """A CastError is raised when a value can not be casted to another type."""
