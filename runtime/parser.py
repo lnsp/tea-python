@@ -112,6 +112,8 @@ def get_precedence(operator, last_token):
     return 0
 
 def generate_expression(stream):
+    if flags.debug:
+        print("Starting generate expression")
     operand_stack = []
     operator_stack = []
     max = len(stream) - 1
@@ -330,6 +332,7 @@ def generate_if(stream):
         print("If-condition: " + ' '.join(str(e) for e in stream[1:cond_end_index]))
     condition, cond_len = generate_expression(stream[1:cond_end_index])
     body, body_len = generate_sequence(stream[body_start_index+1:])
+    body.substitute = True
 
     branch_node = ast.Branch()
     cond_node = ast.Conditional()
@@ -358,8 +361,55 @@ def generate_if(stream):
         if flags.debug:
             print("Found else starting with " + ' '.join(str(e) for e in stream[after_if+2:]))
         else_body, else_body_len = generate_sequence(stream[after_if+2:])
+        else_body.substitute = True
         branch_node.add(else_body)
         return branch_node, 2 + after_if + else_body_len
+
+def generate_for(stream):
+    if flags.debug:
+        print("Starting generating for statement")
+    head_start = stream[0]
+    if head_start.kind is not lexer.LPRT:
+        raise InvalidCondition()
+
+    head_end_index = find_matching_prt(stream, 1)
+    if head_end_index == -1:
+        raise InvalidCondition()
+
+    # find first ;
+    init_end_index = 1
+    for j in range(len(stream)):
+        if stream[j].kind is lexer.STATEMENT:
+            init_end_index = j
+            break
+
+    init_stmt, init_len = generate_sequence(stream[1:init_end_index+1])
+    cond_expr, cond_len = generate_expression(stream[1 + init_len:head_end_index])
+    iter_stmt, iter_len = generate_sequence(stream[1 + init_len + cond_len:head_end_index])
+
+    body_start_index = head_end_index + 1
+    body_start = stream[body_start_index]
+
+    if body_start.kind is not lexer.LBLOCK:
+        raise InvalidBlock()
+
+    body_end_index = find_matching_block(stream, body_start_index + 1)
+    body, body_len = generate_sequence(stream[body_start_index+1:])
+
+    inner_sequ = ast.Sequence()
+    inner_sequ.add(body)
+    inner_sequ.add(iter_stmt)
+
+    loop = ast.Loop()
+    loop.add(cond_expr)
+    loop.add(inner_sequ)
+
+    sequ = ast.Sequence(True)
+    sequ.add(init_stmt)
+    sequ.add(loop)
+
+    return sequ, 3 + init_len + cond_len + iter_len + body_len
+
 
 def generate_while(stream):
     if flags.debug:
@@ -382,6 +432,8 @@ def generate_while(stream):
 
     condition, cond_len = generate_expression(stream[1:cond_end_index])
     body, offset = generate_sequence(stream[body_start_index+1:])
+    body.substitute = True
+
     loop = ast.Loop()
     loop.add(condition)
     loop.add(body)
@@ -399,6 +451,8 @@ def generate_sequence(stream):
 
     i = 0
     while i <= max:
+        if flags.debug:
+            print("Operating on", i, stream[i])
         token = stream[i]
         if token.kind == lexer.IDENTIFIER:
             if token.value == "func":
@@ -422,7 +476,9 @@ def generate_sequence(stream):
                 sequence.add(if_node)
                 i += offset + 1
             elif token.value == "for":
-                raise NotImplemented()
+                for_node, offset = generate_for(stream[i+1:])
+                sequence.add(for_node)
+                i += offset + 1
             elif token.value == "import":
                 raise NotImplemented()
             elif token.value == "var":

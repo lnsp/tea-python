@@ -60,11 +60,16 @@ class Sequence(Node):
     """A sequence node."""
     name = "sequence"
 
-    def __init__(self):
+    def __init__(self, substitute=False):
         super().__init__()
+        self.substitute = substitute
 
     def eval(self, context):
         """Evaluate a sequence of statements."""
+        parent = None
+        if self.substitute:
+            parent = context.substitute()
+
         context.behaviour = DEFAULT_BEHAVIOUR
         value = env.Value(env.NULL)
 
@@ -72,6 +77,9 @@ class Sequence(Node):
             value = item.eval(context)
             if context.behaviour is not DEFAULT_BEHAVIOUR:
                 break
+
+        if self.substitute:
+            context.namespace = parent
 
         return value
 
