@@ -1,10 +1,9 @@
-var a, b, i = 1;
-b = 0;
+func fib(n: int) {
+	if (n == 0) {
+		return 0;
+	} else if (n == 1) {
+		return 1;
+	}
 
-while (i <= 10) {
-	print("fib(" + i + ") = " + a);
-	var tmp = a + b;
-	b = a;
-	a = tmp;
-	i = i + 1;
+	return fib(n - 1) + fib(n - 2);
 }
