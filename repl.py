@@ -2,6 +2,7 @@
 """Command line runtime for Tea."""
 
 import runtime.lib
+import sys
 from runtime import lexer, parser, env, flags
 
 TEA_VERSION = "0.0.5-dev"
@@ -31,6 +32,16 @@ class CLISupportLib(object):
         PRINT_FUNCTION,
     ]
 
+def run_script(name, context):
+    script = ""
+    with open(name, "r") as f:
+        script = ' '.join(line for line in f)
+
+    tokens = lexer.run(script)
+    tree = parser.generate(tokens)
+    return tree.eval(context)
+
+
 def interpret(expression, context):
     """Interpret an expression by tokenizing, parsing and evaluating."""
     if expression == CLI_ESCAPE + "exit":
@@ -39,12 +50,6 @@ def interpret(expression, context):
     if expression == CLI_ESCAPE + "debug":
         flags.debug = not flags.debug
         return "Debug mode %s" % ("on" if flags.debug else "off")
-    if expression.startswith(CLI_ESCAPE + "exec"):
-        # load file
-        filename = expression.split(' ')[1]
-        print("Executing %s" % filename)
-        with open(filename, "r") as f:
-            expression = ' '.join(line for line in f)
 
     try:
         tokens = lexer.run(expression)
@@ -63,6 +68,11 @@ def main():
     context = env.empty_context()
     context.load(runtime.lib)
     context.load(CLISupportLib)
+
+    if len(sys.argv) > 1:
+        run_script(sys.argv[1], context)
+        return
+
     while "done" not in context.flags:
         output = interpret(input(CLI_SYMBOL), context)
         while "continue" in context.flags:
