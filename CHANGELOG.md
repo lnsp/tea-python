@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Working token-to-AST parser
 - New `!exec` CLI command for code reuse
 - New `while` statement for basic loops
+- New `for` statement for iteration loops
 - New `if-else` statement for branching
 - Support for comparison operators in lexer
 - Support for type interference on declaration
