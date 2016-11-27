@@ -67,8 +67,11 @@ class Sequence(Node):
     def eval(self, context):
         """Evaluate a sequence of statements."""
         parent = None
-        if self.substitute:
-            parent = context.substitute()
+        try:
+            if self.substitute:
+                parent = context.substitute()
+        except:
+            pass
 
         context.behaviour = DEFAULT_BEHAVIOUR
         value = env.Value(env.NULL)
@@ -78,7 +81,7 @@ class Sequence(Node):
             if context.behaviour is not DEFAULT_BEHAVIOUR:
                 break
 
-        if self.substitute:
+        if parent is not None:
             context.namespace = parent
 
         return value
