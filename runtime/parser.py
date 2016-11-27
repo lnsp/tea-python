@@ -77,7 +77,7 @@ def find_matching_prt(stream, start):
     return -1
 
 def get_arg_count(operator, last_token):
-    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.STRING]):
+    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.STRING, lexer.RPRT]):
         if flags.debug:
             print("unary operator because of", last_token)
         return 1
@@ -88,7 +88,7 @@ def get_arg_count(operator, last_token):
     return 2
 
 def is_left_associative(operator, last_token):
-    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.STRING]):
+    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.STRING, lexer.RPRT]):
         if flags.debug:
             print("right associative because of", last_token)
         return False
@@ -99,7 +99,7 @@ def is_left_associative(operator, last_token):
     return True
 
 def get_precedence(operator, last_token):
-    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.STRING]):
+    if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.STRING, lexer.RPRT]):
         return 7
     elif operator in ["^"]:
         return 6
