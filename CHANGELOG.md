@@ -27,6 +27,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
   - `unmi` (`-`)
   - `unpl` (`+`)
   - `uninv` (`!`)
+  - `mod` (`%`)
 - New persistent runtime flag storage
 - Advanced type formatting
 - Fibonacci demo script in compatible Tea
