@@ -180,7 +180,9 @@ class Call(Node):
         function = context.find("id", self.identity)
         if function is not None:
             args = [child.eval(context) for child in self.children]
-            return function.eval(args, context)
+            result = function.eval(args, context)
+            context.behaviour = DEFAULT_BEHAVIOUR
+            return result
         raise Exception("Function not found")
 
 
