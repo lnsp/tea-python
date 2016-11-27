@@ -208,6 +208,28 @@ def _div_operation():
 DIV_FUNCTION = _div_operation()
 DIV_OPERATOR = Operator(DIV_FUNCTION, "/")
 
+def _mod_operation():
+    def mod(context):
+        """Get the modulo of two numbers."""
+        var_a = context.find("id", "a")
+        var_b = context.find("id", "b")
+        if var_b.data == 0:
+            raise RuntimeException("Can not divide by 0")
+
+        return Value(INTEGER, var_a.data % var_b.data)
+
+    mod_node= FunctionBinding(mod)
+    signatures = [
+        Signature([
+            Value(INTEGER, None, "a"),
+            Value(INTEGER, None, "b"),
+        ], mod_node)
+    ]
+    return Function(signatures, "#mod")
+
+MOD_FUNCTION = _mod_operation()
+MOD_OPERATOR = Operator(MOD_FUNCTION, "%")
+
 def _equ_operation():
     def equ(context):
         """Checks if two values are equal."""
@@ -449,11 +471,11 @@ EXPORTS = [
     PLUS_OPERATOR, MINUS_OPERATOR, MUL_OPERATOR, DIV_OPERATOR, EQU_OPERATOR,
     AND_OPERATOR, OR_OPERATOR, XOR_OPERATOR, NEQ_OPERATOR,
     SM_OPERATOR, LG_OPERATOR, SME_OPERATOR, LGE_OPERATOR,
-    UNINV_OPERATOR,
+    UNINV_OPERATOR, MOD_OPERATOR,
     # Functions
     ADD_FUNCTION, UNPL_FUNCTION, SUB_FUNCTION, UNMI_FUNCTION,
     MUL_FUNCTION, DIV_FUNCTION, EQU_FUNCTION,
     AND_FUNCTION, OR_FUNCTION, XOR_FUNCTION, NEQ_FUNCTION,
     SM_FUNCTION, LG_FUNCTION, SME_FUNCTION, LGE_FUNCTION,
-    UNINV_FUNCTION,
+    UNINV_FUNCTION, MOD_FUNCTION,
 ]

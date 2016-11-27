@@ -486,3 +486,17 @@ class TestLib(unittest.TestCase):
 
         args = [FALSE_VALUE]
         self.assertEqual(uninv_op.eval(args, context), TRUE_VALUE)
+
+    def test_mod_operation(self):
+        mod_op = lib.MOD_OPERATOR
+        context = env.empty_context()
+
+        args = [INT_VALUE, INT2_VALUE]
+        self.assertEqual(mod_op.eval(args, context), INT_VALUE)
+
+        args = [INT_VALUE, INT_VALUE]
+        self.assertEqual(mod_op.eval(args, context), INT0_VALUE)
+
+        args = [INT_VALUE, INT0_VALUE]
+        self.assertRaises(env.RuntimeException, mod_op.eval, args, context)
+
