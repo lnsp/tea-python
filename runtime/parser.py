@@ -27,6 +27,10 @@ class InvalidDeclaration(ParseException):
     def __init__(self, msg):
         super().__init__("Invalid declaration: Unexpected %s" % msg)
 
+class InvalidDefinition(ParseException):
+    def __init__(self, msg):
+        super().__init__("Invalid definition: Unexpected %s" % str(msg))
+
 class InvalidAssignment(ParseException):
     def __init__(self, msg="Invalid assignment"):
         super().__init__(msg)
@@ -310,6 +314,50 @@ def generate_assignment(stream):
 
     return assgn, 2 + offset
 
+def generate_function(stream):
+    if flags.debug:
+        print("Starting generating function definition")
+
+    head_name = stream[0]
+    if head_name.kind is not lexer.IDENTIFIER:
+        raise InvalidDefinition(head_name)
+    fnc_name = head_name.value
+
+    head_start = stream[1]
+    if head_start.kind != lexer.LPRT:
+        raise InvalidDefinition(head_start)
+    head_end_index = find_matching_prt(stream, 2)
+
+    arguments = []
+    arg_index = 2
+    while arg_index < head_end_index:
+        if stream[arg_index].kind is not lexer.IDENTIFIER:
+            raise InvalidDefinition(stream[arg_index])
+        arg_name = stream[arg_index].value
+        if arg_index + 3 >= len(stream):
+            raise InvalidDefinition(stream[arg_index+1])
+        if (stream[arg_index+1].kind is not lexer.OPERATOR) or stream[arg_index+1].value != ":":
+            raise InvalidDefinitiom(stream[arg_index+1])
+        if stream[arg_index+2].kind is not lexer.IDENTIFIER:
+            raise InvalidDefinitiom(stream[arg_index+2])
+        arg_type = stream[arg_index+2].value
+        arguments.append(env.Value(arg_type, None, arg_name))
+        arg_index += 4
+
+    if flags.debug:
+        print("Adding arguments:", ', '.join(str(e) for e in arguments))
+
+    body_start_index = head_end_index + 1
+    body_start = stream[body_start_index]
+    if body_start.kind is not lexer.LBLOCK:
+        raise InvalidDefinition(body_start)
+
+    body, body_len = generate_sequence(stream[body_start_index+1:])
+    defi_node = ast.Definition(fnc_name, arguments)
+    defi_node.add(body)
+
+    return defi_node, 2 + head_end_index + body_len
+
 def generate_if(stream):
     if flags.debug:
         print("Starting generating if statement")
@@ -356,7 +404,7 @@ def generate_if(stream):
             print("Found else-if")
         elif_node, elif_len = generate_if(stream[after_if+2:])
         branch_node.add(elif_node)
-        return branch_node, 2 + after_if + elif_len
+        return branch_node, 1 + after_if + elif_len
     else:
         if flags.debug:
             print("Found else starting with " + ' '.join(str(e) for e in stream[after_if+2:]))
@@ -456,7 +504,9 @@ def generate_sequence(stream):
         token = stream[i]
         if token.kind == lexer.IDENTIFIER:
             if token.value == "func":
-                raise NotImplemented()
+                func, offset = generate_function(stream[i+1:])
+                sequence.add(func)
+                i += offset + 1
             elif token.value == "return":
                 expr, offset = generate_expression(stream[i+1:])
                 return_node = ast.Return()

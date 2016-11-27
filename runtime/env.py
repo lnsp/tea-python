@@ -191,6 +191,9 @@ class Function(object):
         self.name = name
         self.source_ns = source_ns
 
+    def format(self):
+        return self.__str__()
+
     def eval(self, args, context):
         """Searches for a matching signature and evaluates the function node."""
         for sgn in self.signatures:

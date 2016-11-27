@@ -281,6 +281,34 @@ class Continue(Node):
         context.behaviour = CONTINUE_BEHAVIOUR
         return env.Value(env.NULL)
 
+class Definition(Node):
+    """A definition node."""
+    name = "definition"
+
+    def __init__(self, name, args):
+        super().__init__()
+        self.name = name
+        self.args = args
+
+    def describe(self):
+        return "definition %s: (%s)" % (self.name, ', '.join(str(arg) for arg in self.args))
+
+    def eval(self, context):
+        # check if function with the same name already exists
+        try:
+            context.find("id", self.name)
+            raise env.RuntimeException("%s already defined in the same context." % self.name)
+        except env.NamespaceException:
+            # convert types from text to type
+            for arg in self.args:
+                arg.datatype = context.find("ty", arg.datatype)
+            signature = env.Signature(self.args, self.children[0])
+
+            fnc = env.Function([signature], self.name, context.namespace)
+            context.store(fnc)
+
+            return fnc
+
 class Declaration(Node):
     """A declaration node."""
     name = "declaration"
