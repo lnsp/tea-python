@@ -301,16 +301,25 @@ class Assignment(Node):
     def describe(self):
         return "assignment %s" % self.name
 
-    def __init__(self, name):
+    def __init__(self, name, ignore_type=False):
         super().__init__()
         self.name = name
+        self.ignore_type = ignore_type
 
     def eval(self, context):
         """Looks for a variable in the namespace and assigns a value to it."""
         # Search for variable in namespace
         variable = context.find("id", self.name)
         value = self.children[0].eval(context)
-        variable.data = variable.datatype.cast(value).data
+
+        if self.ignore_type:
+            variable.datatype = value.datatype
+            variable.data = value.data
+        else:
+            if variable.datatype != value.datatype:
+                raise env.AssignmentException(value.datatype, variable.datatype)
+            variable.data = value.data
+
         return value
 
 def syntax_tree():
