@@ -146,7 +146,7 @@ def generate_expression(stream):
         if token.kind == lexer.NUMBER:
             value = None
             if '.' in token.value:
-                value = env.Value(lib.FLOAT, data=int(token.value))
+                value = env.Value(lib.FLOAT, data=float(token.value))
             else:
                 value = env.Value(lib.INTEGER, data=float(token.value))
             operand_stack.append(ast.Literal(value))
@@ -404,14 +404,14 @@ def generate_if(stream):
             print("Found else-if")
         elif_node, elif_len = generate_if(stream[after_if+2:])
         branch_node.add(elif_node)
-        return branch_node, 1 + after_if + elif_len
+        return branch_node, 2 + after_if + elif_len
     else:
         if flags.debug:
             print("Found else starting with " + ' '.join(str(e) for e in stream[after_if+2:]))
         else_body, else_body_len = generate_sequence(stream[after_if+2:])
         else_body.substitute = True
         branch_node.add(else_body)
-        return branch_node, 2 + after_if + else_body_len
+        return branch_node, 3 + after_if + else_body_len
 
 def generate_for(stream):
     if flags.debug:
@@ -524,7 +524,7 @@ def generate_sequence(stream):
             elif token.value == "if":
                 if_node, offset = generate_if(stream[i+1:])
                 sequence.add(if_node)
-                i += offset + 1
+                i += offset
             elif token.value == "for":
                 for_node, offset = generate_for(stream[i+1:])
                 sequence.add(for_node)
