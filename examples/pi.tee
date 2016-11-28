@@ -1,0 +1,19 @@
+func pi(n: int) {
+	if (n == 0) {
+		return 4;
+	}
+
+	var p: float;
+	if (n % 2 == 1) {
+		p = -4.0;
+	} else {
+		p = 4.0;
+	}
+
+	var nf = (n: float);
+	return p / (2.0 * nf + 1.0) + pi(n - 1);
+}
+
+for (var i = 0; i < 100; i = i + 1) {
+print(pi(i));
+}
