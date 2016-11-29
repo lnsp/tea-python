@@ -184,6 +184,30 @@ def _mul_operation():
 MUL_FUNCTION = _mul_operation()
 MUL_OPERATOR = Operator(MUL_FUNCTION, "*")
 
+def _pow_operation():
+    def pow(context):
+        """Calculate a to the power of b."""
+        var_b = context.find("id", "b")
+        var_a = context.find("id", "a")
+
+        if var_b.datatype != var_a.datatype:
+            var_b = FLOAT.cast(var_b)
+            var_a = FLOAT.cast(var_a)
+
+        return Value(var_b.datatype, var_a.data**var_b.data)
+
+    pow_node = FunctionBinding(pow)
+    signatures = [
+        Signature([
+            Value(NUMBER, None, "a"),
+            Value(NUMBER, None, "b"),
+        ], pow_node)
+    ]
+    return Function(signatures, "#pow")
+
+POW_FUNCTION = _pow_operation()
+POW_OPERATOR = Operator(POW_FUNCTION, "^")
+
 def _div_operation():
     def div(context):
         """Divide two numbers."""
@@ -471,11 +495,11 @@ EXPORTS = [
     PLUS_OPERATOR, MINUS_OPERATOR, MUL_OPERATOR, DIV_OPERATOR, EQU_OPERATOR,
     AND_OPERATOR, OR_OPERATOR, XOR_OPERATOR, NEQ_OPERATOR,
     SM_OPERATOR, LG_OPERATOR, SME_OPERATOR, LGE_OPERATOR,
-    UNINV_OPERATOR, MOD_OPERATOR,
+    UNINV_OPERATOR, MOD_OPERATOR, POW_OPERATOR,
     # Functions
     ADD_FUNCTION, UNPL_FUNCTION, SUB_FUNCTION, UNMI_FUNCTION,
     MUL_FUNCTION, DIV_FUNCTION, EQU_FUNCTION,
     AND_FUNCTION, OR_FUNCTION, XOR_FUNCTION, NEQ_FUNCTION,
     SM_FUNCTION, LG_FUNCTION, SME_FUNCTION, LGE_FUNCTION,
-    UNINV_FUNCTION, MOD_FUNCTION,
+    UNINV_FUNCTION, MOD_FUNCTION, POW_FUNCTION,
 ]
