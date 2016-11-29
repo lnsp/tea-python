@@ -1,10 +1,100 @@
 """Test the runtime.lexer module."""
 import unittest
 
-from runtime.lexer import TokenTuple, NUMBER, OPERATOR, WHITESPACE, IDENTIFIER, STRING, run
+from runtime.lexer import *
+
+def t(value, kind):
+    return TokenTuple(value=value, kind=kind)
 
 class TestLexer(unittest.TestCase):
     """Test the lexer."""
+
+    def test_asgn(self):
+        self.assertEqual(run("="), [t("=", OPERATOR)])
+
+    def test_asgn_add(self):
+        self.assertEqual(run("+="),[ t("+=", OPERATOR)])
+
+    def test_asgn_sub(self):
+        self.assertEqual(run("-="),[ t("-=", OPERATOR)])
+
+    def test_asgn_mul(self):
+        self.assertEqual(run("*="),[ t("*=", OPERATOR)])
+
+    def test_asgn_div(self):
+        self.assertEqual(run("/="),[ t("/=", OPERATOR)])
+
+    def test_asgn_mod(self):
+        self.assertEqual(run("%="),[ t("%=", OPERATOR)])
+
+    def test_asgn_pow(self):
+        self.assertEqual(run("^="),[ t("^=", OPERATOR)])
+
+    def test_and(self):
+        self.assertEqual(run("&&"),[ t("&&", OPERATOR)])
+
+    def test_or(self):
+        self.assertEqual(run("||"),[ t("||", OPERATOR)])
+
+    def test_xor(self):
+        self.assertEqual(run("^|"),[ t("^|", OPERATOR)])
+
+    def test_equal(self):
+        self.assertEqual(run("=="),[ t("==", OPERATOR)])
+
+    def test_unequal(self):
+        self.assertEqual(run("!="),[ t("!=", OPERATOR)])
+
+    def test_sm(self):
+        self.assertEqual(run("<"), [t("<", OPERATOR)])
+
+    def test_lg(self):
+        self.assertEqual(run(">"), [t(">", OPERATOR)])
+
+    def test_smeq(self):
+        self.assertEqual(run(">="),[ t(">=", OPERATOR)])
+
+    def test_lgeq(self):
+        self.assertEqual(run("<="),[ t("<=", OPERATOR)])
+
+    def test_mod(self):
+        self.assertEqual(run("%"), [t("%", OPERATOR)])
+
+    def test_type(self):
+        self.assertEqual(run(":"), [t(":", OPERATOR)])
+
+    def test_add(self):
+        self.assertEqual(run("+"), [t("+", OPERATOR)])
+
+    def test_sub(self):
+        self.assertEqual(run("-"), [t("-", OPERATOR)])
+
+    def test_mul(self):
+        self.assertEqual(run("*"), [t("*", OPERATOR)])
+
+    def test_div(self):
+        self.assertEqual(run("/"), [t("/", OPERATOR)])
+
+    def test_pow(self):
+        self.assertEqual(run("^"), [t("^", OPERATOR)])
+
+    def test_sep(self):
+        self.assertEqual(run(","), [t(",", SEPARATOR)])
+
+    def test_neg(self):
+        self.assertEqual(run("!"), [t("!", OPERATOR)])
+
+    def test_parentheses(self):
+        self.assertEqual(run("("), [t("(", LPRT)])
+        self.assertEqual(run(")"), [t(")", RPRT)])
+
+    def test_statement(self):
+        self.assertEqual(run(";"), [t(";", STATEMENT)])
+
+    def test_block(self):
+        self.assertEqual(run("{"), [t("{", LBLOCK)])
+        self.assertEqual(run("}"), [t("}", RBLOCK)])
+
     def test_simple(self):
         """A small collection of simple test cases."""
         test_cases = [
@@ -24,4 +114,3 @@ class TestLexer(unittest.TestCase):
         ]
         for (case, expected) in test_cases:
             self.assertEqual(run(case), expected)
-            
