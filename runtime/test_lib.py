@@ -500,3 +500,25 @@ class TestLib(unittest.TestCase):
         args = [INT_VALUE, INT0_VALUE]
         self.assertRaises(env.RuntimeException, mod_op.eval, args, context)
 
+    def test_pow_operation(self):
+        pow_op = lib.POW_OPERATOR
+        context = env.empty_context()
+
+        args = [INT_VALUE, INT_VALUE]
+        self.assertEqual(pow_op.eval(args, context), INT_VALUE)
+
+        args = [INTM_VALUE, INT_VALUE]
+        self.assertEqual(pow_op.eval(args, context), INTM_VALUE)
+
+        args = [INTM_VALUE, INT2_VALUE]
+        self.assertEqual(pow_op.eval(args, context), INT_VALUE)
+
+        args = [INT_VALUE, FLOAT_VALUE]
+        self.assertEqual(pow_op.eval(args, context), FLOAT_VALUE)
+
+        args = [FLOAT_VALUE, INT_VALUE]
+        self.assertEqual(pow_op.eval(args, context), FLOAT_VALUE)
+
+        args = [FLOAT_VALUE, FLOAT_VALUE]
+        self.assertEqual(pow_op.eval(args, context), FLOAT_VALUE)
+
