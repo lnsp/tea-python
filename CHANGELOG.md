@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 ## [Unreleased]
 ### Added
 - Working token-to-AST parser
-- New `!exec` CLI command for code reuse
+- Run `tea [file]` to execute a Tea script>
 - New `while` statement for basic loops
 - New `for` statement for iteration loops
 - New `func` statement for defining functions
@@ -28,6 +28,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
   - `unpl` (`+`)
   - `uninv` (`!`)
   - `mod` (`%`)
+  - `pow` (`^`)
 - New persistent runtime flag storage
 - Advanced type formatting
 - Fibonacci demo script in compatible Tea
