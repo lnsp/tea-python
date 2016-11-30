@@ -95,6 +95,21 @@ class TestLexer(unittest.TestCase):
         self.assertEqual(run("{"), [t("{", LBLOCK)])
         self.assertEqual(run("}"), [t("}", RBLOCK)])
 
+    def test_identifiers(self):
+        test_cases = [
+            ("#add", t("#add", IDENTIFIER)),
+            ("#", t("#", IDENTIFIER)),
+            ("#123", t("#123", IDENTIFIER)),
+            ("#abc", t("#abc", IDENTIFIER)),
+            ("#a12", t("#a12", IDENTIFIER)),
+            ("a", t("a", IDENTIFIER)),
+            ("_", t("_", IDENTIFIER)),
+            ("_abc", t("_abc", IDENTIFIER)),
+            ("_123", t("_123", IDENTIFIER)),
+        ]
+        for tc in test_cases:
+            self.assertEqual(run(tc[0]), [tc[1]])
+
     def test_simple(self):
         """A small collection of simple test cases."""
         test_cases = [
