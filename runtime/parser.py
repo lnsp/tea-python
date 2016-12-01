@@ -1,4 +1,5 @@
 """Parse an tokenized expression into an AST."""
+import codecs
 from runtime import ast, lexer, env, lib, flags
 
 class ParseException(Exception):
@@ -151,7 +152,9 @@ def generate_expression(stream):
                 value = env.Value(lib.INTEGER, data=float(token.value))
             operand_stack.append(ast.Literal(value))
         elif token.kind == lexer.STRING:
-            value = env.Value(lib.STRING, data=token.value.strip("\""))
+            stripped = token.value.strip("\"")
+            decoded = codecs.decode(stripped, "unicode_escape")
+            value = env.Value(lib.STRING, data=decoded)
             operand_stack.append(ast.Literal(value))
         elif token.kind == lexer.SEPARATOR:
             while len(operator_stack) > 0 and operator_stack[-1] != "(":
