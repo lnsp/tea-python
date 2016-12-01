@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - Support for type interference on declaration
 - Support for multi-variable declarations
 - Support for multi-bound operators like `+`
+- Support for escape codes in string sequences
 - New operators
   - `and` (`&&`)
   - `or` (`||`)
