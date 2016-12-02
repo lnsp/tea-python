@@ -132,4 +132,32 @@ class TestParser(unittest.TestCase):
                 self.assertEqual(get_precedence(tc[0].value, e), tc[2],
                                  "bad operator precedence for %s when tested against %s" % (tc[0].value, e))
 
+    def test_associativity(self):
+        cases = [
+            (neg_token, all_tokens, False),
+            (plus_token, operation_tokens, False),
+            (minus_token, operation_tokens, False),
+            (power_token, all_tokens, False),
+            (divide_token, all_tokens, True),
+            (multiply_token, all_tokens, True),
+            (plus_token, value_tokens, True),
+            (minus_token, value_tokens, True),
+            (type_token, all_tokens, True),
+            (mod_token, all_tokens, True),
+            (smaller_token, all_tokens, True),
+            (larger_token, all_tokens, True),
+            (smequ_token, all_tokens, True),
+            (lgequ_token, all_tokens, True),
+            (equal_token, all_tokens, True),
+            (unequal_token, all_tokens, True),
+            (and_token, all_tokens, True),
+            (or_token, all_tokens, True),
+            (xor_token, all_tokens, True),
+        ]
+
+        for tc in cases:
+            for e in tc[1]:
+                self.assertEqual(is_left_associative(tc[0].value, e), tc[2],
+                                 "bad operator associativity for %s when tested against %s" % (tc[0].value, e))
+
 
