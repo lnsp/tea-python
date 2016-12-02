@@ -102,6 +102,8 @@ def is_left_associative(operator, last_token):
 def get_precedence(operator, last_token):
     if operator in ["+", "-"] and (last_token == None or last_token.kind not in [lexer.NUMBER, lexer.IDENTIFIER, lexer.STRING, lexer.RPRT]):
         return 7
+    elif operator in ["!"]:
+        return 7
     elif operator in ["^"]:
         return 6
     elif operator in ["*", "/"]:
