@@ -8,6 +8,30 @@ from runtime.parser import *
 def token(value, kind):
     return lexer.TokenTuple(value=value, kind=kind)
 
+plus_token = token("+", lexer.OPERATOR)
+minus_token = token("-", lexer.OPERATOR)
+neg_token = token("!", lexer.OPERATOR)
+and_token = token("&&", lexer.OPERATOR)
+or_token = token("||", lexer.OPERATOR)
+xor_token = token("^|", lexer.OPERATOR)
+equal_token = token("==", lexer.OPERATOR)
+unequal_token = token("!=", lexer.OPERATOR)
+smaller_token = token("<", lexer.OPERATOR)
+larger_token = token(">", lexer.OPERATOR)
+smequ_token = token("<=", lexer.OPERATOR)
+lgequ_token = token(">=", lexer.OPERATOR)
+mod_token = token("%", lexer.OPERATOR)
+type_token = token(":", lexer.OPERATOR)
+multiply_token = token("*", lexer.OPERATOR)
+divide_token = token("/", lexer.OPERATOR)
+power_token = token("^", lexer.OPERATOR)
+lprt_token = token(")", lexer.LPRT)
+sep_token = token(",", lexer.SEPARATOR)
+identifier_token = token("abc", lexer.IDENTIFIER)
+string_token = token("abc", lexer.STRING)
+rprt_token = token("(", lexer.RPRT)
+number_token = token("1", lexer.NUMBER)
+
 def clean_lex(expr):
     clean = lexer.run(expr)
     output = []
@@ -47,29 +71,8 @@ class TestParser(unittest.TestCase):
             self.assertEqual(find_matching_prt(tc[0], 1), tc[1])
 
     def test_arg_count(self):
-        plus_token = token("+", lexer.OPERATOR)
-        minus_token = token("-", lexer.OPERATOR)
-        neg_token = token("!", lexer.OPERATOR)
-        and_token = token("&&", lexer.OPERATOR)
-        or_token = token("||", lexer.OPERATOR)
-        xor_token = token("^|", lexer.OPERATOR)
-        equal_token = token("==", lexer.OPERATOR)
-        unequal_token = token("!=", lexer.OPERATOR)
-        smaller_token = token("<", lexer.OPERATOR)
-        larger_token = token(">", lexer.OPERATOR)
-        smequ_token = token("<=", lexer.OPERATOR)
-        lgequ_token = token(">=", lexer.OPERATOR)
-
-        lprt_token = token(")", lexer.LPRT)
-        sep_token = token(",", lexer.SEPARATOR)
         operation_tokens = [plus_token, minus_token, sep_token, lprt_token, None]
-
-        identifier_token = token("abc", lexer.IDENTIFIER)
-        string_token = token("abc", lexer.STRING)
-        rprt_token = token("(", lexer.RPRT)
-        number_token = token("1", lexer.NUMBER)
         value_tokens = [identifier_token, string_token, rprt_token, number_token]
-
         all_tokens = operation_tokens + value_tokens
 
         cases = [
@@ -88,6 +91,11 @@ class TestParser(unittest.TestCase):
             (larger_token, all_tokens, 2),
             (smequ_token, all_tokens, 2),
             (lgequ_token, all_tokens, 2),
+            (mod_token, all_tokens, 2),
+            (type_token, all_tokens, 2),
+            (multiply_token, all_tokens, 2),
+            (divide_token, all_tokens, 2),
+            (power_token, all_tokens, 2),
         ]
 
         for tc in cases:
