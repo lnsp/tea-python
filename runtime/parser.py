@@ -49,7 +49,7 @@ class InvalidCondition(ParseException):
         super().__init__(msg)
 
 def is_assignment(token):
-    return token != None and token.kind is lexer.OPERATOR and token.value == "="
+    return token != None and (token.kind is lexer.OPERATOR) and (token.value in ["=", "+=", "-=", "*=", "/=", "%=", "^="])
 
 def find_matching_block(stream, start):
     level = 1
@@ -314,6 +314,13 @@ def generate_assignment(stream):
         raise InvalidAssignment()
 
     expr, offset = generate_expression(stream[2:])
+
+    if len(equ_token.value) != -1:
+        operation = ast.Operation(equ_token.value[0])
+        operation.add(ast.Identifier(name_token.value))
+        operation.add(expr)
+        expr = operation
+
     assgn = ast.Assignment(name_token.value)
     assgn.add(expr)
 

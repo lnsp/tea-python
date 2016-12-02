@@ -57,6 +57,12 @@ class TestParser(unittest.TestCase):
     def test_is_assignment(self):
         cases = [
             (asgn_token, True),
+            (asgnadd_token, True),
+            (asgnsub_token, True),
+            (asgnmul_token, True),
+            (asgndiv_token, True),
+            (asgnmod_token, True),
+            (asgnpow_token, True),
             (None, False),
             (number_token, False),
         ]
