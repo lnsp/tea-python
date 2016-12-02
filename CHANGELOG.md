@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](https://semver.org).
 - New `for` statement for iteration loops
 - New `func` statement for defining functions
 - New `if-else` statement for branching
+- Support for shortform assignments
 - Support for comparison operators in lexer
 - Support for type interference on declaration
 - Support for multi-variable declarations
