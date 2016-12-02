@@ -315,7 +315,7 @@ def generate_assignment(stream):
 
     expr, offset = generate_expression(stream[2:])
 
-    if len(equ_token.value) != -1:
+    if len(equ_token.value) != 1:
         operation = ast.Operation(equ_token.value[0])
         operation.add(ast.Identifier(name_token.value))
         operation.add(expr)
