@@ -54,6 +54,17 @@ def clean_lex(expr):
 class TestParser(unittest.TestCase):
     """Test the parser."""
 
+    def test_is_assignment(self):
+        cases = [
+            (asgn_token, True),
+            (None, False),
+            (number_token, False),
+        ]
+
+        for tc in cases:
+            self.assertEqual(is_assignment(tc[0]), tc[1],
+                             "%s mistakingly reported as assignment" % str(tc[0]))
+
     def test_matching_block(self):
         cases = [
             (clean_lex("{}"), 1),
@@ -188,4 +199,34 @@ class TestParser(unittest.TestCase):
                 self.assertEqual(is_left_associative(tc[0].value, e), tc[2],
                                  "bad operator associativity for %s when tested against %s" % (tc[0].value, e))
 
+
+    def test_expression(self):
+        pass
+
+    def test_declaration(self):
+        pass
+
+    def test_assignment(self):
+        pass
+
+    def test_function(self):
+        pass
+
+    def test_if(self):
+        pass
+
+    def test_for(self):
+        pass
+
+    def test_while(self):
+        pass
+
+    def test_sequence(self):
+        pass
+
+    def test_optimize(self):
+        pass
+
+    def test_generate(self):
+        pass
 
