@@ -8,6 +8,13 @@ from runtime.parser import *
 def token(value, kind):
     return lexer.TokenTuple(value=value, kind=kind)
 
+asgn_token = token("=", lexer.OPERATOR)
+asgnadd_token = token("+=", lexer.OPERATOR)
+asgnsub_token = token("-=", lexer.OPERATOR)
+asgnmul_token = token("*=", lexer.OPERATOR)
+asgndiv_token = token("/=", lexer.OPERATOR)
+asgnpow_token = token("^=", lexer.OPERATOR)
+asgnmod_token = token("%=", lexer.OPERATOR)
 plus_token = token("+", lexer.OPERATOR)
 minus_token = token("-", lexer.OPERATOR)
 neg_token = token("!", lexer.OPERATOR)
@@ -97,6 +104,13 @@ class TestParser(unittest.TestCase):
             (multiply_token, all_tokens, 2),
             (divide_token, all_tokens, 2),
             (power_token, all_tokens, 2),
+            (asgn_token, all_tokens, 2),
+            (asgnadd_token, all_tokens, 2),
+            (asgnsub_token, all_tokens, 2),
+            (asgnmul_token, all_tokens, 2),
+            (asgndiv_token, all_tokens, 2),
+            (asgnpow_token, all_tokens, 2),
+            (asgnmod_token, all_tokens, 2),
         ]
 
         for tc in cases:
@@ -125,6 +139,13 @@ class TestParser(unittest.TestCase):
             (and_token, all_tokens, 1),
             (or_token, all_tokens, 1),
             (xor_token, all_tokens, 1),
+            (asgn_token, all_tokens, 0),
+            (asgnadd_token, all_tokens, 0),
+            (asgnsub_token, all_tokens, 0),
+            (asgnmul_token, all_tokens, 0),
+            (asgndiv_token, all_tokens, 0),
+            (asgnpow_token, all_tokens, 0),
+            (asgnmod_token, all_tokens, 0),
         ]
 
         for tc in cases:
@@ -153,6 +174,13 @@ class TestParser(unittest.TestCase):
             (and_token, all_tokens, True),
             (or_token, all_tokens, True),
             (xor_token, all_tokens, True),
+            (asgn_token, all_tokens, True),
+            (asgnadd_token, all_tokens, True),
+            (asgnsub_token, all_tokens, True),
+            (asgnmul_token, all_tokens, True),
+            (asgndiv_token, all_tokens, True),
+            (asgnpow_token, all_tokens, True),
+            (asgnmod_token, all_tokens, True),
         ]
 
         for tc in cases:
