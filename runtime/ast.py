@@ -44,6 +44,9 @@ class Node:
             rep += i.get_str_rep(depth+2)
         return rep + ">"
 
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.children == other.children
+
     def __str__(self):
         return self.get_str_rep(2)
 
@@ -63,6 +66,9 @@ class Sequence(Node):
     def __init__(self, substitute=False):
         super().__init__()
         self.substitute = substitute
+
+    def __eq__(self, other):
+        return super().__eq__(other)
 
     def eval(self, context):
         """Evaluate a sequence of statements."""
@@ -94,6 +100,9 @@ class Branch(Node):
     def __init__(self):
         super().__init__()
 
+    def __eq__(self, other):
+        return super().__eq__(other)
+
     def eval(self, context):
         """Evaluate a n-component branch (if, else-if ..., else)."""
         for conditional in self.children[:-1]:  # all if / else if branches
@@ -109,6 +118,9 @@ class Conditional(Node):
 
     def __init__(self):
         super().__init__()
+
+    def __eq__(self, other):
+        return super().__eq__(other)
 
     def eval(self, context):
         """Evaluate a conditional (if [0] then [1])."""
@@ -128,6 +140,9 @@ class Loop(Node):
 
     def __init__(self):
         super().__init__()
+
+    def __eq__(self, other):
+        return super().__eq__(other)
 
     def eval(self, context):
         """Evaluate a 2-component loop. for [0] { ... }"""
@@ -155,6 +170,9 @@ class Operation(Node):
         super().__init__()
         self.symbol = symbol
 
+    def __eq__(self, other):
+        return super().__eq__(other) and self.symbol == other.symbol
+
     def eval(self, context):
         """Evaluate an operator and return the result."""
         operator = context.find("op", self.symbol)
@@ -174,6 +192,9 @@ class Call(Node):
     def __init__(self, identity):
         super().__init__()
         self.identity = identity
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.identity == other.identity
 
     def eval(self, context):
         """Evaluate a function call and return the result."""
@@ -197,6 +218,9 @@ class Identifier(Node):
         super().__init__()
         self.identity = identity
 
+    def __eq__(self, other):
+        return super().__eq__(other) and self.identity == other.identity
+
     def eval(self, context):
         """Evaluate an identifier and return the result."""
         identifier = context.find("id", self.identity)
@@ -216,6 +240,9 @@ class Literal(Node):
         super().__init__()
         self.value = value
 
+    def __eq__(self, other):
+        return super().__eq__(other) and self.value == other.value
+
     def eval(self, context):
         """Evaluate a literal and return the result."""
         return self.value
@@ -231,6 +258,9 @@ class Cast(Node):
     def __init__(self, target):
         super().__init__()
         self.target = target
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.target == other.target
 
     def eval(self, context):
         """Evaluate a type cast and return the result."""
@@ -248,6 +278,9 @@ class Return(Node):
     def __init__(self):
         super().__init__()
 
+    def __eq__(self, other):
+        return super().__eq__(other)
+
     def eval(self, context):
         """Evaluate a return statement and return the result.
 
@@ -264,6 +297,9 @@ class Break(Node):
     def __init__(self):
         super().__init__()
 
+    def __eq__(self, other):
+        return super().__eq__(other)
+
     @classmethod
     def eval(cls, context):
         """Evaluate a break statement."""
@@ -276,6 +312,9 @@ class Continue(Node):
 
     def __init__(self):
         super().__init__()
+
+    def __eq__(self, other):
+        return super().__eq__(other)
 
     @classmethod
     def eval(cls, context):
@@ -291,6 +330,9 @@ class Definition(Node):
         super().__init__()
         self.name = name
         self.args = args
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.name == other.name and self.args == other.args
 
     def describe(self):
         return "definition %s: (%s)" % (self.name, ', '.join(str(arg) for arg in self.args))
@@ -323,6 +365,9 @@ class Declaration(Node):
         self.name = name
         self.datatype = datatype
 
+    def __eq__(self, other):
+        return super().__eq__(other) and self.name == other.name and self.datatype == other.datatype
+
     def eval(self, context):
         """Creates an entry in the local namespace."""
         # Search in local namespace
@@ -346,6 +391,9 @@ class Assignment(Node):
         super().__init__()
         self.name = name
         self.ignore_type = ignore_type
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.name == other.name and self.ignore_type == other.ignore_type
 
     def eval(self, context):
         """Looks for a variable in the namespace and assigns a value to it."""
