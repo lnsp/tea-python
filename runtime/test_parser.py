@@ -28,9 +28,13 @@ power_token = token("^", lexer.OPERATOR)
 lprt_token = token(")", lexer.LPRT)
 sep_token = token(",", lexer.SEPARATOR)
 identifier_token = token("abc", lexer.IDENTIFIER)
-string_token = token("abc", lexer.STRING)
+string_token = token("\"abc\"", lexer.STRING)
 rprt_token = token("(", lexer.RPRT)
 number_token = token("1", lexer.NUMBER)
+
+operation_tokens = [plus_token, minus_token, sep_token, lprt_token, None]
+value_tokens = [identifier_token, string_token, rprt_token, number_token]
+all_tokens = operation_tokens + value_tokens
 
 def clean_lex(expr):
     clean = lexer.run(expr)
@@ -71,9 +75,6 @@ class TestParser(unittest.TestCase):
             self.assertEqual(find_matching_prt(tc[0], 1), tc[1])
 
     def test_arg_count(self):
-        operation_tokens = [plus_token, minus_token, sep_token, lprt_token, None]
-        value_tokens = [identifier_token, string_token, rprt_token, number_token]
-        all_tokens = operation_tokens + value_tokens
 
         cases = [
             (plus_token, value_tokens, 2),
@@ -102,4 +103,33 @@ class TestParser(unittest.TestCase):
             for e in tc[1]:
                 self.assertEqual(get_arg_count(tc[0].value, e), tc[2],
                                  "bad operator arg count for %s when tested against %s" % (tc[0].value, e))
+
+    def test_precedence(self):
+        cases = [
+            (neg_token, all_tokens, 7),
+            (plus_token, operation_tokens, 7),
+            (minus_token, operation_tokens, 7),
+            (power_token, all_tokens, 6),
+            (divide_token, all_tokens, 5),
+            (multiply_token, all_tokens, 5),
+            (plus_token, value_tokens, 4),
+            (minus_token, value_tokens, 4),
+            (type_token, all_tokens, 4),
+            (mod_token, all_tokens, 3),
+            (smaller_token, all_tokens, 2),
+            (larger_token, all_tokens, 2),
+            (smequ_token, all_tokens, 2),
+            (lgequ_token, all_tokens, 2),
+            (equal_token, all_tokens, 2),
+            (unequal_token, all_tokens, 2),
+            (and_token, all_tokens, 1),
+            (or_token, all_tokens, 1),
+            (xor_token, all_tokens, 1),
+        ]
+
+        for tc in cases:
+            for e in tc[1]:
+                self.assertEqual(get_precedence(tc[0].value, e), tc[2],
+                                 "bad operator precedence for %s when tested against %s" % (tc[0].value, e))
+
 
