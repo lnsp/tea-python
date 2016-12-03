@@ -385,6 +385,18 @@ class TestParser(unittest.TestCase):
             self.assertEqual(output, tc[1], "%s is not equal to %s" % (output, tc[1]))
             self.assertEqual(offset, tc[2], "%s offset %d is not equal to %d" % (output, offset, tc[2]))
 
+        error_cases = [
+            ("while () {}", ParseException),
+            ("while ()", ParseException),
+            ("() {}", ParseException),
+            ("while () {}", ParseException),
+            ("while (false) {", ParseException),
+            ("while ) {}}}", ParseException),
+        ]
+
+        for tc in error_cases:
+            self.assertRaises(tc[1], generate_while, clean_lex(tc[0]))
+
     def test_sequence(self):
         pass
 
