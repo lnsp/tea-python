@@ -14,6 +14,6 @@ func pi(n: int) {
 	return p / (2.0 * nf + 1.0) + pi(n - 1);
 }
 
-for (var i = 0; i < 100; i = i + 1) {
-print(pi(i));
+for (var i = 0; i < 100; i += 1) {
+	print("π(" + i + ") = " + pi(i));
 }
