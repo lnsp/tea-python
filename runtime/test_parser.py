@@ -254,11 +254,11 @@ class TestParser(unittest.TestCase):
         case5.add(case5_assgn_c)
 
         cases = [
-            ("var a: int", case1, 4),
-            ("var a = null", case2, 4),
-            ("var a: int = null", case3, 6),
-            ("var a, b = null", case4, 6),
-            ("var a, b, c: int = null", case5, 10)
+            ("var a: int", case1, 3),
+            ("var a = null", case2, 3),
+            ("var a: int = null", case3, 5),
+            ("var a, b = null", case4, 5),
+            ("var a, b, c: int = null", case5, 9)
         ]
 
         for tc in cases:
@@ -329,17 +329,17 @@ class TestParser(unittest.TestCase):
         case7 = case7_assgn
 
         cases = [
-            ("a = a", case1, 3),
-            ("a += null", case2, 3),
-            ("a = a + null", case2, 5),
-            ("a -= null", case3, 3),
-            ("a = a - null", case3, 5),
-            ("a *= null", case4, 3),
-            ("a = a * null", case4, 5),
-            ("a /= null", case5, 3),
-            ("a = a / null", case5, 5),
-            ("a ^= null", case6, 3),
-            ("a = a ^ null", case6, 5),
+            ("a = a", case1, 2),
+            ("a += null", case2, 2),
+            ("a = a + null", case2, 4),
+            ("a -= null", case3, 2),
+            ("a = a - null", case3, 4),
+            ("a *= null", case4, 2),
+            ("a = a * null", case4, 4),
+            ("a /= null", case5, 2),
+            ("a = a / null", case5, 4),
+            ("a ^= null", case6, 2),
+            ("a = a ^ null", case6, 4),
         ]
 
         for tc in cases:

@@ -314,7 +314,7 @@ def generate_declaration(stream):
     if expr is not None:
         sequ.add(expr)
 
-    return sequ, end
+    return sequ, end - 1
 
 def generate_assignment(stream):
     if flags.debug:
@@ -342,9 +342,9 @@ def generate_assignment(stream):
     assgn.add(expr)
 
     if flags.debug:
-        print("Assignment has offset %d" % (2 + offset))
+        print("Assignment has offset %d" % (1 + offset))
 
-    return assgn, 2 + offset
+    return assgn, 1 + offset
 
 def generate_function(stream):
     if flags.debug:
@@ -388,7 +388,7 @@ def generate_function(stream):
     defi_node = ast.Definition(fnc_name, arguments)
     defi_node.add(body)
 
-    return defi_node, 2 + head_end_index + body_len
+    return defi_node, 3 + head_end_index + body_len
 
 def generate_if(stream):
     if flags.debug:
@@ -420,7 +420,7 @@ def generate_if(stream):
     cond_node.add(body)
     branch_node.add(cond_node)
 
-    after_if = 5 + cond_len + body_len
+    after_if = 4 + cond_len + body_len
     if len(stream) <= after_if:
         return branch_node, after_if
 
@@ -593,10 +593,12 @@ def generate_sequence(stream):
             i += offset
         elif token.kind == lexer.LBLOCK:
             sequ, offset = generate_sequence(stream[i+1:])
-            i += offset
+            i += offset + 1
             sequence.add(sequ)
         elif token.kind == lexer.RBLOCK:
             return sequence, i
+        if flags.debug:
+            print("Tree view:", sequence)
         i += 1
     return sequence, i
 
