@@ -26,7 +26,7 @@ class NotImplemented(ParseException):
 
 class InvalidDeclaration(ParseException):
     def __init__(self, msg):
-        super().__init__("Invalid declaration: Unexpected %s" % msg)
+        super().__init__("Invalid declaration: Unexpected %s" % str(msg))
 
 class InvalidDefinition(ParseException):
     def __init__(self, msg):
@@ -47,6 +47,10 @@ class InvalidExpression(ParseException):
 class InvalidCondition(ParseException):
     def __init__(self, msg="Invalid condition"):
         super().__init__(msg)
+
+class InvalidLoop(ParseException):
+    def __init__(self, msg):
+        super().__init__("Invalid loop: Unexpected %s" % str(msg))
 
 def is_assignment(token):
     return token != None and (token.kind is lexer.OPERATOR) and (token.value in ["=", "+=", "-=", "*=", "/=", "%=", "^="])
@@ -261,10 +265,10 @@ def generate_declaration(stream):
         raise ParseException("Declaration too short")
 
     if not (stream[0].kind is lexer.IDENTIFIER and stream[0].value == "var"):
-        raise InvalidDeclaration(str(stream[0]))
+        raise InvalidDeclaration(stream[0])
 
     if stream[1].kind != lexer.IDENTIFIER:
-        raise InvalidDeclaration(str(stream[1]))
+        raise InvalidDeclaration(stream[1])
 
     declared_names = []
     sequ = ast.Sequence()
@@ -279,14 +283,14 @@ def generate_declaration(stream):
         if (stream[expr_begin].kind is lexer.OPERATOR) and stream[expr_begin].value == ":":
             ignore_type = False
         if expr_begin > 2 and stream[expr_begin - 2].kind != lexer.SEPARATOR:
-            raise InvalidDeclaration(str(stream[expr_begin - 2]))
+            raise InvalidDeclaration(stream[expr_begin - 2])
         if stream[expr_begin - 1].kind is not lexer.IDENTIFIER:
-            raise InvalidDeclaration(str(stream[expr_begin - 1]))
+            raise InvalidDeclaration(stream[expr_begin - 1])
         declared_names.append(stream[expr_begin - 1].value)
         expr_begin += 2
 
     if not ignore_type and stream[expr_begin - 1].kind is not lexer.IDENTIFIER:
-        raise InvalidDeclaration(str(stream[expr_begin - 1]))
+        raise InvalidDeclaration(stream[expr_begin - 1])
 
     datatype = "null"
     if not ignore_type:
@@ -490,14 +494,20 @@ def generate_for(stream):
 def generate_while(stream):
     if flags.debug:
         print("Starting generating while statement")
-    cond_start = stream[0]
+
+    if len(stream) < 6:
+        raise InvalidLoop("length %d" % len(stream))
+
+    if not (stream[0].kind is lexer.IDENTIFIER and stream[0].value == "while"):
+        raise InvalidLoop(stream[0])
+
+    cond_start = stream[1]
     if cond_start.kind != lexer.LPRT:
         raise InvalidCondition()
 
-    cond_end_index = find_matching_prt(stream, 1)
+    cond_end_index = find_matching_prt(stream, 2)
     if cond_end_index == -1:
         raise InvalidCondition()
-
 
     body_start_index = cond_end_index+1
     body_start = stream[body_start_index]
@@ -506,7 +516,7 @@ def generate_while(stream):
         raise InvalidBlock()
     body_end_index = find_matching_block(stream, body_start_index+1)
 
-    condition, cond_len = generate_expression(stream[1:cond_end_index])
+    condition, cond_len = generate_expression(stream[2:cond_end_index])
     body, offset = generate_sequence(stream[body_start_index+1:])
     body.substitute = True
 
@@ -551,7 +561,7 @@ def generate_sequence(stream):
             elif token.value == "break":
                 sequence.add(ast.Break())
             elif token.value == "while":
-                while_node, offset = generate_while(stream[i+1:])
+                while_node, offset = generate_while(stream[i:])
                 sequence.add(while_node)
                 i += offset
             elif token.value == "if":
