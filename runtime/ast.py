@@ -105,11 +105,17 @@ class Branch(Node):
 
     def eval(self, context):
         """Evaluate a n-component branch (if, else-if ..., else)."""
-        for conditional in self.children[:-1]:  # all if / else if branches
-            result = conditional.eval(context)
+        if len(self.children) > 1:
+            for conditional in self.children[:-1]:  # all if / else if branches
+                result = conditional.eval(context)
+                if result != False:
+                    return result
+            return run_in_substitution(self.children[-1], context)
+        else:
+            result = self.children[0].eval(context)
             if result != False:
                 return result
-        return run_in_substitution(self.children[-1], context)
+
 
 
 class Conditional(Node):
