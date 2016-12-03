@@ -3,6 +3,8 @@
 import unittest
 
 import runtime.lexer
+import runtime.env
+import runtime.flags
 from runtime.parser import *
 
 def token(value, kind):
@@ -213,7 +215,71 @@ class TestParser(unittest.TestCase):
         pass
 
     def test_assignment(self):
-        pass
+        case1_assgn = ast.Assignment("a")
+        case1_assgn.add(ast.Identifier("a"))
+        case1 = case1_assgn
+
+        case2_assgn = ast.Assignment("a")
+        case2_assgnadd = ast.Operation("+")
+        case2_assgnadd.add(ast.Identifier("a"))
+        case2_assgnadd.add(ast.Literal(env.Value(env.NULL)))
+        case2_assgn.add(case2_assgnadd)
+        case2 = case2_assgn
+
+        case3_assgn = ast.Assignment("a")
+        case3_assgnsub = ast.Operation("-")
+        case3_assgnsub.add(ast.Identifier("a"))
+        case3_assgnsub.add(ast.Literal(env.Value(env.NULL)))
+        case3_assgn.add(case3_assgnsub)
+        case3 = case3_assgn
+
+        case4_assgn = ast.Assignment("a")
+        case4_assgnmul = ast.Operation("*")
+        case4_assgnmul.add(ast.Identifier("a"))
+        case4_assgnmul.add(ast.Literal(env.Value(env.NULL)))
+        case4_assgn.add(case4_assgnmul)
+        case4 = case4_assgn
+
+        case5_assgn = ast.Assignment("a")
+        case5_assgndiv = ast.Operation("/")
+        case5_assgndiv.add(ast.Identifier("a"))
+        case5_assgndiv.add(ast.Literal(env.Value(env.NULL)))
+        case5_assgn.add(case5_assgndiv)
+        case5 = case5_assgn
+
+        case6_assgn = ast.Assignment("a")
+        case6_assgnpow = ast.Operation("^")
+        case6_assgnpow.add(ast.Identifier("a"))
+        case6_assgnpow.add(ast.Literal(env.Value(env.NULL)))
+        case6_assgn.add(case6_assgnpow)
+        case6 = case6_assgn
+
+        case7_assgn = ast.Assignment("a")
+        case7_assgnmod = ast.Operation("%")
+        case7_assgnmod.add(ast.Identifier("a"))
+        case7_assgnmod.add(ast.Literal(env.Value(env.NULL)))
+        case7_assgn.add(case7_assgnmod)
+        case7 = case7_assgn
+
+        cases = [
+            ("a = a", case1, 3),
+            ("a += null", case2, 3),
+            ("a = a + null", case2, 5),
+            ("a -= null", case3, 3),
+            ("a = a - null", case3, 5),
+            ("a *= null", case4, 3),
+            ("a = a * null", case4, 5),
+            ("a /= null", case5, 3),
+            ("a = a / null", case5, 5),
+            ("a ^= null", case6, 3),
+            ("a = a ^ null", case6, 5),
+        ]
+
+        for tc in cases:
+            output, offset = generate_assignment(clean_lex(tc[0]))
+            self.assertEqual(output, tc[1], "%s is not equal to %s" % (output, tc[1]))
+            self.assertEqual(offset, tc[2], "%s offset %d is not equal to %d" % (output, offset, tc[2]))
+
 
     def test_function(self):
         pass
