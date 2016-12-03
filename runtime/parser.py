@@ -229,7 +229,7 @@ def generate_expression(stream):
                 pop_off_operator()
             if len(operand_stack) > 1:
                 raise InvalidExpression()
-            return operand_stack[0], i
+            return operand_stack[0], i + 1
 
     last_token = token
 
@@ -242,7 +242,10 @@ def generate_expression(stream):
     if len(operand_stack) > 1:
         raise InvalidExpression()
 
-    return operand_stack[0], max
+    if flags.debug:
+        print("Parsed expression with length %d" % (max + 1))
+
+    return operand_stack[0], max + 1
 
 def generate_declaration(stream):
     if flags.debug:
@@ -303,9 +306,12 @@ def generate_declaration(stream):
     if expr is not None:
         sequ.add(expr)
 
-    return sequ, end
+    return sequ, end + 1
 
 def generate_assignment(stream):
+    if flags.debug:
+        print("Starting generating assigment")
+
     if len(stream) < 3:
         raise InvalidAssignment()
 
@@ -315,6 +321,9 @@ def generate_assignment(stream):
 
     expr, offset = generate_expression(stream[2:])
 
+    if flags.debug:
+        print("Expression has offset %d" % offset)
+
     if len(equ_token.value) != 1:
         operation = ast.Operation(equ_token.value[0])
         operation.add(ast.Identifier(name_token.value))
@@ -323,6 +332,9 @@ def generate_assignment(stream):
 
     assgn = ast.Assignment(name_token.value)
     assgn.add(expr)
+
+    if flags.debug:
+        print("Assignment has offset %d" % (2 + offset))
 
     return assgn, 2 + offset
 
@@ -518,13 +530,13 @@ def generate_sequence(stream):
             if token.value == "func":
                 func, offset = generate_function(stream[i+1:])
                 sequence.add(func)
-                i += offset + 1
+                i += offset
             elif token.value == "return":
                 expr, offset = generate_expression(stream[i+1:])
                 return_node = ast.Return()
                 return_node.add(expr)
                 sequence.add(return_node)
-                i += offset + 1
+                i += offset
             elif token.value == "continue":
                 sequence.add(ast.Continue())
             elif token.value == "break":
@@ -532,7 +544,7 @@ def generate_sequence(stream):
             elif token.value == "while":
                 while_node, offset = generate_while(stream[i+1:])
                 sequence.add(while_node)
-                i += offset + 1
+                i += offset
             elif token.value == "if":
                 if_node, offset = generate_if(stream[i+1:])
                 sequence.add(if_node)
@@ -540,13 +552,13 @@ def generate_sequence(stream):
             elif token.value == "for":
                 for_node, offset = generate_for(stream[i+1:])
                 sequence.add(for_node)
-                i += offset + 1
+                i += offset
             elif token.value == "import":
                 raise NotImplemented()
             elif token.value == "var":
                 decl, offset = generate_declaration(stream[i+1:])
                 sequence.add(decl)
-                i += offset + 1
+                i += offset
             else:
                 if i < max and is_assignment(stream[i+1]):
                     assgn, offset = generate_assignment(stream[i:])
@@ -562,7 +574,7 @@ def generate_sequence(stream):
             i += offset
         elif token.kind == lexer.LBLOCK:
             sequ, offset = generate_sequence(stream[i+1:])
-            i += offset + 1
+            i += offset
             sequence.add(sequ)
         elif token.kind == lexer.RBLOCK:
             return sequence, i
