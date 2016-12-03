@@ -212,7 +212,74 @@ class TestParser(unittest.TestCase):
         pass
 
     def test_declaration(self):
-        pass
+        # case 1: var a: int, length 4
+        case1 = ast.Sequence()
+        case1.add(ast.Declaration("a", "int"))
+
+        # case 2: var a = null, length 4
+        case2 = ast.Sequence()
+        case2.add(ast.Declaration("a", "null"))
+        case2_assgn = ast.Assignment("a", True)
+        case2_assgn.add(ast.Literal(env.Value(env.NULL)))
+        case2.add(case2_assgn)
+
+        # case 3: var a: int = null, length 6
+        case3 = ast.Sequence()
+        case3.add(ast.Declaration("a", "int"))
+        case3_assgn = ast.Assignment("a", False)
+        case3_assgn.add(ast.Literal(env.Value(env.NULL)))
+        case3.add(case3_assgn)
+
+        # case 4: var a, b = null, length 6
+        case4 = ast.Sequence()
+        case4.add(ast.Declaration("a", "null"))
+        case4.add(ast.Declaration("b", "null"))
+        case4_assgn_a = ast.Assignment("a", True)
+        case4_assgn_a.add(ast.Literal(env.Value(env.NULL)))
+        case4_assgn_b = ast.Assignment("b", True)
+        case4_assgn_b.add(case4_assgn_a)
+        case4.add(case4_assgn_b)
+
+        # case 5: var a, b, c: int = null, length 10
+        case5 = ast.Sequence()
+        case5.add(ast.Declaration("a", "int"))
+        case5.add(ast.Declaration("b", "int"))
+        case5.add(ast.Declaration("c", "int"))
+        case5_assgn_a = ast.Assignment("a", False)
+        case5_assgn_a.add(ast.Literal(env.Value(env.NULL)))
+        case5_assgn_b = ast.Assignment("b", False)
+        case5_assgn_b.add(case5_assgn_a)
+        case5_assgn_c = ast.Assignment("c", False)
+        case5_assgn_c.add(case5_assgn_b)
+        case5.add(case5_assgn_c)
+
+        cases = [
+            ("var a: int", case1, 4),
+            ("var a = null", case2, 4),
+            ("var a: int = null", case3, 6),
+            ("var a, b = null", case4, 6),
+            ("var a, b, c: int = null", case5, 10)
+        ]
+
+        for tc in cases:
+            output, offset = generate_declaration(clean_lex(tc[0]))
+            self.assertEqual(output, tc[1],
+                             "%s is not equal to %s" % (str(output), str(tc[1])))
+            self.assertEqual(offset, tc[2],
+                             "%s offset %d is not equal to %d" % (str(output), offset, tc[2]))
+
+        # error-case 6: var a
+        # error-case 7: var a: null, b: null
+        # error-case 8: var a: null, b
+        error_cases = [
+            ("var a", ParseException),
+            ("var a: null, b: null", ParseException),
+            ("var a: null, b", ParseException),
+        ]
+
+        for tc in error_cases:
+            tokens = clean_lex(tc[0])
+            self.assertRaises(tc[1], generate_declaration, tokens)
 
     def test_assignment(self):
         case1_assgn = ast.Assignment("a")
