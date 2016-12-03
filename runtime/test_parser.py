@@ -370,7 +370,20 @@ class TestParser(unittest.TestCase):
         pass
 
     def test_while(self):
-        pass
+        # case 1: while (null) {}
+        case1 = ast.Loop()
+        case1.add(ast.Literal(env.Value(env.NULL)))
+        case1.add(ast.Sequence())
+
+        cases = [
+            ("while (null) {}", case1, 5),
+            ("while (null) {;}", case1, 6),
+        ]
+
+        for tc in cases:
+            output, offset = generate_while(clean_lex(tc[0]))
+            self.assertEqual(output, tc[1], "%s is not equal to %s" % (output, tc[1]))
+            self.assertEqual(offset, tc[2], "%s offset %d is not equal to %d" % (output, offset, tc[2]))
 
     def test_sequence(self):
         pass
