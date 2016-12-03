@@ -250,21 +250,25 @@ def generate_expression(stream):
 def generate_declaration(stream):
     if flags.debug:
         print("Starting generating declaration")
-    end = 0
+
+    end = len(stream)
     for j in range(len(stream)):
         if stream[j].kind is lexer.STATEMENT:
             end = j
             break
-    if end == 0:
-        end = len(stream)
 
-    # declaration too short
-    if end < 3 or stream[0].kind != lexer.IDENTIFIER:
+    if end < 3:
+        raise ParseException("Declaration too short")
+
+    if not (stream[0].kind is lexer.IDENTIFIER and stream[0].value == "var"):
         raise InvalidDeclaration(str(stream[0]))
+
+    if stream[1].kind != lexer.IDENTIFIER:
+        raise InvalidDeclaration(str(stream[1]))
 
     declared_names = []
     sequ = ast.Sequence()
-    expr_begin = 1
+    expr_begin = 2
 
     ignore_type = True
 
@@ -274,7 +278,7 @@ def generate_declaration(stream):
                                   (stream[expr_begin].value == "=" and ignore_type)))):
         if (stream[expr_begin].kind is lexer.OPERATOR) and stream[expr_begin].value == ":":
             ignore_type = False
-        if expr_begin > 1 and stream[expr_begin - 2].kind != lexer.SEPARATOR:
+        if expr_begin > 2 and stream[expr_begin - 2].kind != lexer.SEPARATOR:
             raise InvalidDeclaration(str(stream[expr_begin - 2]))
         if stream[expr_begin - 1].kind is not lexer.IDENTIFIER:
             raise InvalidDeclaration(str(stream[expr_begin - 1]))
@@ -291,7 +295,7 @@ def generate_declaration(stream):
         expr_begin -= 2
 
     expr = None
-    if is_assignment(stream[expr_begin]):
+    if expr_begin < end and is_assignment(stream[expr_begin]):
         expr, _ = generate_expression(stream[expr_begin + 1:])
 
     for name in declared_names:
@@ -306,7 +310,7 @@ def generate_declaration(stream):
     if expr is not None:
         sequ.add(expr)
 
-    return sequ, end + 1
+    return sequ, end
 
 def generate_assignment(stream):
     if flags.debug:
@@ -522,6 +526,11 @@ def generate_sequence(stream):
     max = len(stream) - 1
 
     i = 0
+    def next():
+        if i < max:
+            return stream[i+1]
+        return None
+
     while i <= max:
         if flags.debug:
             print("Operating on", i, stream[i])
@@ -556,11 +565,11 @@ def generate_sequence(stream):
             elif token.value == "import":
                 raise NotImplemented()
             elif token.value == "var":
-                decl, offset = generate_declaration(stream[i+1:])
+                decl, offset = generate_declaration(stream[i:])
                 sequence.add(decl)
                 i += offset
             else:
-                if i < max and is_assignment(stream[i+1]):
+                if i < max and is_assignment(next()):
                     assgn, offset = generate_assignment(stream[i:])
                     sequence.add(assgn)
                     i += offset
