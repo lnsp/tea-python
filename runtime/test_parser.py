@@ -364,7 +364,56 @@ class TestParser(unittest.TestCase):
         pass
 
     def test_if(self):
-        pass
+        # case 1: if (null) {;}, offset 6
+        case1 = ast.Branch()
+        case1_cond = ast.Conditional()
+        case1_cond.add(ast.Literal(env.Value(env.NULL)))
+        case1_cond.add(ast.Sequence())
+        case1.add(case1_cond)
+        # case 2: if (null) {;} else {;}, offset 10
+        case2 = ast.Branch()
+        case2_cond = ast.Conditional()
+        case2_cond.add(ast.Literal(env.Value(env.NULL)))
+        case2_cond.add(ast.Sequence())
+        case2.add(case2_cond)
+        case2.add(ast.Sequence())
+        # case 3: if (null) {;} else if (null) {;}, offset 14
+        case3 = ast.Branch()
+        case3_if = ast.Conditional()
+        case3_if.add(ast.Literal(env.Value(env.NULL)))
+        case3_if.add(ast.Sequence())
+        case3_elif = ast.Branch()
+        case3_elif_cond = ast.Conditional()
+        case3_elif_cond.add(ast.Literal(env.Value(env.NULL)))
+        case3_elif_cond.add(ast.Sequence())
+        case3_elif.add(case3_elif_cond)
+        case3.add(case3_if)
+        case3.add(case3_elif)
+        # case 4: if (null) {;} else if (null) {;} else {;}, offset 18
+        case4 = ast.Branch()
+        case4_if = ast.Conditional()
+        case4_if.add(ast.Literal(env.Value(env.NULL)))
+        case4_if.add(ast.Sequence())
+        case4_elif = ast.Branch()
+        case4_elif_cond = ast.Conditional()
+        case4_elif_cond.add(ast.Literal(env.Value(env.NULL)))
+        case4_elif_cond.add(ast.Sequence())
+        case4_elif.add(case4_elif_cond)
+        case4_elif.add(ast.Sequence())
+        case4.add(case4_if)
+        case4.add(case4_elif)
+
+        cases = [
+            ("if (null) {;}", case1, 6),
+            ("if (null) {;} else {;}", case2, 10),
+            ("if (null) {;} else if (null) {;}", case3, 14),
+            ("if (null) {;} else if (null) {;} else {;}", case4, 18)
+        ]
+
+        for tc in cases:
+            output, offset = generate_if(clean_lex(tc[0]))
+            self.assertEqual(output, tc[1], "%s is not equal to %s" % (output, tc[1]))
+            self.assertEqual(offset, tc[2], "%s offset %d is not equal to %d" % (output, offset, tc[2]))
 
     def test_for(self):
         pass
