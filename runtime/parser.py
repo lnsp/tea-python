@@ -440,8 +440,6 @@ def generate_if(stream):
     # 0  1  cond  2 3  body  4
     offset = 4 + cond_len + body_len
 
-    print(len(stream), offset)
-
     if offset + 1 >= len(stream) or not (stream[offset+1].kind is lexer.IDENTIFIER and
                                      stream[offset+1].value == "else"):
         return branch_node, offset
