@@ -233,6 +233,10 @@ def generate_expression(stream):
                 pop_off_operator()
             if len(operand_stack) > 1:
                 raise InvalidExpression()
+
+            if len(operand_stack) != 1:
+                raise InvalidExpression("Empty expression")
+
             return operand_stack[0], i + 1
 
     last_token = token
@@ -243,8 +247,9 @@ def generate_expression(stream):
     if flags.debug:
         print("Operands: ", ', '.join(str(e) for e in operand_stack))
         print("Operators:", ', '.join(str(e) for e in operator_stack))
-    if len(operand_stack) > 1:
-        raise InvalidExpression()
+
+    if len(operand_stack) != 1:
+        raise InvalidExpression("Empty expression")
 
     if flags.debug:
         print("Parsed expression with length %d" % (max + 1))
@@ -393,25 +398,36 @@ def generate_function(stream):
 def generate_if(stream):
     if flags.debug:
         print("Starting generating if statement")
-    cond_start = stream[0]
+
+    cond_head = stream[0]
+    if not (cond_head.kind is lexer.IDENTIFIER and cond_head.value == "if"):
+        raise InvalidCondition()
+
+    cond_start_index = 1
+    cond_start = stream[cond_start_index]
     if cond_start.kind != lexer.LPRT:
         raise InvalidCondition()
 
-    cond_end_index = find_matching_prt(stream, 1)
-    if cond_end_index == 1:
+    cond_end_index = find_matching_prt(stream, cond_start_index + 1)
+    if cond_end_index == -1:
         raise InvalidCondition()
+
+    cond_block = stream[cond_start_index+1:cond_end_index]
+
+    if flags.debug:
+        print("if-condition: " + ' '.join(str(e) for e in cond_block))
 
     body_start_index = cond_end_index + 1
     body_start = stream[body_start_index]
 
     if body_start.kind != lexer.LBLOCK:
         raise InvalidBlock()
-    body_end_index = find_matching_block(stream, body_start_index)
 
-    if flags.debug:
-        print("If-condition: " + ' '.join(str(e) for e in stream[1:cond_end_index]))
-    condition, cond_len = generate_expression(stream[1:cond_end_index])
-    body, body_len = generate_sequence(stream[body_start_index+1:])
+    body_end_index = find_matching_block(stream, body_start_index)
+    body_block = stream[body_start_index+1:body_end_index]
+
+    condition, cond_len = generate_expression(cond_block)
+    body, body_len = generate_sequence(body_block)
     body.substitute = True
 
     branch_node = ast.Branch()
@@ -420,30 +436,44 @@ def generate_if(stream):
     cond_node.add(body)
     branch_node.add(cond_node)
 
-    after_if = 4 + cond_len + body_len
-    if len(stream) <= after_if:
-        return branch_node, after_if
+    # if (  ....  ) {  ....  }
+    # 0  1  cond  2 3  body  4
+    offset = 4 + cond_len + body_len
 
-    if stream[after_if].kind is not lexer.IDENTIFIER or stream[after_if].value != "else":
-        return branch_node, after_if
+    print(len(stream), offset)
+
+    if offset + 1 >= len(stream) or not (stream[offset+1].kind is lexer.IDENTIFIER and
+                                     stream[offset+1].value == "else"):
+        return branch_node, offset
 
     if flags.debug:
-        print("Going for possible else")
+        print("Possible else (if) at", str(stream[offset+1]))
 
-    # check for else_if
-    if stream[after_if+1].kind is lexer.IDENTIFIER and stream[after_if+1].value == "if":
+    # else if? (offset+2 == 'if')
+    if stream[offset+2].kind is lexer.IDENTIFIER and stream[offset+2].value == "if":
         if flags.debug:
-            print("Found else-if")
-        elif_node, elif_len = generate_if(stream[after_if+2:])
+            print("Parsing else-if at token", offset + 2)
+
+        elif_node, elif_len = generate_if(stream[offset+2:])
         branch_node.add(elif_node)
-        return branch_node, 2 + after_if + elif_len
+        # ...... else .......
+        # offset 1    elif_len
+        offset += elif_len + 2
+
+    # guaranteed to be else
     else:
         if flags.debug:
-            print("Found else starting with " + ' '.join(str(e) for e in stream[after_if+2:]))
-        else_body, else_body_len = generate_sequence(stream[after_if+2:])
+            print("Parsing else at token", offset + 2)
+
+        else_body, else_len = generate_sequence(stream[offset+3:])
         else_body.substitute = True
         branch_node.add(else_body)
-        return branch_node, 3 + after_if + else_body_len
+
+        # ...... else { ........ }
+        # offset 1    2 else_len 3
+        offset += else_len + 3
+
+    return branch_node, offset
 
 def generate_for(stream):
     if flags.debug:
@@ -565,7 +595,7 @@ def generate_sequence(stream):
                 sequence.add(while_node)
                 i += offset
             elif token.value == "if":
-                if_node, offset = generate_if(stream[i+1:])
+                if_node, offset = generate_if(stream[i:])
                 sequence.add(if_node)
                 i += offset
             elif token.value == "for":
