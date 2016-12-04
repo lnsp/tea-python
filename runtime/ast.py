@@ -115,6 +115,8 @@ class Branch(Node):
             result = self.children[0].eval(context)
             if result != False:
                 return result
+            else:
+                return env.Value(env.NULL)
 
 
 
