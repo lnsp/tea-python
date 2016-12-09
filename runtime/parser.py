@@ -137,6 +137,9 @@ def generate_expression(stream):
     token = None
 
     def pop_off_operator():
+        if len(operator_stack) < 1:
+            raise ParseException("Empty operator stack, could not pop off operator")
+
         operator = operator_stack.pop()
         if flags.debug:
             print("popping of", operator)
@@ -223,6 +226,9 @@ def generate_expression(stream):
         elif token.kind == lexer.RPRT:
             while len(operator_stack) > 0 and operator_stack[-1] != "(":
                 pop_off_operator()
+
+            if len(operator_stack) < 1:
+                raise ParseException("Mismatched parentheses")
 
             operator_stack.pop()
 
