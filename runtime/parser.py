@@ -24,6 +24,10 @@ class NotImplemented(ParseException):
     def __init__(self, msg="Functionality not implemented"):
         super().__init__(msg)
 
+class InvalidStatement(ParseException):
+    def __init__(self, msg):
+        super().__init__("Invalid statement: Unexpected %s" % str(msg))
+
 class InvalidDeclaration(ParseException):
     def __init__(self, msg):
         super().__init__("Invalid declaration: Unexpected %s" % str(msg))
@@ -134,9 +138,13 @@ def generate_expression(stream):
 
     def pop_off_operator():
         operator = operator_stack.pop()
+        if flags.debug:
+            print("popping of", operator)
+
         arg_count = operator.tag("arg_count")
         if len(operand_stack) < arg_count:
             raise MissingOperand(operator.symbol)
+
         for j in range(arg_count):
             operator.add_front(operand_stack.pop())
         operand_stack.append(operator)
@@ -215,6 +223,7 @@ def generate_expression(stream):
         elif token.kind == lexer.RPRT:
             while len(operator_stack) > 0 and operator_stack[-1] != "(":
                 pop_off_operator()
+
             operator_stack.pop()
 
             if len(operator_stack) > 0 and type(operator_stack[-1]) is ast.Call:
@@ -224,10 +233,10 @@ def generate_expression(stream):
                 operand_stack.pop()
                 operand_stack.append(function)
             else:
-                i = len(operand_stack) - 1
-                while i >= 0 and operand_stack[i] != "(":
-                    i -= 1
-                del operand_stack[i]
+                j = len(operand_stack) - 1
+                while j >= 0 and operand_stack[j] != "(":
+                    j -= 1
+                del operand_stack[j]
         elif token.kind == lexer.STATEMENT:
             while len(operator_stack) > 0:
                 pop_off_operator()
@@ -237,7 +246,7 @@ def generate_expression(stream):
             if len(operand_stack) != 1:
                 raise InvalidExpression("Empty expression")
 
-            return operand_stack[0], i + 1
+            return operand_stack[0], i
 
     last_token = token
 
@@ -557,6 +566,7 @@ def generate_while(stream):
 def generate_sequence(stream):
     if flags.debug:
         print("Starting generating sequence")
+        print("Generating on", stream)
     sequence = ast.Sequence()
     stack = []
     queue = []
@@ -614,8 +624,8 @@ def generate_sequence(stream):
                 else:
                     expr, offset = generate_expression(stream[i:])
                     sequence.add(expr)
-                    i += offset
-        elif token.kind == lexer.NUMBER or token.kind == lexer.STRING or token.kind == lexer.OPERATOR:
+                    i += offset - 1
+        elif token.kind in [lexer.NUMBER, lexer.STRING, lexer.OPERATOR, lexer.LPRT]:
             expr, offset = generate_expression(stream[i:])
             sequence.add(expr)
             i += offset
@@ -623,10 +633,14 @@ def generate_sequence(stream):
             sequ, offset = generate_sequence(stream[i+1:])
             i += offset + 1
             sequence.add(sequ)
+        elif token.kind == lexer.STATEMENT:
+            pass
         elif token.kind == lexer.RBLOCK:
+            if flags.debug:
+                print("Stopping generating sequence")
             return sequence, i
-        if flags.debug:
-            print("Tree view:", sequence)
+        else:
+            raise InvalidStatement(stream[i])
         i += 1
     return sequence, i
 
