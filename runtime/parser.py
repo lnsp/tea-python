@@ -491,24 +491,30 @@ def generate_if(stream):
 def generate_for(stream):
     if flags.debug:
         print("Starting generating for statement")
-    head_start = stream[0]
+
+    for_ident = stream[0]
+    if not (for_ident.kind is lexer.IDENTIFIER and for_ident.value == "for"):
+        raise InvalidCondition()
+
+    cond_start = 2
+    head_start = stream[cond_start - 1]
     if head_start.kind is not lexer.LPRT:
         raise InvalidCondition()
 
-    head_end_index = find_matching_prt(stream, 1)
+    head_end_index = find_matching_prt(stream, cond_start)
     if head_end_index == -1:
         raise InvalidCondition()
 
     # find first ;
-    init_end_index = 1
+    init_end_index = cond_start
     for j in range(len(stream)):
         if stream[j].kind is lexer.STATEMENT:
             init_end_index = j
             break
 
-    init_stmt, init_len = generate_sequence(stream[1:init_end_index+1])
-    cond_expr, cond_len = generate_expression(stream[1 + init_len:head_end_index])
-    iter_stmt, iter_len = generate_sequence(stream[1 + init_len + cond_len:head_end_index])
+    init_stmt, init_len = generate_sequence(stream[cond_start:init_end_index+1])
+    cond_expr, cond_len = generate_expression(stream[cond_start + init_len:head_end_index])
+    iter_stmt, iter_len = generate_sequence(stream[cond_start + init_len + cond_len:head_end_index])
 
     body_start_index = head_end_index + 1
     body_start = stream[body_start_index]
@@ -531,7 +537,7 @@ def generate_for(stream):
     sequ.add(init_stmt)
     sequ.add(loop)
 
-    return sequ, 3 + init_len + cond_len + iter_len + body_len
+    return sequ, 4 + init_len + cond_len + iter_len + body_len
 
 
 def generate_while(stream):
@@ -613,7 +619,7 @@ def generate_sequence(stream):
                 sequence.add(if_node)
                 i += offset
             elif token.value == "for":
-                for_node, offset = generate_for(stream[i+1:])
+                for_node, offset = generate_for(stream[i:])
                 sequence.add(for_node)
                 i += offset
             elif token.value == "import":
