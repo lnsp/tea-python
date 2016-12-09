@@ -1,19 +1,16 @@
-import std.io;
-
-func add(a: int, b: int): int {
-    return a + b;
+func add(a: int, b: int) {
+	return a + b;
 }
 
-func main() {
-    var n = null;
-    var a: int = 3, b: int = 4;
-    var c = (a + b): int; // explicit type interference
-    var d = (a + b); // implicit type interference
-    var e: int = a + b; // explicit conversion by type declaration
-    
-    if (add(a, b) == c) {
-        io.println("Found a match!");
-    } else {
-        io.println("a != b");
-    }
+var n = null;
+var a: int = 3;
+var b: int = 4;
+var c = (a + b): int;
+var d = (a + b);
+var e: int = a + b;
+
+if (add(a, b) == c) {
+	print("Found a match!");
+} else {
+	print("a != b");
 }
