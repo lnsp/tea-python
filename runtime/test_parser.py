@@ -426,7 +426,80 @@ class TestParser(unittest.TestCase):
             self.assertRaises(tc[1], generate_if, tokens)
 
     def test_for(self):
-        pass
+        # case 1: for (var a: int = 0; a < 100; a += 1) {;}, offset 18
+        case1 = ast.Sequence()
+        case1_init, _ = generate_declaration(clean_lex("var a: int = 0"))
+        case1_init_base = ast.Sequence()
+        case1_init_base.add(case1_init)
+        case1.add(case1_init_base)
+
+        case1_cond, _ = generate_expression(clean_lex("a < 100"))
+        case1_iter, _ = generate_sequence(clean_lex("a += 1"))
+        case1_body = ast.Sequence()
+        case1_body.add(ast.Sequence())
+        case1_body.add(case1_iter)
+
+        case1_loop = ast.Loop()
+        case1_loop.add(case1_cond)
+        case1_loop.add(case1_body)
+
+        case1.add(case1_loop)
+
+        # case 2: for (a = 0; true; ) {;}, offset 11
+        case2 = ast.Sequence()
+        case2_init, _ = generate_assignment(clean_lex("a = 0"))
+        case2_init_base = ast.Sequence()
+        case2_init_base.add(case2_init)
+        case2.add(case2_init_base)
+
+        case2_cond, _ = generate_expression(clean_lex("true"))
+        case2_iter = ast.Sequence()
+        case2_body = ast.Sequence()
+
+        case2_body.add(ast.Sequence())
+        case2_body.add(case2_iter)
+
+        case2_loop = ast.Loop()
+        case2_loop.add(case2_cond)
+        case2_loop.add(case2_body)
+
+        case2.add(case2_loop)
+        # case 3: for (; true; ) {;}, 8
+        case3 = ast.Sequence()
+        case3_init = ast.Sequence()
+        case3.add(case3_init)
+
+        case3_cond, _ = generate_expression(clean_lex("true"))
+        case3_body = ast.Sequence()
+        case3_body.add(ast.Sequence())
+        case3_body.add(ast.Sequence())
+
+        case3_loop = ast.Loop()
+        case3_loop.add(case3_cond)
+        case3_loop.add(case3_body)
+        case3.add(case3_loop)
+
+        cases = [
+            ("for (var a: int = 0; a < 100; a += 1) {;}", case1, 19),
+            ("for (a = 0; true; ) {;}", case2, 11),
+            ("for (; true; ) {;}", case3, 8),
+        ]
+
+        for tc in cases:
+            output, offset = generate_for(clean_lex(tc[0]))
+            self.assertEqual(output, tc[1], "%s is not equal to %s" % (output, tc[1]))
+            self.assertEqual(offset, tc[2], "%s offset %d is not equal to %d" % (output, offset, tc[2]))
+
+        error_cases = [
+            ("for ; true; a < 100; {;}", ParseException),
+            ("for (true) {;}", ParseException),
+            ("true;", ParseException),
+            ("for {true; ; } (false);", ParseException),
+        ]
+
+        for tc in error_cases:
+            self.assertRaises(tc[1], generate_for, clean_lex(tc[0]))
+
 
     def test_while(self):
         # case 1: while (null) {}
