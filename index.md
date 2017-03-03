@@ -1,4 +1,4 @@
-# ![Tea](https://cloud.githubusercontent.com/assets/3391295/14614369/372907fa-05a1-11e6-8272-956c2cc447cb.png)
+# ![Tea](https://cloud.githubusercontent.com/assets/3391295/23532925/c1c217d2-ffae-11e6-8f4d-2ffe792f82f7.png)
 
 [![Build Status](https://travis-ci.org/TeaLang/tea.svg?branch=master)](https://travis-ci.org/TeaLang/tea)
 
