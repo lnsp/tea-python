@@ -1,6 +1,0 @@
-{
-  "name": "Tea",
-  "tagline": "A programming language governed by KISS principles.",
-  "body": "# ![Tea](https://cloud.githubusercontent.com/assets/3391295/14614369/372907fa-05a1-11e6-8272-956c2cc447cb.png)\r\n\r\n[![Build Status](https://travis-ci.org/TeaLang/tea.svg?branch=master)](https://travis-ci.org/TeaLang/tea)\r\n\r\nCode written in Tea is simple and small, even Tea itself is short (less than 3000 lines of code).\r\nIt was crafted for reading, extending and maintaining.\r\n\r\n## How about a little taste of Tea?\r\n```tea\r\n// tasty.tea\r\nimport std.io;\r\n\r\nfunc greet(greeting, name: string): string {\r\n    return \"%s, %s!\" % [greeting, name];\r\n}\r\n\r\nio.println(\"You called\", args.join(\",\"));\r\nio.print(\"Please enter your name: \");\r\nvar name: string = io.readln();\r\n\r\nif (length(trim(name)) == 0) {\r\n    io.println(\"Ok, I won't greet you :(\");\r\n} else {\r\n    io.print(\"How many times? \");\r\n    var times: int = io.readln();\r\n    \r\n    for (i: int = 0; i < times; i += 1) {\r\n        print(greet(\"Hello\", name));\r\n    }\r\n}\r\n```\r\n",
-  "note": "Don't delete this file! It's used internally to help with page regeneration."
-}
