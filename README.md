@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/TeaLang/tea.svg?branch=master)](https://travis-ci.org/TeaLang/tea)
 
-**Careful! This project is deprecated and no longer developed. Refer to the Go implementation for a more recent version.**
+**Careful! This project is deprecated and no longer in development. Refer to the Go implementation for a more recent version.**
 
 Code written in Tea is simple and small, even Tea itself is short (less than 3000 lines of code).
 It was crafted for reading, extending and maintaining.
